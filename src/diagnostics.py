@@ -20,6 +20,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 
 from src.loader import encode_responses, identify_missingness, load_data, parse_question_columns
+from src.similarity import compute_spearman_matrix, row_centre
 
 FIGURES_DIR = Path("figures")
 RAW_CSV = Path("data/Survey_Results_UC.csv")
@@ -29,6 +30,8 @@ PRESENT_COLOR = "#EDEFF2"
 MISSING_COLOR = "#2B3A55"
 CUTOFF_COLOR = "#E4572E"
 HIST_COLOR = "#1B998B"
+RAW_CORR_COLOR = "#E4572E"
+CENTRED_CORR_COLOR = "#1B998B"
 
 BLOCK_COLORS = {"T": "#2E86AB", "E": "#7B9E4A", "S": "#8E5EA2", "V": "#D17A22"}
 BLOCK_NAMES = {"T": "Technology", "E": "Education", "S": "Society/Ethics", "V": "Environment"}
@@ -181,6 +184,69 @@ def plot_item_variance_ranking(
     }
 
 
+def plot_row_centring_effect(
+    output_path: Path = FIGURES_DIR / "graph3_row_centring_effect.png",
+    imputed_csv: Path = IMPUTED_CSV,
+    min_pairwise_n: int = 50,
+    n_bins: int = 40,
+) -> Dict[str, object]:
+    """Overlaid distributions of all 1,770 pairwise item correlations,
+    raw vs. row-centred, on identical bin edges (see module pitfall notes:
+    different bins per curve would make the visual comparison misleading).
+    """
+    imputed_df = pd.read_csv(imputed_csv)
+    question_cols, question_codes, _ = parse_question_columns(imputed_df)
+    item_df = imputed_df[question_cols].copy()
+    item_df.columns = [question_codes[col] for col in question_cols]
+    centred_df = row_centre(item_df)
+
+    raw_corr, _, _ = compute_spearman_matrix(item_df, min_pairwise_n)
+    centred_corr, _, _ = compute_spearman_matrix(centred_df, min_pairwise_n)
+
+    n = len(raw_corr)
+    iu = np.triu_indices(n, k=1)
+    raw_values = raw_corr.to_numpy()[iu]
+    centred_values = centred_corr.to_numpy()[iu]
+    assert len(raw_values) == n * (n - 1) // 2 == 1770
+
+    raw_mean = float(np.mean(raw_values))
+    centred_mean = float(np.mean(centred_values))
+
+    combined_min = min(raw_values.min(), centred_values.min())
+    combined_max = max(raw_values.max(), centred_values.max())
+    bin_edges = np.linspace(combined_min, combined_max, n_bins + 1)
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.hist(raw_values, bins=bin_edges, density=True, color=RAW_CORR_COLOR, alpha=0.55,
+            label=f"Raw (mean r = {raw_mean:.3f})", edgecolor="white")
+    ax.hist(centred_values, bins=bin_edges, density=True, color=CENTRED_CORR_COLOR, alpha=0.55,
+            label=f"Row-centred (mean r = {centred_mean:.3f})", edgecolor="white")
+    ax.axvline(raw_mean, color=RAW_CORR_COLOR, linewidth=2.0, linestyle="--")
+    ax.axvline(centred_mean, color=CENTRED_CORR_COLOR, linewidth=2.0, linestyle="--")
+    ax.axvline(0.0, color="#888888", linewidth=1.0, linestyle=":")
+    ax.set_xlabel("Pairwise item Spearman correlation (upper triangle, 1,770 pairs)")
+    ax.set_ylabel("Density")
+    ax.set_title("Row-centring effect on the item-item correlation distribution")
+    ax.legend(loc="upper right", frameon=True)
+
+    plt.tight_layout()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+    return {
+        "n_pairs": len(raw_values),
+        "raw_mean": raw_mean,
+        "raw_median": float(np.median(raw_values)),
+        "raw_skew": float(pd.Series(raw_values).skew()),
+        "centred_mean": centred_mean,
+        "centred_median": float(np.median(centred_values)),
+        "centred_skew": float(pd.Series(centred_values).skew()),
+        "output_path": str(output_path),
+    }
+
+
 if __name__ == "__main__":
     stats = plot_missingness_and_response_distribution()
     for key, value in stats.items():
@@ -188,4 +254,8 @@ if __name__ == "__main__":
     print()
     stats2 = plot_item_variance_ranking()
     for key, value in stats2.items():
+        print(f"{key}: {value}")
+    print()
+    stats3 = plot_row_centring_effect()
+    for key, value in stats3.items():
         print(f"{key}: {value}")
