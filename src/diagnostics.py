@@ -1,10 +1,11 @@
 """Diagnostic figures documenting preprocessing decisions.
 
-These figures characterise the raw dataset (missingness structure, item
+These figures characterise the dataset (missingness structure, item
 variance, the effect of row-centring) so that decisions made or rejected in
-the main pipeline (src/pipeline.py) are demonstrated, not just asserted. They
-operate directly on the raw 96-respondent CSV and do not depend on the
-ordinal-regression imputation pipeline.
+the main pipeline (src/pipeline.py) are demonstrated, not just asserted.
+Graph 1 operates on the raw 96-respondent CSV directly; Graph 2 reads the
+already-imputed 91-respondent matrix produced by src/pipeline.py, since item
+variance is a property of the analysis-ready data, not the raw file.
 """
 
 from __future__ import annotations
@@ -16,16 +17,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import ListedColormap
+from matplotlib.patches import Patch
 
 from src.loader import encode_responses, identify_missingness, load_data, parse_question_columns
 
 FIGURES_DIR = Path("figures")
 RAW_CSV = Path("data/Survey_Results_UC.csv")
+IMPUTED_CSV = Path("outputs/sanitised_data/dataset_imputed.csv")
 
 PRESENT_COLOR = "#EDEFF2"
 MISSING_COLOR = "#2B3A55"
 CUTOFF_COLOR = "#E4572E"
 HIST_COLOR = "#1B998B"
+
+BLOCK_COLORS = {"T": "#2E86AB", "E": "#7B9E4A", "S": "#8E5EA2", "V": "#D17A22"}
+BLOCK_NAMES = {"T": "Technology", "E": "Education", "S": "Society/Ethics", "V": "Environment"}
 
 
 def _load_raw_encoded() -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -118,7 +124,68 @@ def plot_missingness_and_response_distribution(
     }
 
 
+def plot_item_variance_ranking(
+    output_path: Path = FIGURES_DIR / "graph2_item_variance_ranking.png",
+    imputed_csv: Path = IMPUTED_CSV,
+) -> Dict[str, object]:
+    """Standard deviation per item on the encoded, UNCENTRED matrix.
+
+    Uses the already-imputed 91-respondent matrix (ordinal regression fill,
+    src/imputation.py), not the raw file with missing cells and not the
+    row-centred matrix -- row-centring changes item variances and would
+    answer a different question ("how spread out is this item after removing
+    each respondent's baseline") than the one this graph asks ("how divided
+    is the class on this item").
+    """
+    imputed_df = pd.read_csv(imputed_csv)
+    question_cols, question_codes, _ = parse_question_columns(imputed_df)
+    item_df = imputed_df[question_cols].copy()
+    item_df.columns = [question_codes[col] for col in question_cols]
+
+    sds = item_df.std(axis=0, ddof=1).sort_values(ascending=False)
+    blocks = [code[0] for code in sds.index]
+    colors = [BLOCK_COLORS[b] for b in blocks]
+
+    fig, ax = plt.subplots(figsize=(8, 14))
+    y_pos = np.arange(len(sds))
+    ax.barh(y_pos, sds.to_numpy(), color=colors)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(sds.index, fontsize=7)
+    ax.invert_yaxis()  # highest SD (most contested) at top
+    ax.set_xlabel("Standard deviation (encoded, uncentred, 91 respondents)")
+    ax.set_title("Item variance ranking: contested (top) to consensus (bottom)")
+    ax.legend(
+        handles=[Patch(facecolor=color, label=BLOCK_NAMES[b]) for b, color in BLOCK_COLORS.items()],
+        loc="lower right",
+        frameon=True,
+    )
+
+    plt.tight_layout()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+    block_mean_sd = {BLOCK_NAMES[b]: float(item_df[[c for c in sds.index if c[0] == b]].std(axis=0, ddof=1).mean()) for b in BLOCK_COLORS}
+
+    return {
+        "n_items": len(sds),
+        "min_sd": float(sds.min()),
+        "min_sd_item": sds.idxmin(),
+        "max_sd": float(sds.max()),
+        "max_sd_item": sds.idxmax(),
+        "top5_contested": list(sds.index[:5]),
+        "bottom5_consensus": list(sds.index[-5:]),
+        "block_mean_sd": block_mean_sd,
+        "output_path": str(output_path),
+    }
+
+
 if __name__ == "__main__":
     stats = plot_missingness_and_response_distribution()
     for key, value in stats.items():
+        print(f"{key}: {value}")
+    print()
+    stats2 = plot_item_variance_ranking()
+    for key, value in stats2.items():
         print(f"{key}: {value}")
