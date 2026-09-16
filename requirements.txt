@@ -1,0 +1,11 @@
+pandas
+numpy
+scipy
+networkx
+matplotlib
+scikit-learn
+statsmodels
+joblib
+nbformat
+nbclient
+ipykernel
