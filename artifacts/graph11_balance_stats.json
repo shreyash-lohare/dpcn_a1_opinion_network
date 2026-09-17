@@ -1,0 +1,465 @@
+{
+  "operating_threshold": 0.22,
+  "sweep": [
+    {
+      "threshold": 0.05,
+      "total_triads": 12960,
+      "balanced_triads": 10203,
+      "unbalanced_triads": 2757,
+      "balanced_fraction": 0.7872685185185185,
+      "null_mean": 0.499770987654321,
+      "null_sd": 0.004383216565449622,
+      "z": 65.59053758155036
+    },
+    {
+      "threshold": 0.060000000000000005,
+      "total_triads": 9854,
+      "balanced_triads": 8182,
+      "unbalanced_triads": 1672,
+      "balanced_fraction": 0.8303227115892023,
+      "null_mean": 0.5000696163994317,
+      "null_sd": 0.004994587322733402,
+      "z": 66.12219866225747
+    },
+    {
+      "threshold": 0.07,
+      "total_triads": 7816,
+      "balanced_triads": 6740,
+      "unbalanced_triads": 1076,
+      "balanced_fraction": 0.8623336745138178,
+      "null_mean": 0.4999219549641761,
+      "null_sd": 0.005501350314816157,
+      "z": 65.8768663710798
+    },
+    {
+      "threshold": 0.08000000000000002,
+      "total_triads": 6211,
+      "balanced_triads": 5535,
+      "unbalanced_triads": 676,
+      "balanced_fraction": 0.8911608436644662,
+      "null_mean": 0.49973144421188215,
+      "null_sd": 0.00664615051970545,
+      "z": 58.89565671015405
+    },
+    {
+      "threshold": 0.09000000000000001,
+      "total_triads": 4844,
+      "balanced_triads": 4465,
+      "unbalanced_triads": 379,
+      "balanced_fraction": 0.9217588769611891,
+      "null_mean": 0.5000165152766308,
+      "null_sd": 0.006791066274331099,
+      "z": 62.102524794767774
+    },
+    {
+      "threshold": 0.1,
+      "total_triads": 3927,
+      "balanced_triads": 3692,
+      "unbalanced_triads": 235,
+      "balanced_fraction": 0.940157881334352,
+      "null_mean": 0.4999383753501401,
+      "null_sd": 0.008103855990682814,
+      "z": 54.32222715832342
+    },
+    {
+      "threshold": 0.11000000000000001,
+      "total_triads": 3026,
+      "balanced_triads": 2903,
+      "unbalanced_triads": 123,
+      "balanced_fraction": 0.9593522802379378,
+      "null_mean": 0.5001685393258427,
+      "null_sd": 0.008921761986571027,
+      "z": 51.467831309920086
+    },
+    {
+      "threshold": 0.12000000000000001,
+      "total_triads": 2249,
+      "balanced_triads": 2185,
+      "unbalanced_triads": 64,
+      "balanced_fraction": 0.9715429079590929,
+      "null_mean": 0.49972787905735877,
+      "null_sd": 0.010450813180286879,
+      "z": 45.14625041730797
+    },
+    {
+      "threshold": 0.13,
+      "total_triads": 1777,
+      "balanced_triads": 1748,
+      "unbalanced_triads": 29,
+      "balanced_fraction": 0.983680360157569,
+      "null_mean": 0.4998255486775464,
+      "null_sd": 0.011931825605724531,
+      "z": 40.5516161121131
+    },
+    {
+      "threshold": 0.14,
+      "total_triads": 1359,
+      "balanced_triads": 1343,
+      "unbalanced_triads": 16,
+      "balanced_fraction": 0.9882266372332598,
+      "null_mean": 0.5000044150110375,
+      "null_sd": 0.013395935680233005,
+      "z": 36.44554840186649
+    },
+    {
+      "threshold": 0.15000000000000002,
+      "total_triads": 983,
+      "balanced_triads": 974,
+      "unbalanced_triads": 9,
+      "balanced_fraction": 0.9908443540183113,
+      "null_mean": 0.499940996948118,
+      "null_sd": 0.014603991792735669,
+      "z": 33.614327098867506
+    },
+    {
+      "threshold": 0.16000000000000003,
+      "total_triads": 771,
+      "balanced_triads": 767,
+      "unbalanced_triads": 4,
+      "balanced_fraction": 0.9948119325551232,
+      "null_mean": 0.5010142671854734,
+      "null_sd": 0.01749783335082389,
+      "z": 28.220503388575203
+    },
+    {
+      "threshold": 0.17000000000000004,
+      "total_triads": 581,
+      "balanced_triads": 579,
+      "unbalanced_triads": 2,
+      "balanced_fraction": 0.9965576592082617,
+      "null_mean": 0.49981411359724615,
+      "null_sd": 0.0214325772278221,
+      "z": 23.17703280994979
+    },
+    {
+      "threshold": 0.18000000000000005,
+      "total_triads": 436,
+      "balanced_triads": 435,
+      "unbalanced_triads": 1,
+      "balanced_fraction": 0.9977064220183486,
+      "null_mean": 0.5017155963302753,
+      "null_sd": 0.02409865022062947,
+      "z": 20.581684913766832
+    },
+    {
+      "threshold": 0.19,
+      "total_triads": 291,
+      "balanced_triads": 290,
+      "unbalanced_triads": 1,
+      "balanced_fraction": 0.9965635738831615,
+      "null_mean": 0.5004742268041238,
+      "null_sd": 0.029007479833673265,
+      "z": 17.102118140685686
+    },
+    {
+      "threshold": 0.2,
+      "total_triads": 204,
+      "balanced_triads": 203,
+      "unbalanced_triads": 1,
+      "balanced_fraction": 0.9950980392156863,
+      "null_mean": 0.5005686274509804,
+      "null_sd": 0.035762481248796885,
+      "z": 13.828162769923654
+    },
+    {
+      "threshold": 0.21000000000000002,
+      "total_triads": 151,
+      "balanced_triads": 150,
+      "unbalanced_triads": 1,
+      "balanced_fraction": 0.9933774834437086,
+      "null_mean": 0.5018145695364239,
+      "null_sd": 0.03961265956998172,
+      "z": 12.409237835668792
+    },
+    {
+      "threshold": 0.22000000000000003,
+      "total_triads": 98,
+      "balanced_triads": 98,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.4960612244897959,
+      "null_sd": 0.04912325307903937,
+      "z": 10.258660490162693
+    },
+    {
+      "threshold": 0.23000000000000004,
+      "total_triads": 61,
+      "balanced_triads": 61,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.5015081967213115,
+      "null_sd": 0.06186655898535194,
+      "z": 8.057532396406849
+    },
+    {
+      "threshold": 0.24000000000000005,
+      "total_triads": 33,
+      "balanced_triads": 33,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.49890909090909086,
+      "null_sd": 0.08675931790708824,
+      "z": 5.77564371388367
+    },
+    {
+      "threshold": 0.25000000000000006,
+      "total_triads": 19,
+      "balanced_triads": 19,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.49105263157894735,
+      "null_sd": 0.11529436485485384,
+      "z": 4.414329954996289
+    },
+    {
+      "threshold": 0.26000000000000006,
+      "total_triads": 14,
+      "balanced_triads": 14,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.498,
+      "null_sd": 0.136623515659959,
+      "z": 3.674330861529161
+    },
+    {
+      "threshold": 0.27,
+      "total_triads": 9,
+      "balanced_triads": 9,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.5099999999999999,
+      "null_sd": 0.16638438204020894,
+      "z": 2.9449879489385324
+    },
+    {
+      "threshold": 0.28,
+      "total_triads": 7,
+      "balanced_triads": 7,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.5005714285714286,
+      "null_sd": 0.18981812079150603,
+      "z": 2.631090063193376
+    },
+    {
+      "threshold": 0.29000000000000004,
+      "total_triads": 6,
+      "balanced_triads": 6,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.49733333333333324,
+      "null_sd": 0.21153972124138135,
+      "z": 2.376228273899868
+    },
+    {
+      "threshold": 0.30000000000000004,
+      "total_triads": 4,
+      "balanced_triads": 4,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": 0.538,
+      "null_sd": 0.23593926055097036,
+      "z": 1.9581310839117143
+    },
+    {
+      "threshold": 0.31000000000000005,
+      "total_triads": 2,
+      "balanced_triads": 2,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.32000000000000006,
+      "total_triads": 2,
+      "balanced_triads": 2,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.33,
+      "total_triads": 2,
+      "balanced_triads": 2,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.34,
+      "total_triads": 1,
+      "balanced_triads": 1,
+      "unbalanced_triads": 0,
+      "balanced_fraction": 1.0,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.35000000000000003,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.36000000000000004,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.37000000000000005,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.38000000000000006,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.39000000000000007,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.4000000000000001,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.4100000000000001,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.42000000000000004,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.43000000000000005,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.44000000000000006,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.45000000000000007,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.4600000000000001,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.4700000000000001,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.4800000000000001,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.49000000000000005,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    },
+    {
+      "threshold": 0.5000000000000001,
+      "total_triads": 0,
+      "balanced_triads": 0,
+      "unbalanced_triads": 0,
+      "balanced_fraction": NaN,
+      "null_mean": NaN,
+      "null_sd": NaN,
+      "z": NaN
+    }
+  ]
+}
