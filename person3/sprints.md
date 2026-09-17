@@ -31,6 +31,19 @@
 
 **Goal:** get the branch, verify artifacts exist, confirm environment works.
 
+## Sprint Plan (Person 3)
+
+| Sprint | Task | Status | Notes / Output |
+| :--- | :--- | :--- | :--- |
+| **S0** | **Setup & Orientation** | [x] | Created `src/person3/`, updated `FIGDIR_P3` config, validated artifacts. |
+| **S1** | **Graph 10: Communities vs Nulls** | [x] | Implemented Louvain on item network, ran permutation/rewiring/ER nulls, computed NMI vs topic blocks. Saved to `graph_10.py` and `graph10_communities.json`. |
+| **S2** | **Graph 11: Structural Balance** | [x] | Computed balanced triads fraction against sign-permutation null. Saved to `graph_11.py` and `graph11_balance_stats.json`. |
+| **S3** | **Graph 6: Reordered Heatmap** | [x] | Plotted MP-denoised correlations ordered by Graph 10 communities. Diverging map + block border strips. Saved to `graph_6.py`. |
+| **S4** | **Exploration Notebook** | [x] | Created `notebooks/person3_exploration.ipynb` referencing P3 modules and showing figures/stats inline. |
+| **S5** | **Pipeline Integration** | [x] | Replaced `_p3_pending()` in `run_all.py` with the 3 distinct Graph 6, 10, 11 stages. All runs pass. |
+| **S6** | **Report Writing** | [x] | Replaced P3 `\todoblock`s in `report/report.tex` with analysis for G6, G10, G11, Discussion, Conclusion, and Individual Contribution. |
+| **S7** | **Final Polish & PR** | [ ] | (User instructed to skip this sprint) |
+
 | # | Task | Notes |
 |---|---|---|
 | 0.1 | Checkout `person3-work` branch (or create it) | `git checkout -b person3-work` from latest main |
