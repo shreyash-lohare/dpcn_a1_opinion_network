@@ -31,6 +31,7 @@ ARTIFACTS = ROOT / "artifacts"
 ARTEFACT_OWNER = {
     "outputs/sanitised_data/dataset_imputed.csv": "P1 (src/pipeline.py, stage 1)",
     "outputs/sanitised_data/row_centred_data.csv": "P1 (src/pipeline.py, stage 1)",
+    "outputs/block_connectivity/block_means_centred.csv": "P1 (src/block_connectivity.py)",
     "artifacts/chance_edges_by_threshold.csv": "P2 (src/person2/graph_4.py, stage 3)",
     "artifacts/null_replicates.npz": "P2 (src/person2/graph_4.py, stage 3)",
     "artifacts/corr_raw.npy": "P2 (src/person2/graph_5.py, stage 4)",
@@ -78,6 +79,12 @@ def _p1_diagnostics():
     plot_missingness_and_response_distribution()
     plot_item_variance_ranking()
     plot_row_centring_effect()
+
+
+def _p1_graph_9():
+    from src.block_connectivity import plot_block_connectivity
+
+    return plot_block_connectivity()
 
 
 def _p1_graph_12():
@@ -132,6 +139,9 @@ STAGES: List[Stage] = [
                     "outputs/sanitised_data/row_centred_data.csv"]),
     Stage("P1", "Graphs 1-3 (missingness, item variance, centring effect)", _p1_diagnostics,
           requires=["outputs/sanitised_data/dataset_imputed.csv"]),
+    Stage("P1", "Graph 9: topic-block connectivity (4x4)", _p1_graph_9,
+          requires=["outputs/sanitised_data/dataset_imputed.csv"],
+          produces=["outputs/block_connectivity/block_means_centred.csv"]),
     Stage("P1", "Graph 12: Deffuant-Weisbuch opinion dynamics", _p1_graph_12,
           requires=["outputs/sanitised_data/row_centred_data.csv",
                     "outputs/sanitised_data/dataset_imputed.csv"]),
