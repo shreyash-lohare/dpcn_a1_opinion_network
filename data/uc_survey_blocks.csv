@@ -1,0 +1,5 @@
+key,name,n_answers,mean,sd,pct_agree,pct_disagree,pct_neutral,cronbach_alpha
+T,Technology & AI,1354,3.987,0.987,74.0,8.1,17.9,0.649
+E,Education,1297,3.909,1.148,70.2,13.8,16.0,0.579
+S,Society & Ethics,1292,4.283,0.838,86.0,3.7,10.3,0.824
+V,Environment,1275,4.385,0.755,89.5,2.4,8.2,0.868

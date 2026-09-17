@@ -1,0 +1,69 @@
+% =====================================================================
+%  STAND-IN ONLY -- NOT THE OFFICIAL ICML 2025 STYLE FILE
+% =====================================================================
+%  This file exists so report.tex compiles and can be proof-read locally.
+%  It reproduces ICML's page geometry (10pt, two columns, ~6.75in x 9.0in
+%  text block, 0.25in gutter) so the page count is representative, but the
+%  title block, footers and copyright notice are approximations.
+%
+%  BEFORE SUBMISSION: delete this file and drop in the official
+%  icml2025.sty (and icml2025.bst) from the ICML 2025 template bundle.
+%  report.tex needs no changes -- it already uses the official macro names,
+%  and its \bibliographystyle call falls back automatically.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{icml2025}[2025/01/01 stand-in for local proofing]
+
+\DeclareOption{accepted}{}
+\DeclareOption{nohyperref}{}
+\DeclareOption*{}
+\ProcessOptions\relax
+
+\RequirePackage[letterpaper,textwidth=6.75in,textheight=9.0in,
+                columnsep=0.25in,centering]{geometry}
+\RequirePackage{times}
+
+\renewcommand{\normalsize}{\fontsize{10}{11.5}\selectfont}
+\normalsize
+
+\newcommand{\icmltitlerunning}[1]{\gdef\@icmltitlerunning{#1}}
+
+\newcommand{\icmltitle}[1]{%
+  \begin{center}{\LARGE\bfseries #1\par}\end{center}\vspace{1mm}}
+
+% map each affiliation key to a number on first use, so superscripts read
+% "1" rather than the raw key
+\newcounter{icml@affilcount}
+\newcommand{\icml@num}[1]{%
+  \expandafter\ifx\csname icml@affil@#1\endcsname\relax
+    \stepcounter{icml@affilcount}%
+    \expandafter\xdef\csname icml@affil@#1\endcsname{\arabic{icml@affilcount}}%
+  \fi
+  \csname icml@affil@#1\endcsname}
+
+\newenvironment{icmlauthorlist}{\begin{center}\normalsize}{\end{center}}
+\newcommand{\icmlauthor}[2]{#1\textsuperscript{\icml@num{#2}}\quad}
+
+\newcommand{\icml@affils}{}
+\newcommand{\icmlaffiliation}[2]{%
+  \g@addto@macro\icml@affils{\textsuperscript{\icml@num{#1}}#2\par}}
+
+\newcommand{\icml@corr}{}
+\newcommand{\icmlcorrespondingauthor}[2]{%
+  \g@addto@macro\icml@corr{Correspondence to: #1 $<$\texttt{#2}$>$.\par}}
+
+\newcommand{\icmlkeywords}[1]{\gdef\@icmlkeywords{#1}}
+
+\newcommand{\printAffiliationsAndNotice}[1][]{%
+  \begingroup\footnotesize
+  \vspace{-2mm}
+  \begin{center}\icml@affils\end{center}
+  \vspace{-1mm}
+  \begin{center}\icml@corr\end{center}
+  \endgroup
+  \vspace{1mm}\hrule\vspace{3mm}}
+
+\newcommand{\icmlEqualContribution}{\textsuperscript{*}Equal contribution }
+
+\pagestyle{plain}
+\endinput

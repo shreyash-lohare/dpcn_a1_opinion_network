@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "respondents": 96,
+    "items": 60,
+    "cells": 5760,
+    "answered": 5255,
+    "valid": 5218,
+    "note": "Companion descriptive statistics computed on the raw file with pairwise deletion (per-item n varies 84-91). Encoded 1-5 here; subtract 3 for the -2..+2 scale used by the pipeline."
+  },
+  "overall": {
+    "Strongly Agree": 2251,
+    "Agree": 1914,
+    "Neutral": 686,
+    "Disagree": 256,
+    "Strongly Disagree": 111,
+    "No Comments": 37
+  },
+  "blockkeys": ["T", "E", "S", "V"],
+  "blocknames": ["Technology & AI", "Education", "Society & Ethics", "Environment"],
+  "blockcorr": [
+    [1.0, 0.289, 0.542, 0.455],
+    [0.289, 1.0, 0.526, 0.488],
+    [0.542, 0.526, 1.0, 0.704],
+    [0.455, 0.488, 0.704, 1.0]
+  ],
+  "completion": [
+    {"answered": 0, "people": 5},
+    {"answered": 15, "people": 4},
+    {"answered": 45, "people": 1},
+    {"answered": 50, "people": 1},
+    {"answered": 60, "people": 85}
+  ],
+  "corr_top": [
+    ["V07", "V08", 0.63],
+    ["E14", "E15", 0.604],
+    ["V05", "V07", 0.601],
+    ["V08", "V10", 0.599],
+    ["V10", "V12", 0.579],
+    ["S14", "V13", 0.555],
+    ["S01", "S03", 0.546],
+    ["V09", "V14", 0.54],
+    ["T02", "E12", 0.531],
+    ["E11", "V07", 0.531],
+    ["S13", "V10", 0.53],
+    ["S14", "V09", 0.53]
+  ],
+  "corr_neg": [
+    ["E03", "E10", -0.44],
+    ["T03", "E04", -0.323],
+    ["E01", "E02", -0.314],
+    ["T06", "E03", -0.302],
+    ["E03", "E07", -0.297],
+    ["E03", "S06", -0.292],
+    ["T01", "T12", -0.286],
+    ["T14", "E03", -0.279]
+  ],
+  "corr_stats": {"mean": 0.15, "pos": 82.7},
+  "alpha_all": 0.885
+}
