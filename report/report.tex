@@ -43,8 +43,12 @@ from an Ordinal Attitude Questionnaire}
 \icmlauthor{Dev Patel}{iiith}
 \end{icmlauthorlist}
 
-\icmlaffiliation{iiith}{International Institute of Information Technology Hyderabad, India}
-\icmlcorrespondingauthor{Arijeet Paul}{arijeet.paul@research.iiit.ac.in}
+% Affiliation and correspondence blocks intentionally omitted -- all three
+% authors share one institution, so the numbered superscript and the notice
+% block added clutter without adding information. Restore both lines if the
+% official ICML style file is dropped in and the venue requires them.
+% \icmlaffiliation{iiith}{International Institute of Information Technology Hyderabad, India}
+% \icmlcorrespondingauthor{Arijeet Paul}{arijeet.paul@research.iiit.ac.in}
 
 \icmlkeywords{network science, opinion dynamics, questionnaire analysis,
 ordinal regression, missing data, Likert scale}
@@ -723,18 +727,89 @@ whether edges respect block boundaries.}
 
 \subsection{Graph 9: Topic-block connectivity}
 
-\todoblock{Graph 9 --- owner: P1}{%
-$4\times4$ heatmap of connectivity between the four thematic blocks,
-summarising how strongly each pair of topics is linked.\\[0.25em]
-\emph{Reference values (respondent-level block-score correlations):} T--E
-$0.29$, T--S $0.54$, T--V $0.46$, E--S $0.53$, E--V $0.49$, S--V $\mathbf{0.70}$.
-The raw values are available in \texttt{data/uc\_survey\_derived.json}.
-\\[0.25em]
-\emph{Findings + implication:} to be written. The headline is that society and
-environment behave as a single ``civic and ecological responsibility''
-disposition, while technology and education are close to independent
-($r=0.29$, the weakest pair) --- views on AI and views on pedagogy are
-separate axes.}
+\label{sec:g9}
+
+The questionnaire arrives with its own partition: fifteen items each for
+technology, education, society and environment. That partition is an editorial
+claim about what belongs together. Whether it is also a \emph{statistical} one
+is a separate question, and it is the first thing the network should be asked,
+because every later community result is interpreted against it. We collapse the
+$60\times60$ item correlation matrix into a $4\times4$ block matrix by averaging
+within each block pair. Off-diagonal cells average all $225$ cross-block pairs;
+diagonal cells average only the $105$ \emph{distinct} within-block pairs, with
+self-correlations excluded---retaining the unit diagonal would add a constant to
+every diagonal cell and manufacture exactly the block structure being tested
+for.
+
+Significance comes from a \textbf{block-label permutation}: the correlation
+matrix is held fixed and the T/E/S/V labels are reshuffled across the $60$
+items, preserving the $15/15/15/15$ design, over $5{,}000$ seeded draws. This is
+deliberately not the response-permutation null of
+Section~\ref{sec:g4}, which regenerates the whole pipeline to ask whether the
+network is meaningful at all. The question here is narrower and needs no
+threshold: given this matrix, is the survey's own partition better aligned with
+it than an arbitrary partition of the same shape? Because only labels move, the
+test is immune to any constant offset in the matrix.
+
+\textbf{Findings.} Row-centring is what makes the block structure visible at
+all. On the raw matrix (Figure~\ref{fig:g9}, left) every one of the sixteen
+cells is positive, from $+0.041$ to $+0.377$: acquiescence makes all four topics
+appear mutually connected, and the thematic design is invisible underneath it.
+On the row-centred matrix (centre) the sign pattern separates cleanly---
+\textbf{every diagonal cell positive, every off-diagonal cell negative}. The
+partition is strongly significant: within-block mean $r=+0.0746$ against
+between-block $-0.0282$, a gap of $\mathbf{+0.1027}$ against a null of
+$-0.00003\pm0.0077$, giving $\mathbf{z=13.4}$ with no permutation out of $5{,}000$
+reaching the observed value ($p<0.0002$).
+
+The blocks are not equally coherent. Ranking the diagonal gives environment
+$+0.136$, technology $+0.066$, education $+0.054$ and society/ethics $+0.042$:
+environment is more than three times as internally consistent as ethics.
+Among cross-block pairs, S--V is the one seam in the partition: at
+$-0.004$ it is the only pair not clearly separated, and it is also the
+strongest off-diagonal cell in the raw matrix ($+0.256$). T--V is the most
+separated pair ($-0.046$). This reproduces the ordering of the
+respondent-level block-score correlations computed independently on the raw
+file (T--E weakest at $0.29$, S--V strongest at $0.70$), though those are a
+different quantity---correlations between block \emph{average scores} rather
+than means of item--item correlations---and the two should not be compared
+numerically.
+
+One reading caveat matters. The negative off-diagonal cells do \emph{not}
+indicate opposition between topics. Row-centring forces every row to sum to
+zero, which pushes the grand mean of all $1{,}770$ pairwise correlations
+slightly negative; measured, it is $-0.0038$. The off-diagonal values should be
+read relative to each other and to the diagonal, not as evidence that
+technology views oppose environmental ones. The permutation null is unaffected,
+since observed and null statistics are computed on the same shifted matrix.
+
+\textbf{Implication.} The survey's thematic design is real and should be
+carried into the interpretation of every later partition: a detected community
+that aligns with a block is recovering something the instrument built in, and a
+community that cuts across blocks is the more informative object. The uneven
+diagonal sharpens this. Environmental attitudes travel as a package---agreement
+with one environmental item predicts agreement with others---whereas ethics
+items are close to independent of one another, so respondents hold ethical
+positions issue by issue rather than as a doctrine. The society--environment
+seam is where a genuine cross-block community is most likely to appear, and the
+community structure reported in Graph~10 should be checked against that
+expectation rather than treated as a discovery if it reproduces it.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{../figures/graph9_topic_block_connectivity.png}
+\caption{Graph 9. Topic-block connectivity, $91$ respondents $\times$ $60$
+items. \textbf{Left:} mean item--item Spearman correlation within and between
+the four thematic blocks on the raw matrix---every cell positive, the design
+invisible under acquiescence. \textbf{Centre:} the same collapse on the
+row-centred matrix, sharing a colour scale; the diagonal turns positive and all
+off-diagonal cells negative. Diagonal cells average the $105$ distinct
+within-block pairs, excluding self-correlations. \textbf{Right:} null
+distribution of the within-minus-between gap under $5{,}000$ reshufflings of
+the T/E/S/V labels with the correlation matrix held fixed. The observed gap of
+$+0.1027$ ($z=13.4$, $p<0.0002$) is not approached by any permutation.}
+\label{fig:g9}
+\end{figure*}
 
 \subsection{Graph 10: Communities against null models}
 
@@ -1033,9 +1108,9 @@ any subgroup without additional joined data.
 A methodological limitation deserves separate mention: correlation stability
 under perturbation does not imply partition stability. Table~\ref{tab:sens}
 shows correlation matrices agreeing at $r>0.94$ across NC treatments whose
-community assignments agree at AMI $0.337$. Community-level conclusions
-require their own stability analysis, by respondent-level bootstrap
-resampling, before being treated as findings.
+community assignments agree at only AMI $0.337$. Conclusions drawn at the
+level of communities require their own stability analysis, by respondent-level
+bootstrap resampling, before being treated as findings.
 
 % ============================================================
 \section{Conclusion}

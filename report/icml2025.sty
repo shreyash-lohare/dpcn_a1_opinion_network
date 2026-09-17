@@ -41,8 +41,20 @@
   \fi
   \csname icml@affil@#1\endcsname}
 
+% Did the document declare any affiliation? The author list is typeset before
+% \icmlaffiliation is ever reached, so the answer is carried across passes in
+% the .aux file: with no affiliations the superscripts are suppressed entirely
+% rather than left dangling with nothing to refer to.
+\newif\ificml@hasaffils
+\icml@hasaffilsfalse
+\AtEndDocument{%
+  \ifnum\value{icml@affilcount}>0
+    \immediate\write\@auxout{\string\global\string\icml@hasaffilstrue}%
+  \fi}
+
 \newenvironment{icmlauthorlist}{\begin{center}\normalsize}{\end{center}}
-\newcommand{\icmlauthor}[2]{#1\textsuperscript{\icml@num{#2}}\quad}
+\newcommand{\icmlauthor}[2]{%
+  #1\ificml@hasaffils\textsuperscript{\icml@num{#2}}\fi\quad}
 
 \newcommand{\icml@affils}{}
 \newcommand{\icmlaffiliation}[2]{%
@@ -54,13 +66,18 @@
 
 \newcommand{\icmlkeywords}[1]{\gdef\@icmlkeywords{#1}}
 
+% With no affiliation and no correspondence declared, print the separating rule
+% alone -- two empty centred blocks would otherwise leave a gap under the author
+% line where the notice used to sit.
 \newcommand{\printAffiliationsAndNotice}[1][]{%
-  \begingroup\footnotesize
-  \vspace{-2mm}
-  \begin{center}\icml@affils\end{center}
-  \vspace{-1mm}
-  \begin{center}\icml@corr\end{center}
-  \endgroup
+  \ifnum\value{icml@affilcount}>0
+    \begingroup\footnotesize
+    \vspace{-2mm}
+    \begin{center}\icml@affils\end{center}
+    \vspace{-1mm}
+    \begin{center}\icml@corr\end{center}
+    \endgroup
+  \fi
   \vspace{1mm}\hrule\vspace{3mm}}
 
 \newcommand{\icmlEqualContribution}{\textsuperscript{*}Equal contribution }
