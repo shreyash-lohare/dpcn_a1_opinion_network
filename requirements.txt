@@ -1,11 +1,17 @@
-pandas
-numpy
-scipy
-networkx
-matplotlib
-scikit-learn
-statsmodels
-joblib
-nbformat
-nbclient
-ipykernel
+# Pinned to the versions the reported numbers were produced with.
+# Tested on Python 3.13.5. Python 3.14 is NOT supported: several of these have
+# no 3.14 wheels yet, so `python run_all.py` fails at import on a 3.14 default.
+#
+# Verify before running:  python -c "import sys; print(sys.version)"
+
+numpy==2.2.2
+pandas==3.0.3
+scipy==1.15.2
+networkx==3.3
+matplotlib==3.10.1
+
+# Optional: only needed to execute notebooks/sanitise_data_pipeline.ipynb.
+# run_all.py does not import these.
+# nbformat==5.10.4
+# nbclient==0.10.0
+# ipykernel==6.29.5
