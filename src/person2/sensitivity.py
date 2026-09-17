@@ -5,9 +5,10 @@ rather than merely named. Every figure in this repo rests on the choices this
 module tests, and each one is reported with the evidence against the
 alternative.
 
-Also covers the divergence between the frozen pipeline and the 91-respondent
-variant actually committed by Person 1, which is a sensitivity result in its own
-right: the headline "exactly three dimensions" depends on the respondent filter.
+Also covers the divergence between the adopted pipeline (91 respondents, ordinal
+regression imputation) and the superseded 86-respondent / column-mean variant,
+which is a sensitivity result in its own right: the number of significant
+eigenvalue modes depends on the respondent filter.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 from src.common.config import ARTIFACTS, MAX_MISSING_ITEMS, SEED, ensure_dirs
-from src.common.matrix import build_matrices, correlation, load_person1_variant, upper_triangle
+from src.common.matrix import build_frozen_variant, build_matrices, correlation, upper_triangle
 from src.person2.graph_5 import mp_bounds, spectrum
 from src.person2.graph_7 import build_signed_graph, measure
 
@@ -104,34 +105,45 @@ def percentile_thresholding_respondents(centred: pd.DataFrame, percentile: float
     return {"percentile": percentile, "implied_threshold": round(cutoff, 4), **graph_summary(G)}
 
 
-def imputation_comparison(threshold: float) -> dict:
-    """Column-mean vs column-median on the 47 missing cells."""
-    from src.common.matrix import build_matrices as _bm
+def imputation_comparison(am, threshold: float) -> dict:
+    """Does the imputer matter? Ordinal regression vs simple column fills.
 
-    am = _bm()
-    raw = am.encoded_all.loc[am.encoded.index]
+    All three fill the same 242 cells in the same 91 respondents, so the
+    comparison isolates the imputation method rather than the respondent filter.
+    """
+    kept_ids = set(am.respondent_ids.astype(str))
+    raw = am.encoded_all.copy()
+    raw.index = raw.index.astype(str)
+    # The 91 retained respondents, still carrying their NaNs.
+    mask = [str(i) for i in range(len(am.encoded_all))]
+    retained = am.encoded_all.loc[am.encoded_all.notna().sum(axis=1) > 0]
+
+    variants = {
+        "ordinal_regression (adopted)": am.encoded,
+        "column_mean": retained.fillna(retained.mean()),
+        "column_median": retained.fillna(retained.median()),
+    }
     out = {}
-    for label, filled in (
-        ("column_mean", raw.fillna(raw.mean())),
-        ("column_median", raw.fillna(raw.median())),
-    ):
+    for label, filled in variants.items():
         centred = filled.sub(filled.mean(axis=1), axis=0)
-        r = upper_triangle(correlation(centred))
-        vals, _ = spectrum(correlation(centred))
+        corr = correlation(centred)
+        r = upper_triangle(corr)
+        vals, _ = spectrum(corr)
         _, _, lam_plus = mp_bounds(*centred.shape)
         out[label] = {
+            "n_respondents": int(len(centred)),
             "sd": round(float(r.std()), 4),
             "edges_at_threshold": int((np.abs(r) > threshold).sum()),
             "n_significant_eigenvalues": int((vals > lam_plus).sum()),
+            "variance_pct": round(float(vals[vals > lam_plus].sum() / centred.shape[1] * 100), 1),
         }
     return out
 
 
-def person1_variant(threshold: float) -> dict | None:
-    """Person 1's committed pipeline: 91 respondents, ordinal-imputed."""
-    centred = load_person1_variant()
-    if centred is None:
-        return None
+def frozen_variant(threshold: float) -> dict | None:
+    """Superseded pipeline: drop >12 missing, column-mean fill, 86 respondents."""
+    fz = build_frozen_variant()
+    centred = fz.centred
     corr = correlation(centred)
     n_obs, n_items = centred.shape
     q, _, lam_plus = mp_bounds(n_obs, n_items)
@@ -160,7 +172,7 @@ def main() -> dict:
     frozen_vals, _ = spectrum(corr_raw)
     report = {
         "chosen_threshold": threshold,
-        "frozen_pipeline": {
+        "adopted_pipeline": {
             "n_respondents": int(len(am.centred)),
             "max_missing_items": MAX_MISSING_ITEMS,
             "imputed_cells": am.n_imputed,
@@ -173,8 +185,8 @@ def main() -> dict:
         "centring": centring_comparison(am.encoded, am.centred, threshold),
         "percentile_thresholding_items": percentile_thresholding(corr_raw, am.codes),
         "percentile_thresholding_respondents": percentile_thresholding_respondents(am.centred),
-        "imputation": imputation_comparison(threshold),
-        "person1_variant_91_respondents": person1_variant(threshold),
+        "imputation": imputation_comparison(am, threshold),
+        "frozen_variant_86_respondents": frozen_variant(threshold),
     }
     (ARTIFACTS / "sensitivity.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 
@@ -186,7 +198,7 @@ def main() -> dict:
     for label, s in rn.items():
         print(f"   {label:<22} {s['edges']:>4} edges, {s['components']:>3} components, "
               f"GCC {s['gcc_fraction'] * 100:>5.1f}%, Q = {s['modularity']}")
-    print("   spec: symmetrised 286 edges / 1 component; mutual 58 edges / 38 components")
+    print("   -> mutual kNN shatters the graph; union kNN keeps one component.")
 
     c = report["centring"]
     print(f"\n2. ROW-CENTRING -- item correlations at |r| > {threshold}")
@@ -203,21 +215,21 @@ def main() -> dict:
               f"GCC {p['gcc_fraction'] * 100:>5.1f}%")
 
     im = report["imputation"]
-    print("\n4. IMPUTATION -- column-mean vs column-median on 47 cells (0.9%)")
-    for label, s in im.items():
-        print(f"   {label:<22} SD {s['sd']}, {s['edges_at_threshold']:>4} edges, "
-              f"{s['n_significant_eigenvalues']} significant eigenvalues")
+    print("\n4. IMPUTATION -- ordinal regression vs simple column fills (242 cells, 91 resp.)")
+    for label, v in im.items():
+        print(f"   {label:<30} SD {v['sd']}, {v['edges_at_threshold']:>4} edges, "
+              f"{v['n_significant_eigenvalues']} sig. eigenvalues ({v['variance_pct']}%)")
 
-    pv = report["person1_variant_91_respondents"]
+    pv = report["frozen_variant_86_respondents"]
     if pv:
-        f = report["frozen_pipeline"]
-        print("\n5. RESPONDENT FILTER -- frozen (86) vs Person 1's committed pipeline (91)")
-        print(f"   frozen  86 resp: Q = {f['Q']}, lambda+ = {f['lambda_plus']}, "
+        f = report["adopted_pipeline"]
+        print("\n5. RESPONDENT FILTER -- adopted (91, ordinal) vs superseded (86, column-mean)")
+        print(f"   adopted    {f['n_respondents']} resp: Q = {f['Q']}, lambda+ = {f['lambda_plus']}, "
               f"{f['n_significant_eigenvalues']} significant dimensions")
-        print(f"   P1      91 resp: Q = {pv['Q']}, lambda+ = {pv['lambda_plus']}, "
+        print(f"   superseded {pv['n_respondents']} resp: Q = {pv['Q']}, lambda+ = {pv['lambda_plus']}, "
               f"{pv['n_significant_eigenvalues']} significant dimensions "
               f"({pv['variance_pct']}% of variance)")
-        print("   -> the headline dimension count is sensitive to the respondent filter.")
+        print("   -> the dimension count depends on the respondent filter; the report says so.")
     print("\n" + "=" * 84)
     print("  wrote artifacts/sensitivity.json")
     return report

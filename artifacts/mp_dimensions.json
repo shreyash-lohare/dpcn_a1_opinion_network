@@ -1,346 +1,437 @@
 {
-  "n_observations": 86,
+  "n_observations": 91,
   "n_items": 60,
-  "Q": 1.4333333333333333,
-  "lambda_plus": 3.3682125577737643,
-  "lambda_minus": 0.02713627943553762,
-  "n_significant": 3,
+  "Q": 1.5166666666666666,
+  "lambda_plus": 3.2833365452229595,
+  "lambda_minus": 0.03534477345835904,
+  "n_significant": 4,
   "significant_eigenvalues": [
-    4.046397028369029,
-    3.9765460171281983,
-    3.5281189111983715
+    4.382643997855365,
+    4.062178054813059,
+    3.551665583276651,
+    3.3484146332258886
   ],
-  "variance_pct": 19.251769927825997,
+  "variance_pct": 25.574837115284943,
   "eigenvalues_all": [
-    4.046397028369029,
-    3.9765460171281983,
-    3.5281189111983715,
-    3.3540189945078387,
-    2.9423679519064594,
-    2.7567792291813604,
-    2.4866554227845357,
-    2.3543758799320598,
-    2.2092045993237672,
-    2.110940732999209,
-    1.9416594939274627,
-    1.8622646249753139,
-    1.7238366904409652,
-    1.699545593919137,
-    1.5718329414207688,
-    1.4595160546683528,
-    1.3433521076187322,
-    1.2414068154721656,
-    1.2276015803363287,
-    1.1526059982998642,
-    1.101907215415012,
-    0.9708463901188905,
-    0.9102009169147949,
-    0.9040329099048084,
-    0.8702916396958854,
-    0.7693581116888124,
-    0.7470450365535404,
-    0.6881059130732174,
-    0.6699990511835735,
-    0.6176707436512507,
-    0.5932956824536444,
-    0.5434482518541714,
-    0.5060557297470646,
-    0.4662356296489004,
-    0.4345920069871388,
-    0.3971452357533195,
-    0.36622595252730145,
-    0.3636448309348608,
-    0.3267251884189462,
-    0.2953371288460769,
-    0.2741779120944667,
-    0.2598689332840559,
-    0.23985391942761944,
-    0.2059291358334002,
-    0.19852855321846047,
-    0.16870347221067422,
-    0.16811681998281186,
-    0.16257456750043964,
-    0.13952686415824767,
-    0.13017418221449104,
-    0.10751340741397297,
-    0.09012685345933061,
-    0.08445501419513488,
-    0.06742484350395613,
-    0.056901359701914664,
-    0.04125976131836929,
-    0.02941683993169281,
-    0.024952445513979547,
-    0.01930488125585783,
-    1.1684593960557069e-15
+    4.382643997855365,
+    4.062178054813059,
+    3.551665583276651,
+    3.3484146332258886,
+    2.8613632348070737,
+    2.756345461063722,
+    2.503554746995693,
+    2.347763598173394,
+    2.27405404050706,
+    2.1072499446561266,
+    1.9107632263525445,
+    1.834849087831085,
+    1.6882440275603314,
+    1.627164790873999,
+    1.558731697357365,
+    1.498560127259466,
+    1.3951605296488905,
+    1.2556827340696308,
+    1.1869304358729476,
+    1.1400260435979686,
+    1.0972005596318226,
+    0.987263171757412,
+    0.9618849095909693,
+    0.8513344260372752,
+    0.7847680265631373,
+    0.7689962699431976,
+    0.6965207448997968,
+    0.6616985229888627,
+    0.6406577218836264,
+    0.6044393505735493,
+    0.578543445542149,
+    0.5273368777529229,
+    0.5083842822909331,
+    0.48691960170299275,
+    0.43570176712627806,
+    0.4218975656564915,
+    0.3870564213379033,
+    0.34833586432940833,
+    0.32222871717119744,
+    0.28366365100277674,
+    0.26319969272841437,
+    0.2575025986951383,
+    0.22351779110724304,
+    0.18997492103724994,
+    0.18781797030455677,
+    0.1701388346410148,
+    0.16745328072633003,
+    0.14067409823714327,
+    0.13078086051466078,
+    0.12236517547730617,
+    0.11004972318661517,
+    0.09237935314593053,
+    0.0776062803673314,
+    0.054932402339304034,
+    0.051404641117629095,
+    0.03482536586242402,
+    0.028749881047439967,
+    0.028128689124014776,
+    0.022320546759279844,
+    -9.212429498475866e-17
   ],
   "dimensions": [
     {
       "component": 1,
-      "eigenvalue": 4.046397028369029,
-      "variance_pct": 6.7439950472817145,
-      "proposed_name": "Systemic responsibility vs. technological optimism and traditional instruction",
+      "eigenvalue": 4.382643997855365,
+      "variance_pct": 7.304406663092275,
+      "proposed_name": "Environmental and social commitment vs. technology governance and assessment",
       "top_positive": [
         {
-          "code": "V09",
-          "loading": 0.3093035625644802,
-          "text": "Products should be designed to encourage reuse, repair, and recycling."
-        },
-        {
-          "code": "E10",
-          "loading": 0.28751857644169077,
-          "text": "Universities should prioritize innovation and problem-solving over rote learning."
-        },
-        {
           "code": "V14",
-          "loading": 0.2291670486103369,
+          "loading": 0.26625244925271674,
           "text": "International cooperation is necessary to effectively address environmental challenges."
         },
         {
-          "code": "S06",
-          "loading": 0.19510460500785834,
-          "text": "Combating online misinformation requires shared responsibility among users, platforms, and governments."
+          "code": "V09",
+          "loading": 0.26015246936344943,
+          "text": "Products should be designed to encourage reuse, repair, and recycling."
         },
         {
-          "code": "T06",
-          "loading": 0.18009194723223812,
-          "text": "Most repetitive jobs will eventually be replaced by intelligent automation."
-        },
-        {
-          "code": "V12",
-          "loading": 0.17687994966842538,
-          "text": "Environmental sustainability should be integrated into higher education curricula."
-        },
-        {
-          "code": "E07",
-          "loading": 0.17625287112263271,
-          "text": "Publishing research before graduation should be encouraged, but not mandatory."
+          "code": "V05",
+          "loading": 0.2372732875193992,
+          "text": "Single-use plastics should be significantly restricted."
         },
         {
           "code": "V07",
-          "loading": 0.171832052757084,
+          "loading": 0.22713955349585607,
           "text": "Protecting biodiversity is essential for long-term human well-being."
+        },
+        {
+          "code": "E10",
+          "loading": 0.2142240024888427,
+          "text": "Universities should prioritize innovation and problem-solving over rote learning."
+        },
+        {
+          "code": "S06",
+          "loading": 0.18455456721645355,
+          "text": "Combating online misinformation requires shared responsibility among users, platforms, and governments."
+        },
+        {
+          "code": "S09",
+          "loading": 0.17402054776317052,
+          "text": "Universities should promote an inclusive environment where different viewpoints can be discussed respectfully."
+        },
+        {
+          "code": "S07",
+          "loading": 0.16572143732535893,
+          "text": "Equal opportunities should be prioritized regardless of a person's background."
         }
       ],
       "top_negative": [
         {
-          "code": "T01",
-          "loading": -0.24770453266646839,
-          "text": "Artificial Intelligence will improve society more than it will create problems."
-        },
-        {
           "code": "E03",
-          "loading": -0.23523432550618809,
+          "loading": -0.21704257671751945,
           "text": "Class attendance should be compulsory for all courses."
         },
         {
+          "code": "T11",
+          "loading": -0.2103730236131516,
+          "text": "Technology companies should explain how recommendation algorithms work."
+        },
+        {
           "code": "T08",
-          "loading": -0.22804983671586193,
+          "loading": -0.20636521169447353,
           "text": "AI-assisted diagnosis should become routine in healthcare."
         },
         {
           "code": "E02",
-          "loading": -0.19340107493791292,
+          "loading": -0.18671503807235054,
           "text": "Traditional written examinations accurately measure a student's knowledge."
         },
         {
-          "code": "T07",
-          "loading": -0.17307929101471875,
-          "text": "Robots should replace humans in hazardous occupations whenever possible."
+          "code": "T10",
+          "loading": -0.17737471398566643,
+          "text": "Protection of personal data is more important than technological convenience."
         },
         {
-          "code": "T11",
-          "loading": -0.14578718187609643,
-          "text": "Technology companies should explain how recommendation algorithms work."
+          "code": "T12",
+          "loading": -0.170437756098198,
+          "text": "Governments should introduce stricter regulations for Artificial Intelligence."
         },
         {
-          "code": "E13",
-          "loading": -0.1433070483974148,
-          "text": "Universities should invest more resources in research than in expanding infrastructure."
+          "code": "T01",
+          "loading": -0.14996969922183612,
+          "text": "Artificial Intelligence will improve society more than it will create problems."
         },
         {
-          "code": "T05",
-          "loading": -0.12982072029853362,
-          "text": "Artificial Intelligence will significantly accelerate scientific discovery."
+          "code": "T13",
+          "loading": -0.13746679262380293,
+          "text": "Cybersecurity deserves greater investment than the development of new digital technologies."
         }
       ]
     },
     {
       "component": 2,
-      "eigenvalue": 3.9765460171281983,
-      "variance_pct": 6.627576695213663,
-      "proposed_name": "Regulatory guardrails vs. individual autonomy",
+      "eigenvalue": 4.062178054813059,
+      "variance_pct": 6.7702967580217654,
+      "proposed_name": "Developmental optimism vs. regulatory caution",
       "top_positive": [
         {
-          "code": "T12",
-          "loading": 0.3034058938128063,
-          "text": "Governments should introduce stricter regulations for Artificial Intelligence."
-        },
-        {
-          "code": "T14",
-          "loading": 0.26128949179756894,
-          "text": "Social media algorithms contribute to opinion polarization."
-        },
-        {
-          "code": "S15",
-          "loading": 0.22251470123538128,
-          "text": "Building public trust is essential for responsible adoption of emerging technologies."
-        },
-        {
-          "code": "S13",
-          "loading": 0.20207773182573963,
-          "text": "Critical evaluation of online information should be taught as a core educational skill."
-        },
-        {
-          "code": "V10",
-          "loading": 0.18206626183394434,
-          "text": "Consumers should consider environmental impact when purchasing products."
-        },
-        {
-          "code": "T04",
-          "loading": 0.1818255686975576,
-          "text": "Every engineering student should receive formal education in AI."
-        },
-        {
-          "code": "T10",
-          "loading": 0.16810868539015753,
-          "text": "Protection of personal data is more important than technological convenience."
-        },
-        {
-          "code": "V02",
-          "loading": 0.16506902151247863,
-          "text": "Governments should prioritize investment in renewable energy over fossil fuels."
-        }
-      ],
-      "top_negative": [
-        {
           "code": "V07",
-          "loading": -0.27814655131529187,
+          "loading": 0.2503953788015289,
           "text": "Protecting biodiversity is essential for long-term human well-being."
         },
         {
           "code": "T09",
-          "loading": -0.22550524547203085,
+          "loading": 0.241047650744892,
           "text": "Autonomous vehicles will ultimately make transportation safer."
         },
         {
-          "code": "E01",
-          "loading": -0.2205525072993729,
-          "text": "Project-based learning develops deeper understanding than examination-oriented learning."
-        },
-        {
-          "code": "E05",
-          "loading": -0.20215546361357986,
-          "text": "Students should be encouraged to take courses outside their primary discipline."
-        },
-        {
-          "code": "V05",
-          "loading": -0.1898429440268119,
-          "text": "Single-use plastics should be significantly restricted."
-        },
-        {
-          "code": "S11",
-          "loading": -0.18627390749941442,
-          "text": "People should be free to express differing opinions as long as they do not promote harm or discrimination."
-        },
-        {
           "code": "E13",
-          "loading": -0.18146986286626957,
+          "loading": 0.2263877965507204,
           "text": "Universities should invest more resources in research than in expanding infrastructure."
         },
         {
+          "code": "S08",
+          "loading": 0.22591531477932483,
+          "text": "Diverse teams generally make better decisions than homogeneous teams."
+        },
+        {
+          "code": "E05",
+          "loading": 0.198359689947231,
+          "text": "Students should be encouraged to take courses outside their primary discipline."
+        },
+        {
+          "code": "S12",
+          "loading": 0.17484694556827543,
+          "text": "Young people should actively participate in addressing societal challenges."
+        },
+        {
           "code": "E11",
-          "loading": -0.17836722219541323,
+          "loading": 0.17201025046350327,
           "text": "University curricula should be updated more frequently to match emerging technologies."
+        },
+        {
+          "code": "E09",
+          "loading": 0.16596862666659903,
+          "text": "Collaborative learning is generally more effective than individual learning."
+        }
+      ],
+      "top_negative": [
+        {
+          "code": "S15",
+          "loading": -0.22080907784129877,
+          "text": "Building public trust is essential for responsible adoption of emerging technologies."
+        },
+        {
+          "code": "T14",
+          "loading": -0.22043359381106525,
+          "text": "Social media algorithms contribute to opinion polarization."
+        },
+        {
+          "code": "V13",
+          "loading": -0.19776988276246538,
+          "text": "Companies should be held accountable for the environmental impacts of their activities."
+        },
+        {
+          "code": "T12",
+          "loading": -0.19363024291095648,
+          "text": "Governments should introduce stricter regulations for Artificial Intelligence."
+        },
+        {
+          "code": "S13",
+          "loading": -0.17815319474112276,
+          "text": "Critical evaluation of online information should be taught as a core educational skill."
+        },
+        {
+          "code": "T04",
+          "loading": -0.17686489510726602,
+          "text": "Every engineering student should receive formal education in AI."
+        },
+        {
+          "code": "S14",
+          "loading": -0.17138221755716937,
+          "text": "Leaders should prioritize ethical decision-making even when it reduces short-term gains."
+        },
+        {
+          "code": "V02",
+          "loading": -0.16824592456746396,
+          "text": "Governments should prioritize investment in renewable energy over fossil fuels."
         }
       ]
     },
     {
       "component": 3,
-      "eigenvalue": 3.5281189111983715,
-      "variance_pct": 5.880198185330619,
+      "eigenvalue": 3.551665583276651,
+      "variance_pct": 5.9194426387944175,
       "proposed_name": "AI-enabled education and industry vs. environmental stewardship",
       "top_positive": [
         {
           "code": "T02",
-          "loading": 0.28717661288172247,
+          "loading": 0.27369664162779744,
           "text": "Generative AI tools should be allowed as learning aids in higher education."
         },
         {
           "code": "E12",
-          "loading": 0.25829637457944593,
+          "loading": 0.23322668895418647,
           "text": "Artificial intelligence should be integrated into teaching and personalized learning."
         },
         {
+          "code": "T01",
+          "loading": 0.2203817576521817,
+          "text": "Artificial Intelligence will improve society more than it will create problems."
+        },
+        {
           "code": "E14",
-          "loading": 0.257237382185482,
+          "loading": 0.21737362833151966,
           "text": "Strong collaborations between universities and industry improve student education."
         },
         {
           "code": "T04",
-          "loading": 0.2549205534951313,
+          "loading": 0.21484704870926993,
           "text": "Every engineering student should receive formal education in AI."
         },
         {
+          "code": "E06",
+          "loading": 0.20322199850039332,
+          "text": "Every undergraduate student should participate in at least one research project."
+        },
+        {
           "code": "E10",
-          "loading": 0.21659431812365898,
+          "loading": 0.18435431027245797,
           "text": "Universities should prioritize innovation and problem-solving over rote learning."
         },
         {
-          "code": "T06",
-          "loading": 0.18854928620040465,
-          "text": "Most repetitive jobs will eventually be replaced by intelligent automation."
-        },
-        {
-          "code": "T01",
-          "loading": 0.17432017336028127,
-          "text": "Artificial Intelligence will improve society more than it will create problems."
-        },
-        {
           "code": "E01",
-          "loading": 0.1616855444653958,
+          "loading": 0.17486643715393743,
           "text": "Project-based learning develops deeper understanding than examination-oriented learning."
         }
       ],
       "top_negative": [
         {
           "code": "V06",
-          "loading": -0.24318100068870288,
+          "loading": -0.22739401233039416,
           "text": "Water conservation should be a priority in households, institutions, and industries."
         },
         {
           "code": "V04",
-          "loading": -0.23866993584893112,
+          "loading": -0.22554803414415558,
           "text": "Public transportation and non-motorized transport should be promoted even if they require additional public investment."
         },
         {
-          "code": "V08",
-          "loading": -0.19253794307177402,
-          "text": "Universities should adopt environmentally sustainable campus practices even if implementation costs increase."
-        },
-        {
           "code": "V10",
-          "loading": -0.18889617749819418,
+          "loading": -0.2203842701607178,
           "text": "Consumers should consider environmental impact when purchasing products."
         },
         {
-          "code": "T13",
-          "loading": -0.1878891962277756,
-          "text": "Cybersecurity deserves greater investment than the development of new digital technologies."
-        },
-        {
           "code": "T11",
-          "loading": -0.18776275814341192,
+          "loading": -0.1897952820787795,
           "text": "Technology companies should explain how recommendation algorithms work."
         },
         {
-          "code": "V15",
-          "loading": -0.1819462942739364,
-          "text": "Current generations have a responsibility to protect natural resources for future generations."
+          "code": "T12",
+          "loading": -0.18123804518329736,
+          "text": "Governments should introduce stricter regulations for Artificial Intelligence."
         },
         {
-          "code": "V07",
-          "loading": -0.1670894310506788,
-          "text": "Protecting biodiversity is essential for long-term human well-being."
+          "code": "V08",
+          "loading": -0.1807527852179239,
+          "text": "Universities should adopt environmentally sustainable campus practices even if implementation costs increase."
+        },
+        {
+          "code": "T13",
+          "loading": -0.17950172073000162,
+          "text": "Cybersecurity deserves greater investment than the development of new digital technologies."
+        },
+        {
+          "code": "V15",
+          "loading": -0.17901595598559153,
+          "text": "Current generations have a responsibility to protect natural resources for future generations."
+        }
+      ]
+    },
+    {
+      "component": 4,
+      "eigenvalue": 3.3484146332258886,
+      "variance_pct": 5.580691055376481,
+      "proposed_name": "Systemic technological action vs. individual and community obligation",
+      "top_positive": [
+        {
+          "code": "V01",
+          "loading": 0.289108978651517,
+          "text": "Climate change requires immediate global action."
+        },
+        {
+          "code": "T05",
+          "loading": 0.254005036248198,
+          "text": "Artificial Intelligence will significantly accelerate scientific discovery."
+        },
+        {
+          "code": "T07",
+          "loading": 0.2096995049377945,
+          "text": "Robots should replace humans in hazardous occupations whenever possible."
+        },
+        {
+          "code": "V04",
+          "loading": 0.19476843560699245,
+          "text": "Public transportation and non-motorized transport should be promoted even if they require additional public investment."
+        },
+        {
+          "code": "S11",
+          "loading": 0.19153238324303143,
+          "text": "People should be free to express differing opinions as long as they do not promote harm or discrimination."
+        },
+        {
+          "code": "T01",
+          "loading": 0.18274240889506466,
+          "text": "Artificial Intelligence will improve society more than it will create problems."
+        },
+        {
+          "code": "V06",
+          "loading": 0.17708797242295019,
+          "text": "Water conservation should be a priority in households, institutions, and industries."
+        },
+        {
+          "code": "T15",
+          "loading": 0.17435046302411444,
+          "text": "Society will increasingly depend on AI-assisted decision making."
+        }
+      ],
+      "top_negative": [
+        {
+          "code": "S02",
+          "loading": -0.2494888892009619,
+          "text": "Universities should encourage students to participate in community service activities."
+        },
+        {
+          "code": "E09",
+          "loading": -0.23203052434668736,
+          "text": "Collaborative learning is generally more effective than individual learning."
+        },
+        {
+          "code": "S04",
+          "loading": -0.19302704983825783,
+          "text": "Technology companies should be accountable for unethical use of their platforms."
+        },
+        {
+          "code": "T10",
+          "loading": -0.18832323978210447,
+          "text": "Protection of personal data is more important than technological convenience."
+        },
+        {
+          "code": "S12",
+          "loading": -0.1665252646326201,
+          "text": "Young people should actively participate in addressing societal challenges."
+        },
+        {
+          "code": "V10",
+          "loading": -0.1646798685747685,
+          "text": "Consumers should consider environmental impact when purchasing products."
+        },
+        {
+          "code": "T12",
+          "loading": -0.15505409798465314,
+          "text": "Governments should introduce stricter regulations for Artificial Intelligence."
+        },
+        {
+          "code": "E12",
+          "loading": -0.13219877504565158,
+          "text": "Artificial intelligence should be integrated into teaching and personalized learning."
         }
       ]
     }

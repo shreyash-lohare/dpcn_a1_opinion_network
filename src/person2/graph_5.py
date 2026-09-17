@@ -7,9 +7,9 @@ from T observations of N pure-noise variables, the eigenvalues fall inside an
 analytically known band [lambda_-, lambda_+]. Anything above lambda_+ carries
 more structure than T observations could have produced by chance.
 
-At T = 86, N = 60 the band ends at lambda_+ = 3.368 and exactly three
-eigenvalues clear it. There are precisely three real opinion dimensions in this
-survey, and the denoised correlation matrix is rebuilt from those three alone.
+At T = 91, N = 60 the band ends at lambda_+ = 3.283 and exactly four
+eigenvalues clear it. There are precisely four real opinion dimensions in this
+survey, and the denoised correlation matrix is rebuilt from those four alone.
 """
 
 from __future__ import annotations
@@ -38,12 +38,13 @@ from src.common.matrix import build_matrices, correlation
 N_LOADINGS = 8
 
 # Named by the analyst from the loadings printed below, not derived by the code.
-# PC3 is a clean split; PC1 and PC2 are mixed, and the report says so rather than
-# overstating the reading.
+# PC1 and PC3 split cleanly along topic blocks; PC2 and PC4 cut across them and
+# are the weaker readings, which the report states rather than glosses over.
 DIMENSION_NAMES = {
-    1: "Systemic responsibility vs. technological optimism and traditional instruction",
-    2: "Regulatory guardrails vs. individual autonomy",
+    1: "Environmental and social commitment vs. technology governance and assessment",
+    2: "Developmental optimism vs. regulatory caution",
     3: "AI-enabled education and industry vs. environmental stewardship",
+    4: "Systemic technological action vs. individual and community obligation",
 }
 
 
@@ -120,12 +121,14 @@ def report_numbers(q, lam_minus, lam_plus, vals, n_sig, n_items) -> None:
     print("=" * 78)
     print("GRAPH 5 ACCEPTANCE CRITERIA")
     print("=" * 78)
-    print(f"  Q = T/N                      {q:>8.4f}    (spec 1.4333)")
-    print(f"  lambda_plus                  {lam_plus:>8.4f}    (spec 3.368)")
-    print(f"  lambda_minus                 {lam_minus:>8.4f}    (spec 0.027)")
-    print(f"  eigenvalues above lambda_+   {n_sig:>8}    (spec exactly 3)")
-    print(f"  their values                 {np.round(vals[:n_sig], 3).tolist()}    (spec 4.05, 3.98, 3.53)")
-    print(f"  variance carried             {vals[:n_sig].sum() / n_items * 100:>7.1f}%    (spec 19.3%)")
+    print(f"  T respondents                {int(q * n_items):>8}    (91, ordinal-imputed)")
+    print(f"  Q = T/N                      {q:>8.4f}    (ref 1.5167)")
+    print(f"  lambda_plus                  {lam_plus:>8.4f}    (ref 3.283)")
+    print(f"  lambda_minus                 {lam_minus:>8.4f}    (ref 0.035)")
+    print(f"  eigenvalues above lambda_+   {n_sig:>8}    (ref exactly 4)")
+    print(f"  their values                 {np.round(vals[:n_sig], 3).tolist()}")
+    print(f"                               (ref 4.38, 4.06, 3.55, 3.35)")
+    print(f"  variance carried             {vals[:n_sig].sum() / n_items * 100:>7.1f}%    (ref 25.6%)")
     print(f"  next eigenvalue below band   {vals[n_sig]:>8.3f}")
     print("=" * 78)
 

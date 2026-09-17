@@ -4,7 +4,7 @@ Constructing and analysing an opinion network from a 96-respondent, 60-item Like
 covering Technology, Education, Society/Ethics and Environment.
 
 **Nodes** are the 60 survey questions. **Edges** are signed Pearson correlations between
-questions, computed on row-centred responses and thresholded at `|r| > 0.20`. Edges are
+questions, computed on row-centred responses and thresholded at `|r| > 0.22`. Edges are
 weighted by default and binarised only where a specific metric requires it.
 
 ## Setup
@@ -68,15 +68,17 @@ Every stochastic call — permutation, rewiring, Erdős–Rényi, Louvain, layou
 from the single `SEED` in `src/common/config.py`. All paths resolve relative to the repo
 root via `pathlib`; there are no absolute paths. Reported numbers regenerate exactly.
 
-Two pipelines coexist in this repo, deliberately:
+All analysis runs on one matrix: **91 respondents** (every non-empty record), with the 242
+missing cells recovered by question-wise regularised proportional-odds ordinal regression
+(`src/imputation.py`). `src/common/matrix.py` consumes that matrix and row-centres it; it
+does not re-impute anything. Person 2's stages use Pearson correlation throughout, because
+the Marchenko–Pastur eigenvalue band has no closed form for rank correlations.
 
-- **Frozen pipeline** (`src/common/matrix.py`) — 86 respondents after dropping the 10 with
-  more than 12 missing items, column-mean fill, Pearson. This produces every number in the
-  report.
-- **Person 1's variant** (`src/pipeline.py`) — 91 respondents, ordinal-regression
-  imputation, Spearman. Retained and reported as a documented sensitivity check; it yields
-  four significant dimensions rather than three. See `artifacts/sensitivity.json` and the
-  *Methods tried and rejected* table in the report.
+`build_frozen_variant()` rebuilds a superseded alternative — drop the 10 respondents with
+more than 12 missing items, fill the rest with a column mean — purely so the report can
+quantify what the respondent filter changes. It yields three significant eigenvalue modes
+rather than four. See `artifacts/sensitivity.json` and *Methods considered and rejected*
+in the report.
 
 ## Team
 

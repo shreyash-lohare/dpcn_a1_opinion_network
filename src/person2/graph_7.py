@@ -223,7 +223,7 @@ def finalise(chosen: float, rule: str) -> dict:
     payload = {
         "chosen_threshold": float(chosen),
         "rule": rule,
-        "basis": "MP-denoised correlation matrix (3 significant components)",
+        "basis": f"MP-denoised correlation matrix ({json.loads((ARTIFACTS / 'mp_dimensions.json').read_text())['n_significant']} significant components)",
         "edges": int(stats["edges"]),
         "mean_degree": float(stats["mean_degree"]),
         "n_components": int(stats["n_components"]),

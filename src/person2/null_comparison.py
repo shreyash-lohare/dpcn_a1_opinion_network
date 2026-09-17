@@ -65,9 +65,9 @@ def main(n_reps: int = N_NULL_REPS) -> dict:
     print("NULL-MODEL COMPARISON -- respondent network, symmetrised kNN (k = 4)")
     print("=" * 78)
     print(f"  nodes {G.number_of_nodes()}, edges {G.number_of_edges()}, "
-          f"components {nx.number_connected_components(G)}   (spec 86 / 286 / 1)")
+          f"components {nx.number_connected_components(G)}   (ref 91 / 298 / 1)")
     print(f"  observed modularity  {observed:.3f}")
-    print(f"  observed clustering  {observed_clustering:.3f}   (spec 0.202)")
+    print(f"  observed clustering  {observed_clustering:.3f}   (ref 0.219)")
     print()
 
     perm = np.array(permutation_null(am.encoded.to_numpy(), full_pipeline_modularity,

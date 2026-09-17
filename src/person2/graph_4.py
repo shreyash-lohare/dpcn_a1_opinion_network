@@ -1,8 +1,8 @@
 """Graph 4 -- real vs shuffled correlation distributions (the noise floor).
 
-1,770 pairwise correlations are estimated from 86 respondents. Two unrelated
+1,770 pairwise correlations are estimated from 91 respondents. Two unrelated
 questions do not correlate at 0.00: they scatter around zero with typical
-spread 1/sqrt(n-3) ~ 0.109. Across 1,770 pairs, a large number land high purely
+spread 1/sqrt(n-3) ~ 0.107 at n = 91. Across 1,770 pairs, a large number land high purely
 by luck. That is the noise floor -- not bad data, but irreducible sampling
 scatter -- and any threshold chosen without reference to it is arbitrary.
 
@@ -44,12 +44,17 @@ from src.common.matrix import (
 )
 from src.common.nulls import cache_replicates, permutation_null
 
+# Regression checks for the CURRENT pipeline: 91 respondents, ordinal-regression
+# imputation (team decision, 2026-09-17). The earlier 86-respondent / column-mean
+# reference values no longer apply; build_frozen_variant() reproduces those.
 SPEC = {
-    0.15: "467 / 309 (66%)",
-    0.20: "258 / 118 (46%)",
-    0.25: "111 / 37 (33%)",
-    0.30: "49 / 9 (18%)",
+    0.15: "502 / 286 (57%)",
+    0.20: "266 / 107 (40%)",
+    0.25: "124 / 32 (26%)",
+    0.30: "51 / 7 (14%)",
 }
+SPEC_REAL_SD = 0.139
+SPEC_NULL_SD = 0.106
 
 
 def pipeline_fn(X_permuted: np.ndarray) -> np.ndarray:
@@ -107,11 +112,12 @@ def report_numbers(real_r, null_matrix, table, n_respondents: int) -> dict:
     print("=" * 74)
     print(f"  pairwise correlations        {len(real_r):>8,}    (spec 1,770)")
     print(f"  permutation replicates       {null_matrix.shape[0]:>8,}")
-    print(f"  real correlation SD          {real_r.std():>8.4f}    (spec 0.136)")
-    print(f"  shuffled correlation SD      {pooled.std():>8.4f}    (spec 0.108)")
-    print(f"  theoretical 1/sqrt(n-3)      {theory:>8.4f}    (spec 0.109)")
+    print(f"  respondents                  {n_respondents:>8}    (91, ordinal-imputed)")
+    print(f"  real correlation SD          {real_r.std():>8.4f}    (ref {SPEC_REAL_SD})")
+    print(f"  shuffled correlation SD      {pooled.std():>8.4f}    (ref {SPEC_NULL_SD})")
+    print(f"  theoretical 1/sqrt(n-3)      {theory:>8.4f}")
     print()
-    print(f"  {'threshold':>10} {'real':>8} {'chance':>8} {'chance %':>9}   spec")
+    print(f"  {'threshold':>10} {'real':>8} {'chance':>8} {'chance %':>9}   reference")
     for t in REPORT_THRESHOLDS:
         row = table.loc[np.isclose(table["threshold"], t)].iloc[0]
         print(

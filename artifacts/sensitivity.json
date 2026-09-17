@@ -1,100 +1,110 @@
 {
-  "chosen_threshold": 0.2,
-  "frozen_pipeline": {
-    "n_respondents": 86,
+  "chosen_threshold": 0.22,
+  "adopted_pipeline": {
+    "n_respondents": 91,
     "max_missing_items": 12,
-    "imputed_cells": 47,
-    "Q": 1.4333,
-    "lambda_plus": 3.3682,
-    "n_significant_eigenvalues": 3,
-    "theoretical_noise_sd": 0.1098
+    "imputed_cells": 242,
+    "Q": 1.5167,
+    "lambda_plus": 3.2833,
+    "n_significant_eigenvalues": 4,
+    "theoretical_noise_sd": 0.1066
   },
   "respondent_networks": {
     "symmetrised_knn_k4": {
-      "nodes": 86,
-      "edges": 286,
+      "nodes": 91,
+      "edges": 298,
       "components": 1,
       "isolates": 0,
       "gcc_fraction": 1.0,
-      "modularity": 0.416,
+      "modularity": 0.421,
       "n_communities": 7
     },
     "mutual_knn_k4": {
-      "nodes": 86,
-      "edges": 58,
-      "components": 38,
-      "isolates": 30,
-      "gcc_fraction": 0.395,
-      "modularity": 0.726,
-      "n_communities": 41
+      "nodes": 91,
+      "edges": 66,
+      "components": 37,
+      "isolates": 29,
+      "gcc_fraction": 0.495,
+      "modularity": 0.717,
+      "n_communities": 42
     }
   },
   "centring": {
     "raw_uncentred": {
-      "mean_r": 0.1482,
-      "mean_abs_r": 0.1775,
-      "sd": 0.1562,
-      "edges_at_threshold": 696,
-      "density_at_threshold": 0.393,
-      "positive_fraction": 0.826
+      "mean_r": 0.1526,
+      "mean_abs_r": 0.1823,
+      "sd": 0.1614,
+      "edges_at_threshold": 624,
+      "density_at_threshold": 0.353,
+      "positive_fraction": 0.827
     },
     "row_centred": {
-      "mean_r": -0.0144,
-      "mean_abs_r": 0.1095,
-      "sd": 0.1363,
-      "edges_at_threshold": 258,
-      "density_at_threshold": 0.146,
-      "positive_fraction": 0.446
+      "mean_r": -0.0141,
+      "mean_abs_r": 0.1123,
+      "sd": 0.1391,
+      "edges_at_threshold": 205,
+      "density_at_threshold": 0.116,
+      "positive_fraction": 0.447
     }
   },
   "percentile_thresholding_items": {
     "percentile": 90.0,
-    "implied_threshold": 0.2285,
+    "implied_threshold": 0.2289,
     "nodes": 60,
     "edges": 177,
     "components": 1,
     "isolates": 0,
     "gcc_fraction": 1.0,
-    "modularity": 0.378,
-    "n_communities": 7
+    "modularity": 0.396,
+    "n_communities": 6
   },
   "percentile_thresholding_respondents": {
     "percentile": 90.0,
-    "implied_threshold": 0.5042,
-    "nodes": 86,
-    "edges": 366,
+    "implied_threshold": 0.506,
+    "nodes": 91,
+    "edges": 410,
     "components": 22,
     "isolates": 20,
-    "gcc_fraction": 0.744,
-    "modularity": 0.222,
-    "n_communities": 24
+    "gcc_fraction": 0.758,
+    "modularity": 0.23,
+    "n_communities": 25
   },
   "imputation": {
+    "ordinal_regression (adopted)": {
+      "n_respondents": 91,
+      "sd": 0.1391,
+      "edges_at_threshold": 205,
+      "n_significant_eigenvalues": 4,
+      "variance_pct": 25.6
+    },
     "column_mean": {
-      "sd": 0.1363,
-      "edges_at_threshold": 258,
-      "n_significant_eigenvalues": 3
+      "n_respondents": 91,
+      "sd": 0.135,
+      "edges_at_threshold": 185,
+      "n_significant_eigenvalues": 4,
+      "variance_pct": 24.7
     },
     "column_median": {
-      "sd": 0.1361,
-      "edges_at_threshold": 260,
-      "n_significant_eigenvalues": 3
+      "n_respondents": 91,
+      "sd": 0.1356,
+      "edges_at_threshold": 184,
+      "n_significant_eigenvalues": 4,
+      "variance_pct": 25.0
     }
   },
-  "person1_variant_91_respondents": {
-    "n_respondents": 91,
-    "Q": 1.5167,
-    "lambda_plus": 3.2833,
-    "n_significant_eigenvalues": 4,
+  "frozen_variant_86_respondents": {
+    "n_respondents": 86,
+    "Q": 1.4333,
+    "lambda_plus": 3.3682,
+    "n_significant_eigenvalues": 3,
     "significant_eigenvalues": [
-      4.383,
-      4.062,
-      3.552,
-      3.348
+      4.046,
+      3.977,
+      3.528
     ],
-    "variance_pct": 25.6,
-    "sd": 0.1391,
-    "edges_at_threshold": 266,
-    "theoretical_noise_sd": 0.1066
+    "variance_pct": 19.3,
+    "sd": 0.1363,
+    "edges_at_threshold": 194,
+    "theoretical_noise_sd": 0.1098
   }
 }

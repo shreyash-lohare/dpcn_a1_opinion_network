@@ -47,7 +47,7 @@ THRESHOLD_RULE = (
     "stay meaningful; spectral denoising has already removed the sampling noise that the "
     "chance-edge column measures, so a higher cutoff would penalise the same noise twice"
 )
-CHOSEN_THRESHOLD = 0.20
+CHOSEN_THRESHOLD = 0.22
 
 
 @dataclass
