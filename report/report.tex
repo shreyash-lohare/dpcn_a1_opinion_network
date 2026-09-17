@@ -546,30 +546,111 @@ $|r|\geq0.30$.}
 
 \subsection{Graph 4: Real versus shuffled correlations}
 
-\todoblock{Graph 4 --- owner: P2}{%
-Compare the distribution of observed item--item correlations against a
-column-shuffled null that destroys inter-item structure while preserving each
-item's marginal. Plot both distributions and report the excess of real edges
-over chance at several thresholds.\\[0.25em]
-\emph{Reference values to check against:} real SD $0.136$ vs shuffled SD
-$0.108$ (theoretical $1/\sqrt{n-3}\approx0.109$); edges at $|r|>0.15$: $467$
-real vs $309$ chance; $>0.20$: $258$ vs $118$; $>0.25$: $111$ vs $37$;
-$>0.30$: $49$ vs $9$.\\[0.25em]
-\emph{Findings + implication:} to be written.}
+\label{sec:g4}
+
+Figure~\ref{fig:g4} compares the observed distribution of all $1{,}770$
+item--item correlations against a null that destroys inter-item association
+while preserving every item's marginal distribution exactly. Each of $200$
+replicates permutes \emph{every column independently} and then re-runs the full
+pipeline---row-centre, then correlate---on the shuffled matrix. This detail is
+not cosmetic: applying a single permutation to all columns, or permuting rows,
+merely relabels respondents and leaves the correlation structure numerically
+untouched.
+
+Graphs 4, 5 and 7 are computed on the frozen $86$-respondent matrix rather than
+the $91$-respondent ordinal-imputed matrix of Section~\ref{sec:imputation}.
+Section~\ref{sec:rejected-p2} reports what changes under the other choice.
+
+\textbf{Findings.} Correlations estimated from $n=86$ respondents scatter about
+zero with standard deviation $1/\sqrt{n-3}=0.110$ even when nothing is related.
+The permuted null reproduces this almost exactly at $\mathbf{0.108}$, against
+$\mathbf{0.136}$ for the observed matrix. Real structure exists, but it is
+modest, and it lives in the tails rather than the bulk:
+
+\begin{center}\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+$|r|>$ & $0.15$ & $0.20$ & $0.25$ & $0.30$ \\
+\midrule
+Observed edges & $467$ & $258$ & $111$ & $49$ \\
+Expected by chance & $308$ & $119$ & $37$ & $9$ \\
+Chance fraction & $66\%$ & $46\%$ & $33\%$ & $19\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Implication.} At the conventional cutoff $|r|>0.15$ roughly two thirds
+of surviving edges are what $1{,}770$ simultaneous estimates from $86$ people
+produce by luck alone. A network drawn there is mostly noise with a real signal
+embedded in it, and no amount of downstream community detection can separate the
+two after the fact. This figure is therefore a precondition for
+Section~\ref{sec:g7}: it converts threshold selection from a matter of
+convention into a measured trade-off, and it supplies the chance-expectation
+curve that the sweep is read against.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/person2/graph_4_noise_floor.png}
+\caption{Graph 4. (a) Observed item--item correlations against a $200$-replicate
+permutation null that re-runs the whole pipeline on independently shuffled
+columns; observed SD $0.136$ against $0.108$ for the null, with the excess
+confined to the tails. (b) Surviving edges against edges expected from sampling
+scatter alone, log scale; the shaded band is the excess over chance. At
+$|r|>0.15$ two thirds of surviving edges are chance.}
+\label{fig:g4}
+\end{figure*}
 
 \subsection{Graph 5: Eigenvalue spectrum against Marchenko--Pastur}
 
-\todoblock{Graph 5 --- owner: P2}{%
-Plot the eigenvalue spectrum of the row-centred correlation matrix against the
-Marchenko--Pastur band \cite{marchenko1967distribution} for a random matrix of
-the same shape, to separate informative modes from noise.\\[0.25em]
-\emph{Reference values:} with $T$ respondents and $N=60$ items, $Q=T/N$ and
-$\lambda_+=(1+1/\sqrt{Q})^2$. At $T=86$ this gives $\lambda_+\approx3.368$,
-with exactly three eigenvalues above it ($4.05$, $3.98$, $3.53$) carrying
-$19.3\%$ of total variance. Recompute for $T=91$.\\[0.25em]
-\emph{Findings + implication:} to be written. Note that PC1 explains only
-about $8\%$ of variance, so this should \emph{not} be read as evidence of a
-two-camp polarisation.}
+\label{sec:g5}
+
+Graph 4 establishes that a noise floor exists but not how many genuine
+dimensions sit above it. Principal component analysis alone cannot settle this:
+PC1 explains only $8.3\%$ of variance, and that number is equally consistent
+with weak structure and with none. Marchenko--Pastur theory
+\cite{marchenko1967distribution} answers it exactly. For a correlation matrix
+built from $T$ observations of $N$ pure-noise variables, the eigenvalues fall
+inside an analytically known band, and anything above its upper edge carries
+more structure than $T$ observations could have produced by chance.
+
+\textbf{Findings.} With $T=86$ and $N=60$, $Q=T/N=1.433$ and
+$\lambda_+=(1+1/\sqrt{Q})^2=\mathbf{3.368}$. Figure~\ref{fig:g5} shows the bulk
+of the spectrum tracking the theoretical density closely, with
+\textbf{exactly three} eigenvalues clearing the band---$4.05$, $3.98$ and
+$3.53$---together carrying $\mathbf{19.3\%}$ of total variance. Reading the item
+loadings, the three modes correspond to (i)~systemic responsibility against
+technological optimism and traditional instruction, (ii)~regulatory guardrails
+against individual autonomy, and (iii)~AI-enabled education and industry against
+environmental stewardship. The third is a clean split; the first two mix items
+across blocks and we present them as readings of the loadings rather than as
+established constructs.
+
+One caveat belongs beside the headline. The fourth eigenvalue is $3.354$
+against a band edge of $3.368$---a margin of $0.4\%$. ``Exactly three'' is the
+correct count, but it is not a comfortable one, and a slightly different
+respondent filter changes it (Section~\ref{sec:rejected-p2}).
+
+\textbf{Implication.} Four fifths of this correlation matrix is sampling noise.
+That is the single most important quantitative statement in the analysis, and it
+disciplines everything downstream: the network is rebuilt from the three
+significant modes alone, with the diagonal restored to unity, so that later
+community and balance analyses operate on the part of the matrix that $86$
+respondents can actually support. It also reinforces the reading of
+Section~\ref{sec:discussion}: three modest, cross-cutting dimensions carrying
+under a fifth of variance is the signature of a broadly agreeing cohort with
+local structure, not of a polarised one.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.90\textwidth]{../figures/person2/graph_5_mp_spectrum.png}
+\caption{Graph 5. Eigenvalue spectrum of the row-centred item correlation matrix
+against the Marchenko--Pastur density for pure noise of the same shape
+($T=86$, $N=60$, $Q=1.433$). The bulk tracks the theoretical curve; exactly
+three eigenvalues exceed $\lambda_+=3.368$, carrying $19.3\%$ of total
+variance. Inset: the top six eigenvalues, showing the fourth ($3.354$) falling
+just below the band edge.}
+\label{fig:g5}
+\end{figure*}
 
 \subsection{Graph 6: Reordered correlation heatmap}
 
@@ -583,14 +664,51 @@ that comparison is the point of the figure.}
 
 \subsection{Graph 7: Threshold and percolation sweep}
 
-\todoblock{Graph 7 --- owner: P2}{%
-Sweep the edge threshold $\tau$ and plot number of connected components,
-modularity, and average clustering against it, to select $\tau$ by evidence
-rather than convention. This figure supplies the threshold used by Graph 8.
-\\[0.25em]
-\emph{Findings + implication:} to be written. Report the chosen $\tau$ and the
-justification, and note the trade-off between a connected graph and one whose
-edges are individually trustworthy.}
+\label{sec:g7}
+
+Reporting a network at one threshold invites the obvious objection that the
+threshold was chosen to produce the result. Figure~\ref{fig:g7} answers it by
+rebuilding the signed graph at all $46$ cutoffs from $0.05$ to $0.50$ and
+tracking edge count, giant-component fraction, fragmentation and Louvain
+modularity \cite{blondel2008fast,newman2006modularity} across the whole range, so the chosen value is visibly a point on a curve. The
+sweep also absorbs the giant-component analysis entirely.
+
+\textbf{Findings.} The two constraints pull in opposite directions. Raising the
+threshold lowers the chance fraction from Graph 4, but the graph shatters well
+before the chance fraction becomes small: by $|r|>0.25$ the giant component
+holds fewer than half the items and $32$ of $60$ are isolated. We therefore
+state the rule explicitly---\emph{the highest cutoff at which the giant
+component still spans more than two thirds of the items and mean degree remains
+above $4$}, so that community and path-based metrics stay meaningful---and note
+that spectral denoising has already removed the sampling noise the chance column
+measures, so raising the cutoff further would penalise the same noise twice.
+This selects $\boldsymbol{|r|>0.20}$, giving $\mathbf{124}$ edges ($60$
+positive, $64$ negative), mean degree $4.13$, a giant component of $41$ of $60$
+items ($68\%$), and modularity $Q=0.405$.
+
+Two independent controls agree at this cutoff despite sharing no machinery. The
+permutation null implies the raw graph's $258$ edges contain about $119$ chance
+edges, leaving roughly $139$ real ones; spectral denoising, which never sees the
+null, retains $124$. The estimates differ by about $11\%$.
+
+\textbf{Implication.} Panel~(d) is the cautionary one. Modularity climbs
+steadily to $0.63$ as the threshold rises---but at that point the graph is $51$
+components with $47$ isolated items. Quoting a single high modularity without
+the sweep beside it would report fragmentation as community structure, which is
+precisely the error the null models of Section~\ref{sec:nulls-p2} are designed
+to catch.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/person2/graph_7_threshold_sweep.png}
+\caption{Graph 7. The signed item network rebuilt at all $46$ cutoffs from
+$0.05$ to $0.50$. (a) Edge count against the chance expectation from Graph 4.
+(b) Giant component, which falls below two thirds of the items shortly after the
+chosen cutoff. (c) Components and isolates. (d) Louvain modularity, which rises
+to $0.63$ only once the graph has broken into $51$ pieces. The vertical line
+marks the selected $|r|>0.20$.}
+\label{fig:g7}
+\end{figure*}
 
 \subsection{Graph 8: Main item network}
 
@@ -795,15 +913,58 @@ tolerance, over the range where the dynamics are genuinely active.
 
 \subsection{What the data does not support}
 
+\paragraph{Four fifths of the correlation matrix is noise.}
+Section~\ref{sec:g5} puts a number on how much of this matrix is interpretable:
+exactly three eigenvalue modes exceed the Marchenko--Pastur band, carrying
+$19.3\%$ of total variance. The remaining $80.7\%$ is what $86$ respondents
+answering $60$ items generate by chance. Any claim resting on a single
+correlation, or on the fine structure of the full matrix, is unsupported.
+
+\paragraph{The community structure does not survive its own null.}
+\label{sec:nulls-p2}
+This is the sharpest negative result in the report, and which null model is used
+decides it. A correlation-derived network has transitivity built into its
+construction: if A correlates with B and B with C, A and C are pulled toward
+correlation automatically, and that alone manufactures clustering and modularity
+in data with no association whatsoever. Degree-preserving rewiring
+\cite{maslov2002specificity} and Erd\H{o}s--R\'enyi nulls both take the
+\emph{finished graph} as given, so neither can detect structure that the
+construction itself created. Only a permutation null---destroying association in
+the raw responses, then regenerating the entire chain of centre, correlate,
+threshold and measure---tests the claim actually being made. On the respondent
+network ($86$ nodes, $286$ edges, one component, symmetrised $k$NN at $k=4$),
+observed modularity is $0.416$ and average clustering $0.202$:
+
+\begin{center}\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+Null model & Mean & SD & $z$ \\
+\midrule
+Degree-preserving rewiring & $0.329$ & $0.011$ & $7.74$ \\
+Erd\H{o}s--R\'enyi $G(n,m)$ & $0.332$ & $0.011$ & $7.79$ \\
+Column permutation & $0.400$ & $0.019$ & $\mathbf{0.79}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Against the two graph-level nulls the structure looks overwhelming, at $z$
+approaching $8$. Against the null that reproduces the construction it vanishes
+($p=0.20$). We report this as a finding rather than a failure: those communities
+are an artefact of correlating and then applying a neighbourhood rule. It is
+also the reason the item network, thresholded directly on a measured quantity,
+is the primary object of this report and the respondent network is used only for
+the dynamics of Section~\ref{sec:g12}.
+
+\paragraph{And therefore, not polarisation.}
+Three cross-cutting modes carrying under a fifth of variance, communities that
+fail their own null, and $79.8\%$ agreement across every block describe a cohort
+in broad consensus with local, domain-specific disagreement. They do not
+describe two camps.
+
 \todoblock{Results and Discussion --- integration, owner: P3}{%
-Once Graphs 4--11 are complete, integrate their findings here. In particular
-this section must state:\\[0.25em]
-(i) whether the observed community structure survives the
-\emph{permutation} null of Graph 10, and if it does not, report that the
-communities are largely a construction artefact --- as a finding;\\[0.25em]
-(ii) how many eigenvalue modes exceed the Marchenko--Pastur band (Graph 5) and
-what fraction of variance is therefore attributable to signal rather than
-noise;\\[0.25em]
+Items (i) and (ii) are now answered above from Graphs 5 and 10. Still
+outstanding:\\[0.25em]
 (iii) whether the detected communities align with the four thematic blocks or
 cut across them (Graphs 6 and 9);\\[0.25em]
 (iv) whether structural balance strengthens with threshold (Graph 11).}
@@ -826,12 +987,36 @@ network fragments the graph into many components, which would inflate cluster
 counts in the dynamics for reasons unrelated to the process being studied;
 union $k$NN yields a single connected component.
 
-\todoblock{Rejected methods --- additions from P2/P3}{%
-Add the rejected sparsification and similarity variants once measured:
-percentile thresholding at p90 (reported to leave $22$ components and many
-isolates), cosine similarity and Gower distance as alternatives to Pearson,
-and raw uncentred similarity (near-complete graph --- partially covered by
-Graph 3).}
+\label{sec:rejected-p2}
+Four further alternatives were measured rather than argued about.
+
+\textbf{Percentile thresholding} at p90 fixes the edge count by construction, so
+it cannot say whether any edge beats chance --- the objection is structural, not
+empirical. Measured, it behaves very differently on the two networks: on the
+item network it implies $|r|>0.229$ and leaves $177$ edges in a single
+component, while on the respondent network it implies $|r|>0.504$ and leaves
+$366$ edges across $22$ components with $20$ isolates.
+
+\textbf{Raw uncentred similarity} leaves $696$ of $1{,}770$ pairs above
+$|r|>0.20$ --- a $39\%$-dense graph in which $83\%$ of all correlations are
+positive. This is the same acquiescence effect quantified in
+Section~\ref{sec:g3}, restated at the threshold actually used.
+
+\textbf{Column-median instead of column-mean} imputation was tested rather than
+assumed: across the $47$ missing cells it moves the correlation SD from
+$0.1363$ to $0.1361$ and the edge count at $|r|>0.20$ from $258$ to $260$, and
+leaves the number of significant eigenvalue modes unchanged at three. The choice
+is immaterial, which is itself the argument against anything heavier.
+
+\textbf{Retaining all $91$ non-empty respondents} rather than dropping the ten
+with more than twelve missing items is a genuine sensitivity, and we report it
+because it changes a headline. At $T=91$, $Q=1.517$ and $\lambda_+=3.283$, and
+\emph{four} modes clear the band rather than three, carrying $25.6\%$ of
+variance. The extra mode is supported disproportionately by the $242$ cells
+recovered by the imputation model of Section~\ref{sec:imputation}, whose
+held-out accuracy is $47.6\%$. Graphs 4, 5 and 7 therefore use the
+$86$-respondent matrix, and the ``exactly three dimensions'' result should be
+read as conditional on that filter rather than as a property of the cohort.
 
 \subsection{Limitations}
 
@@ -872,12 +1057,27 @@ experiment that the small-$\varepsilon$ cluster plateau is forced by the
 five-point response grid, while the diversity sustained by the sparse network
 relative to a well-mixed population is a genuine topological effect.
 
+On that matrix we then measured how much is interpretable at all. A
+permutation null that regenerates the whole pipeline from independently shuffled
+columns puts the noise floor at $0.108$ against an observed correlation spread
+of $0.136$, and Marchenko--Pastur filtering leaves exactly three modes above the
+band, carrying $19.3\%$ of variance. The edge threshold was then selected from a
+$46$-point sweep by a stated rule rather than convention, at $|r|>0.20$, where
+the giant component still spans $68\%$ of the items.
+
+The same null framework delivers the report's sharpest negative result. The
+respondent network's community structure clears a degree-preserving rewiring
+null at $z=7.74$ and an Erd\H{o}s--R\'enyi null at $z=7.79$, but fails the
+permutation null at $z=0.79$ ($p=0.20$): it is an artefact of correlating and
+then applying a neighbourhood rule, not a property of the responses. The
+characterisation that survives all of this is a cohort in superficial consensus
+with genuine but local structure --- three modest cross-cutting dimensions, not
+two camps.
+
 \todoblock{Conclusion --- final integration}{%
-Complete once Graphs 4--11 land. State the final chosen threshold and its
-justification, the number of communities and whether they survive the
-permutation null, and close on the overall characterisation of the cohort ---
-superficial consensus with genuine local clustering --- supported by the
-completed null-model evidence rather than asserted.}
+Still to add once Graphs 6 and 11 land: the number of item-network communities
+and whether they align with the four thematic blocks, and whether structural
+balance strengthens with threshold.}
 
 % ============================================================
 \section*{Individual Contribution}
@@ -897,7 +1097,14 @@ Data sanitation and missingness analysis; ordinal-regression imputation and
 its masking validation; row-centring; Graphs 1, 2, 3 and 12; respondent
 $k$NN network; repository structure and \texttt{run\_all.py}. \\
 \addlinespace
-Shreyash Lohare & \textit{[TO BE COMPLETED --- Graphs 4, 5, 7]} \\
+Shreyash Lohare &
+Noise-floor analysis and the permutation null framework
+(\texttt{src/common/nulls.py}); Marchenko--Pastur spectral denoising; threshold
+sweep and selection; the three-null comparison of
+Section~\ref{sec:nulls-p2}; sensitivity analysis of the rejected methods in
+Section~\ref{sec:rejected-p2}; shared configuration and the spec-conformant
+analysis matrix (\texttt{src/common/}); Graphs 4, 5 and 7; this section and
+Section~\ref{sec:g4}--\ref{sec:g7}. Commits tagged \texttt{[P2]}. \\
 \addlinespace
 Dev Patel & \textit{[TO BE COMPLETED --- Graphs 6, 10, 11]} \\
 \bottomrule

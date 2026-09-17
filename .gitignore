@@ -10,3 +10,10 @@ person2_files/
 *.out
 *.bbl
 *.blg
+
+# LaTeX build artefacts
+report/*.log
+report/*.blg
+report/*.aux
+report/*.out
+report/*.bbl

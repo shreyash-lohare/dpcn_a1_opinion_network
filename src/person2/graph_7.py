@@ -115,8 +115,12 @@ def print_table(table: pd.DataFrame, chance: pd.DataFrame | None) -> None:
 
 
 def plot_sweep(table, chance, chosen: float, path_stem, rule: str) -> None:
-    fig, axes = plt.subplots(4, 1, figsize=(6.5, 7.6), sharex=True)
-    ax_a, ax_b, ax_c, ax_d = axes
+    # 2x2 rather than 4x1: the report is two-column, and a 4-high stack becomes
+    # a figure roughly 19cm tall, which would take three quarters of a page as a
+    # full-width float. Each column still shares the threshold axis.
+    fig, axes2d = plt.subplots(2, 2, figsize=(7.5, 4.8), sharex=True)
+    ax_a, ax_b, ax_c, ax_d = axes2d[0, 0], axes2d[0, 1], axes2d[1, 0], axes2d[1, 1]
+    axes = [ax_a, ax_b, ax_c, ax_d]
 
     # --- (a) edge count, with the chance expectation overlaid -------------
     ax_a.plot(table["threshold"], table["edges"], color=REAL_COLOR, linewidth=2.2,
@@ -128,18 +132,17 @@ def plot_sweep(table, chance, chosen: float, path_stem, rule: str) -> None:
                   linestyle="--", linewidth=2.0, label="Expected by chance (permuted null)")
     ax_a.set_ylabel("Edges")
     ax_a.set_yscale("log")
-    ax_a.set_title("(a) Edge count against the chance expectation", fontsize=11, loc="left")
+    ax_a.set_title("(a) Edge count vs chance expectation", fontsize=10, loc="left")
     ax_a.set_ylim(bottom=0.3)
-    ax_a.legend(fontsize=8.5, loc="lower left", framealpha=0.92)
+    ax_a.legend(fontsize=7.5, loc="lower left", framealpha=0.92)
 
     # --- (b) giant component fraction -------------------------------------
     ax_b.plot(table["threshold"], table["gcc_fraction"] * 100, color=REAL_COLOR, linewidth=2.2)
     ax_b.axhline(50, color="#9AA5B1", linestyle=":", linewidth=1.2)
-    ax_b.text(0.052, 53, "50% of nodes", fontsize=8.5, color="#6B7580")
+    ax_b.text(0.055, 53, "50% of nodes", fontsize=8, color="#6B7580")
     ax_b.set_ylabel("GCC (% of 60 items)")
     ax_b.set_ylim(0, 105)
-    ax_b.set_title("(b) Giant connected component: where the network shatters",
-                   fontsize=11, loc="left")
+    ax_b.set_title("(b) Giant component: where the network shatters", fontsize=10, loc="left")
 
     # --- (c) component count and isolates ---------------------------------
     ax_c.plot(table["threshold"], table["n_components"], color=REAL_COLOR, linewidth=2.2,
@@ -147,15 +150,15 @@ def plot_sweep(table, chance, chosen: float, path_stem, rule: str) -> None:
     ax_c.plot(table["threshold"], table["n_isolates"], color=NULL_COLOR, linewidth=1.8,
               linestyle="--", label="Isolated items")
     ax_c.set_ylabel("Count")
-    ax_c.set_title("(c) Fragmentation", fontsize=11, loc="left")
-    ax_c.legend(fontsize=8.5, loc="upper left")
+    ax_c.set_title("(c) Fragmentation", fontsize=10, loc="left")
+    ax_c.legend(fontsize=8, loc="upper left")
 
     # --- (d) modularity ----------------------------------------------------
     ax_d.plot(table["threshold"], table["modularity"], color=REAL_COLOR, linewidth=2.2)
     ax_d.set_ylabel("Louvain modularity $Q$")
     ax_d.set_xlabel("Edge threshold $|r|$")
-    ax_d.set_title("(d) Modularity (rises trivially once the graph fragments)",
-                   fontsize=11, loc="left")
+    ax_c.set_xlabel("Edge threshold $|r|$")
+    ax_d.set_title("(d) Modularity (rises as the graph fragments)", fontsize=10, loc="left")
 
     for ax in axes:
         ax.axvline(chosen, color=MARK_COLOR, linewidth=1.8, alpha=0.85)
@@ -176,11 +179,11 @@ def plot_sweep(table, chance, chosen: float, path_stem, rule: str) -> None:
     fig.suptitle(
         "Threshold sweep on the MP-denoised item network",
         fontsize=12,
-        y=0.999,
-        x=0.055,
+        y=0.985,
+        x=0.02,
         ha="left",
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.982))
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     for ext in ("png", "pdf"):
         fig.savefig(f"{path_stem}.{ext}", dpi=DPI, bbox_inches="tight")
     plt.close(fig)

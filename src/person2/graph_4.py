@@ -134,7 +134,7 @@ def plot_noise_floor(real_r, null_matrix, table, path_stem) -> None:
     bins = np.linspace(-0.6, 0.6, 61)
 
     fig, (ax1, ax2) = plt.subplots(
-        2, 1, figsize=(6.5, 6.1), gridspec_kw={"height_ratios": [1.3, 0.95]}
+        2, 1, figsize=(7.5, 5.3), gridspec_kw={"height_ratios": [1.25, 1.0]}
     )
 
     # --- (a) distributions on shared bin edges ----------------------------
