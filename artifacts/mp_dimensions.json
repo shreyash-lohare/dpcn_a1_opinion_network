@@ -1,0 +1,348 @@
+{
+  "n_observations": 86,
+  "n_items": 60,
+  "Q": 1.4333333333333333,
+  "lambda_plus": 3.3682125577737643,
+  "lambda_minus": 0.02713627943553762,
+  "n_significant": 3,
+  "significant_eigenvalues": [
+    4.046397028369029,
+    3.9765460171281983,
+    3.5281189111983715
+  ],
+  "variance_pct": 19.251769927825997,
+  "eigenvalues_all": [
+    4.046397028369029,
+    3.9765460171281983,
+    3.5281189111983715,
+    3.3540189945078387,
+    2.9423679519064594,
+    2.7567792291813604,
+    2.4866554227845357,
+    2.3543758799320598,
+    2.2092045993237672,
+    2.110940732999209,
+    1.9416594939274627,
+    1.8622646249753139,
+    1.7238366904409652,
+    1.699545593919137,
+    1.5718329414207688,
+    1.4595160546683528,
+    1.3433521076187322,
+    1.2414068154721656,
+    1.2276015803363287,
+    1.1526059982998642,
+    1.101907215415012,
+    0.9708463901188905,
+    0.9102009169147949,
+    0.9040329099048084,
+    0.8702916396958854,
+    0.7693581116888124,
+    0.7470450365535404,
+    0.6881059130732174,
+    0.6699990511835735,
+    0.6176707436512507,
+    0.5932956824536444,
+    0.5434482518541714,
+    0.5060557297470646,
+    0.4662356296489004,
+    0.4345920069871388,
+    0.3971452357533195,
+    0.36622595252730145,
+    0.3636448309348608,
+    0.3267251884189462,
+    0.2953371288460769,
+    0.2741779120944667,
+    0.2598689332840559,
+    0.23985391942761944,
+    0.2059291358334002,
+    0.19852855321846047,
+    0.16870347221067422,
+    0.16811681998281186,
+    0.16257456750043964,
+    0.13952686415824767,
+    0.13017418221449104,
+    0.10751340741397297,
+    0.09012685345933061,
+    0.08445501419513488,
+    0.06742484350395613,
+    0.056901359701914664,
+    0.04125976131836929,
+    0.02941683993169281,
+    0.024952445513979547,
+    0.01930488125585783,
+    1.1684593960557069e-15
+  ],
+  "dimensions": [
+    {
+      "component": 1,
+      "eigenvalue": 4.046397028369029,
+      "variance_pct": 6.7439950472817145,
+      "proposed_name": "Systemic responsibility vs. technological optimism and traditional instruction",
+      "top_positive": [
+        {
+          "code": "V09",
+          "loading": 0.3093035625644802,
+          "text": "Products should be designed to encourage reuse, repair, and recycling."
+        },
+        {
+          "code": "E10",
+          "loading": 0.28751857644169077,
+          "text": "Universities should prioritize innovation and problem-solving over rote learning."
+        },
+        {
+          "code": "V14",
+          "loading": 0.2291670486103369,
+          "text": "International cooperation is necessary to effectively address environmental challenges."
+        },
+        {
+          "code": "S06",
+          "loading": 0.19510460500785834,
+          "text": "Combating online misinformation requires shared responsibility among users, platforms, and governments."
+        },
+        {
+          "code": "T06",
+          "loading": 0.18009194723223812,
+          "text": "Most repetitive jobs will eventually be replaced by intelligent automation."
+        },
+        {
+          "code": "V12",
+          "loading": 0.17687994966842538,
+          "text": "Environmental sustainability should be integrated into higher education curricula."
+        },
+        {
+          "code": "E07",
+          "loading": 0.17625287112263271,
+          "text": "Publishing research before graduation should be encouraged, but not mandatory."
+        },
+        {
+          "code": "V07",
+          "loading": 0.171832052757084,
+          "text": "Protecting biodiversity is essential for long-term human well-being."
+        }
+      ],
+      "top_negative": [
+        {
+          "code": "T01",
+          "loading": -0.24770453266646839,
+          "text": "Artificial Intelligence will improve society more than it will create problems."
+        },
+        {
+          "code": "E03",
+          "loading": -0.23523432550618809,
+          "text": "Class attendance should be compulsory for all courses."
+        },
+        {
+          "code": "T08",
+          "loading": -0.22804983671586193,
+          "text": "AI-assisted diagnosis should become routine in healthcare."
+        },
+        {
+          "code": "E02",
+          "loading": -0.19340107493791292,
+          "text": "Traditional written examinations accurately measure a student's knowledge."
+        },
+        {
+          "code": "T07",
+          "loading": -0.17307929101471875,
+          "text": "Robots should replace humans in hazardous occupations whenever possible."
+        },
+        {
+          "code": "T11",
+          "loading": -0.14578718187609643,
+          "text": "Technology companies should explain how recommendation algorithms work."
+        },
+        {
+          "code": "E13",
+          "loading": -0.1433070483974148,
+          "text": "Universities should invest more resources in research than in expanding infrastructure."
+        },
+        {
+          "code": "T05",
+          "loading": -0.12982072029853362,
+          "text": "Artificial Intelligence will significantly accelerate scientific discovery."
+        }
+      ]
+    },
+    {
+      "component": 2,
+      "eigenvalue": 3.9765460171281983,
+      "variance_pct": 6.627576695213663,
+      "proposed_name": "Regulatory guardrails vs. individual autonomy",
+      "top_positive": [
+        {
+          "code": "T12",
+          "loading": 0.3034058938128063,
+          "text": "Governments should introduce stricter regulations for Artificial Intelligence."
+        },
+        {
+          "code": "T14",
+          "loading": 0.26128949179756894,
+          "text": "Social media algorithms contribute to opinion polarization."
+        },
+        {
+          "code": "S15",
+          "loading": 0.22251470123538128,
+          "text": "Building public trust is essential for responsible adoption of emerging technologies."
+        },
+        {
+          "code": "S13",
+          "loading": 0.20207773182573963,
+          "text": "Critical evaluation of online information should be taught as a core educational skill."
+        },
+        {
+          "code": "V10",
+          "loading": 0.18206626183394434,
+          "text": "Consumers should consider environmental impact when purchasing products."
+        },
+        {
+          "code": "T04",
+          "loading": 0.1818255686975576,
+          "text": "Every engineering student should receive formal education in AI."
+        },
+        {
+          "code": "T10",
+          "loading": 0.16810868539015753,
+          "text": "Protection of personal data is more important than technological convenience."
+        },
+        {
+          "code": "V02",
+          "loading": 0.16506902151247863,
+          "text": "Governments should prioritize investment in renewable energy over fossil fuels."
+        }
+      ],
+      "top_negative": [
+        {
+          "code": "V07",
+          "loading": -0.27814655131529187,
+          "text": "Protecting biodiversity is essential for long-term human well-being."
+        },
+        {
+          "code": "T09",
+          "loading": -0.22550524547203085,
+          "text": "Autonomous vehicles will ultimately make transportation safer."
+        },
+        {
+          "code": "E01",
+          "loading": -0.2205525072993729,
+          "text": "Project-based learning develops deeper understanding than examination-oriented learning."
+        },
+        {
+          "code": "E05",
+          "loading": -0.20215546361357986,
+          "text": "Students should be encouraged to take courses outside their primary discipline."
+        },
+        {
+          "code": "V05",
+          "loading": -0.1898429440268119,
+          "text": "Single-use plastics should be significantly restricted."
+        },
+        {
+          "code": "S11",
+          "loading": -0.18627390749941442,
+          "text": "People should be free to express differing opinions as long as they do not promote harm or discrimination."
+        },
+        {
+          "code": "E13",
+          "loading": -0.18146986286626957,
+          "text": "Universities should invest more resources in research than in expanding infrastructure."
+        },
+        {
+          "code": "E11",
+          "loading": -0.17836722219541323,
+          "text": "University curricula should be updated more frequently to match emerging technologies."
+        }
+      ]
+    },
+    {
+      "component": 3,
+      "eigenvalue": 3.5281189111983715,
+      "variance_pct": 5.880198185330619,
+      "proposed_name": "AI-enabled education and industry vs. environmental stewardship",
+      "top_positive": [
+        {
+          "code": "T02",
+          "loading": 0.28717661288172247,
+          "text": "Generative AI tools should be allowed as learning aids in higher education."
+        },
+        {
+          "code": "E12",
+          "loading": 0.25829637457944593,
+          "text": "Artificial intelligence should be integrated into teaching and personalized learning."
+        },
+        {
+          "code": "E14",
+          "loading": 0.257237382185482,
+          "text": "Strong collaborations between universities and industry improve student education."
+        },
+        {
+          "code": "T04",
+          "loading": 0.2549205534951313,
+          "text": "Every engineering student should receive formal education in AI."
+        },
+        {
+          "code": "E10",
+          "loading": 0.21659431812365898,
+          "text": "Universities should prioritize innovation and problem-solving over rote learning."
+        },
+        {
+          "code": "T06",
+          "loading": 0.18854928620040465,
+          "text": "Most repetitive jobs will eventually be replaced by intelligent automation."
+        },
+        {
+          "code": "T01",
+          "loading": 0.17432017336028127,
+          "text": "Artificial Intelligence will improve society more than it will create problems."
+        },
+        {
+          "code": "E01",
+          "loading": 0.1616855444653958,
+          "text": "Project-based learning develops deeper understanding than examination-oriented learning."
+        }
+      ],
+      "top_negative": [
+        {
+          "code": "V06",
+          "loading": -0.24318100068870288,
+          "text": "Water conservation should be a priority in households, institutions, and industries."
+        },
+        {
+          "code": "V04",
+          "loading": -0.23866993584893112,
+          "text": "Public transportation and non-motorized transport should be promoted even if they require additional public investment."
+        },
+        {
+          "code": "V08",
+          "loading": -0.19253794307177402,
+          "text": "Universities should adopt environmentally sustainable campus practices even if implementation costs increase."
+        },
+        {
+          "code": "V10",
+          "loading": -0.18889617749819418,
+          "text": "Consumers should consider environmental impact when purchasing products."
+        },
+        {
+          "code": "T13",
+          "loading": -0.1878891962277756,
+          "text": "Cybersecurity deserves greater investment than the development of new digital technologies."
+        },
+        {
+          "code": "T11",
+          "loading": -0.18776275814341192,
+          "text": "Technology companies should explain how recommendation algorithms work."
+        },
+        {
+          "code": "V15",
+          "loading": -0.1819462942739364,
+          "text": "Current generations have a responsibility to protect natural resources for future generations."
+        },
+        {
+          "code": "V07",
+          "loading": -0.1670894310506788,
+          "text": "Protecting biodiversity is essential for long-term human well-being."
+        }
+      ]
+    }
+  ]
+}
