@@ -125,12 +125,19 @@ def _p2_sensitivity():
     return main()
 
 
-def _p3_pending():
-    raise NotImplementedError(
-        "Person 3 stages (graphs 6, 10, 11) are not implemented yet. "
-        "Inputs they need are already written: artifacts/corr_denoised.npy, "
-        "artifacts/threshold.json, artifacts/null_replicates.npz."
-    )
+def _p3_graph_10():
+    from src.person3.graph_10 import run
+    return run()
+
+
+def _p3_graph_11():
+    from src.person3.graph_11 import run
+    return run()
+
+
+def _p3_graph_6():
+    from src.person3.graph_6 import run
+    return run()
 
 
 STAGES: List[Stage] = [
@@ -159,9 +166,15 @@ STAGES: List[Stage] = [
     Stage("P2", "Sensitivity annex: methods tried and rejected", _p2_sensitivity,
           requires=["artifacts/corr_raw.npy", "artifacts/threshold.json"],
           produces=["artifacts/sensitivity.json"]),
-    Stage("P3", "Graphs 6, 10, 11 (heatmap, nulls, structural balance)", _p3_pending,
+    Stage("P3", "Graph 10: communities vs three null models", _p3_graph_10,
           requires=["artifacts/corr_denoised.npy", "artifacts/threshold.json",
-                    "artifacts/null_modularity_replicates.npz"]),
+                    "artifacts/null_replicates.npz"],
+          produces=["artifacts/graph10_communities.json"]),
+    Stage("P3", "Graph 11: structural balance vs threshold", _p3_graph_11,
+          requires=["artifacts/corr_denoised.npy", "artifacts/threshold.json"],
+          produces=["artifacts/graph11_balance_stats.json"]),
+    Stage("P3", "Graph 6: reordered correlation heatmap", _p3_graph_6,
+          requires=["artifacts/corr_denoised.npy", "artifacts/graph10_communities.json"])
 ]
 
 
