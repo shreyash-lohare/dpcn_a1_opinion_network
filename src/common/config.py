@@ -29,6 +29,7 @@ DATA = ROOT / "data" / "Survey_Results_UC.csv"
 ARTIFACTS = ROOT / "artifacts"
 FIGDIR = ROOT / "figures"
 FIGDIR_P2 = FIGDIR / "person2"
+FIGDIR_P3 = FIGDIR / "person3"
 REPORT_FIGDIR = ROOT / "report" / "figures"
 
 # --- topic blocks ----------------------------------------------------------
