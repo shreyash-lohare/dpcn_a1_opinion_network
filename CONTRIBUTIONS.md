@@ -8,7 +8,7 @@ Format: `YYYY-MM-DD | P<n> | <task> | <commit-hash>`
 > All Person 2 tasks below are committed on `main`; hashes are the real commits.
 > Person 3's section is filled in as that work lands.
 
-## Person 1 — data preparation, imputation, graphs 1–3
+## Person 1 — data preparation, imputation, graphs 1–3, 9, 12
 
 ```
 2026-09-16 | P1 | Row-centring added to item-network pipeline; split into modules | 74f4673
@@ -16,7 +16,18 @@ Format: `YYYY-MM-DD | P<n> | <task> | <commit-hash>`
 2026-09-17 | P1 | Graph 2: item variance ranking                                  | 661133d
 2026-09-17 | P1 | Graph 3: row-centring effect on item-item correlations          | eed3418
 2026-09-17 | P1 | Method/artifact report for graphs 1-3                           | 6a5ff8e
+2026-09-17 | P1 | Graph 12: Deffuant-Weisbuch dynamics + respondent kNN network   | 8e7264b
+2026-09-17 | P1 | ICML report skeleton: data handling, graphs 1-3 and 12          | 90d52f4
+2026-09-17 | P1 | Merge P2 analysis into report draft                             | f89bacf
+2026-09-17 | P1 | Graph 9: topic-block connectivity + block-label permutation null| eaf158d
+2026-09-17 | P1 | Graph 9 report section; title block and column-overflow fixes   | 04824ea
 ```
+
+Graph 8 (main item network) is P1's remaining graph. It is not yet started:
+P2's chosen threshold is available in `artifacts/threshold.json`, but it was
+selected on the frozen 86-respondent matrix, so which matrix Graph 8 is built
+on is a team decision rather than a unilateral one. See the note under
+Person 2's artefact table.
 
 ## Person 2 — statistical spine, null framework, graphs 4/5/7
 
