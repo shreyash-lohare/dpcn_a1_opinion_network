@@ -436,12 +436,16 @@ def run() -> dict:
     print(f"  item graph: {G.number_of_nodes()} nodes, "
           f"{G.number_of_edges()} edges at |r| > {threshold}")
 
+    # Detect communities: Compare Louvain and Leiden
     # --- Compare three community detection algorithms ----------------------
     print("\n  === Community detection comparison ===")
     Q_louvain, comms_louvain = detect_communities_louvain(G)
     Q_leiden, comms_leiden = detect_communities_leiden(G)
+    print(f"  Louvain: {len(comms_louvain)} communities, Q = {Q_louvain:.4f}")
+    print(f"  Leiden : {len(comms_leiden)} communities, Q = {Q_leiden:.4f}")
     Q_gn, comms_gn, gn_curve = detect_communities_girvan_newman(G, max_k=30)
 
+    # We proceed with Leiden as primary
     print(f"  Louvain       : k={len(comms_louvain):2d}, Q={Q_louvain:.4f}  | Approach: agglomerative, greedy modularity")
     print(f"  Leiden        : k={len(comms_leiden):2d}, Q={Q_leiden:.4f}  | Approach: agglomerative + refinement phase")
     print(f"  Girvan-Newman : k={len(comms_gn):2d}, Q={Q_gn:.4f}  | Approach: divisive, edge-betweenness removal")
@@ -458,8 +462,10 @@ def run() -> dict:
     comm_labels = community_labels(codes, communities)
     n_comms = len(communities)
 
+    # Community vs topic-block analysis
     # Community vs topic-block analysis (Leiden)
     nmi, contingency = community_vs_blocks(codes, comm_labels)
+    print(f"  Leiden NMI (community vs topic block) = {nmi:.4f}")
     print(f"\n  Leiden NMI (community vs topic block) = {nmi:.4f}")
 
     # --- Null distributions for the ITEM network (using Leiden) -----------
@@ -494,6 +500,7 @@ def run() -> dict:
         print(f"  {name:<20} {s['null_mean']:>8.3f} {s['null_sd']:>8.3f} "
               f"{s['z']:>8.2f} {s['p']:>8.3f}")
 
+    # Plot
     # Plot main network + null comparison
     plot_graph_10(G, codes, communities, Q_observed,
                   perm_mods, rewire_mods, er_mods,
