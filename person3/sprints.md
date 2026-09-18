@@ -36,13 +36,15 @@
 | Sprint | Task | Status | Notes / Output |
 | :--- | :--- | :--- | :--- |
 | **S0** | **Setup & Orientation** | [x] | Created `src/person3/`, updated `FIGDIR_P3` config, validated artifacts. |
-| **S1** | **Graph 10: Communities vs Nulls** | [x] | Implemented Leiden (previously Louvain) on item network, ran permutation/rewiring/ER nulls, computed NMI vs topic blocks. Saved to `graph_10.py` and `graph10_communities.json`. |
+| **S1** | **Graph 10: Communities vs Nulls** | [x] | Implemented Louvain on item network, ran permutation/rewiring/ER nulls, computed NMI vs topic blocks. Saved to `graph_10.py` and `graph10_communities.json`. |
 | **S2** | **Graph 11: Structural Balance** | [x] | Computed balanced triads fraction against sign-permutation null. Saved to `graph_11.py` and `graph11_balance_stats.json`. |
 | **S3** | **Graph 6: Reordered Heatmap** | [x] | Plotted MP-denoised correlations ordered by Graph 10 communities. Diverging map + block border strips. Saved to `graph_6.py`. |
 | **S4** | **Exploration Notebook** | [x] | Created `notebooks/person3_exploration.ipynb` referencing P3 modules and showing figures/stats inline. |
 | **S5** | **Pipeline Integration** | [x] | Replaced `_p3_pending()` in `run_all.py` with the 3 distinct Graph 6, 10, 11 stages. All runs pass. |
 | **S6** | **Report Writing** | [x] | Replaced P3 `\todoblock`s in `report/report.tex` with analysis for G6, G10, G11, Discussion, Conclusion, and Individual Contribution. |
 | **S7** | **Final Polish & PR** | [ ] | (User instructed to skip this sprint) |
+| **S8** | **Leiden Migration** | [x] | Migrated Graph 10 community detection from Louvain to Leiden (`leidenalg` + `igraph` installed). Leiden achieves Q=0.491 vs Louvain Q=0.472. Both algorithms run and are compared; Leiden used as primary. Report, notebook, and sprints updated. Commits: `203841e`, `2c41a21`. |
+| **S9** | **Girvan-Newman Comparison** | [x] | Added Girvan-Newman divisive algorithm to Graph 10. GN peaks at k=15, Q=0.447. New three-panel comparison figure generated (`graph_10_algorithm_comparison.{png,pdf}`): modularity bar chart, GN Q(k) curve, and community size distributions. Report section rewritten to explain all three methods and their differences. Commit: `7569fa4`. |
 
 | # | Task | Notes |
 |---|---|---|

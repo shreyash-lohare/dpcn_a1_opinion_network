@@ -85,5 +85,18 @@ Person 2's artefact table.
 2026-09-18 | P3 | pipeline: wire P3 stages into run_all.py                                                        | 2ebf764
 2026-09-18 | P3 | report: draft P3 sections for graphs 6, 10, 11, results, and conclusion                         | 5f98523
 2026-09-18 | P3 | docs: update sprints.md with S0-S6 progress and completion notes                                | 59a8cce
-2026-09-18 | P3 | refactor: migrate community detection from Louvain to Leiden, update report          | [leiden]
+2026-09-18 | P3 | refactor: migrate community detection from Louvain to Leiden; install leidenalg + igraph          | 203841e
+2026-09-18 | P3 | fix: graph_10 clean rewrite, correct syntax errors, notebook importlib reload                      | 2c41a21
+2026-09-18 | P3 | feat: add Girvan-Newman community detection, three-way algorithm comparison figure, report section | 7569fa4
 ```
+
+### Person 3 deliverables
+
+| Deliverable | Path |
+| --- | --- |
+| Graph 10 (communities + nulls + algorithm comparison) | `src/person3/graph_10.py` → `figures/person3/graph_10_communities_nulls.{png,pdf}`, `figures/person3/graph_10_algorithm_comparison.{png,pdf}` |
+| Graph 11 (structural balance) | `src/person3/graph_11.py` → `figures/person3/graph_11_structural_balance.{png,pdf}` |
+| Graph 6 (reordered heatmap) | `src/person3/graph_6.py` → `figures/person3/graph_6_reordered_heatmap.{png,pdf}` |
+| Exploration notebook | `notebooks/person3_exploration.ipynb` |
+| Cached results | `artifacts/graph10_communities.json`, `artifacts/graph11_balance_stats.json` |
+| Sprint log | `person3/sprints.md` |
