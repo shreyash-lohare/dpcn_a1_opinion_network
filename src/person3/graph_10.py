@@ -27,6 +27,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import igraph as ig
+import leidenalg
 
 from src.common.config import (
     ARTIFACTS,
@@ -67,11 +69,32 @@ def build_signed_graph(corr: np.ndarray, codes: List[str],
 # Community detection
 # ---------------------------------------------------------------------------
 
-def detect_communities(G: nx.Graph, seed: int = SEED
-                       ) -> Tuple[float, List[frozenset]]:
+def detect_communities_louvain(G: nx.Graph, seed: int = SEED
+                               ) -> Tuple[float, List[frozenset]]:
     """Louvain on |r| weights. Returns (modularity, communities)."""
     communities = nx.community.louvain_communities(
         G, weight="weight", seed=seed)
+    Q = float(nx.community.modularity(G, communities, weight="weight"))
+    return Q, communities
+
+
+def detect_communities_leiden(G: nx.Graph, seed: int = SEED
+                              ) -> Tuple[float, List[frozenset]]:
+    """Leiden on |r| weights via leidenalg. Returns (modularity, communities)."""
+    if G.number_of_edges() == 0:
+        return 0.0, [frozenset([n]) for n in G.nodes()]
+    
+    H = ig.Graph.from_networkx(G)
+    if "weight" in H.edge_attributes():
+        weights = [float(w) if w is not None else 1.0 for w in H.es["weight"]]
+        partition = leidenalg.find_partition(
+            H, leidenalg.ModularityVertexPartition, weights=weights, seed=seed)
+    else:
+        partition = leidenalg.find_partition(
+            H, leidenalg.ModularityVertexPartition, seed=seed)
+
+    nx_nodes = list(G.nodes())
+    communities = [frozenset(nx_nodes[idx] for idx in p) for p in partition]
     Q = float(nx.community.modularity(G, communities, weight="weight"))
     return Q, communities
 
@@ -90,12 +113,10 @@ def community_labels(codes: List[str],
 # Null-model modularity for the item network
 # ---------------------------------------------------------------------------
 
-def _modularity_fn(G: nx.Graph) -> float:
-    """Louvain modularity of a graph, for use as a null measure."""
-    if G.number_of_edges() == 0:
-        return 0.0
-    comms = nx.community.louvain_communities(G, weight="weight", seed=SEED)
-    return float(nx.community.modularity(G, comms, weight="weight"))
+def _modularity_fn_leiden(G: nx.Graph) -> float:
+    """Leiden modularity of a graph, for use as a null measure."""
+    Q, _ = detect_communities_leiden(G, seed=SEED)
+    return Q
 
 
 def permutation_null_item_modularity(
@@ -104,12 +125,12 @@ def permutation_null_item_modularity(
     threshold: float,
     n_respondents: int,
 ) -> np.ndarray:
-    """Compute Louvain modularity for each permutation replicate.
+    """Compute Leiden modularity for each permutation replicate.
 
     ``null_corr_matrix`` has shape (n_reps, n_pairs) where n_pairs = 1770.
     Each row is the upper triangle of a 60x60 correlation matrix computed
     from column-permuted + row-centred data (already done by P2).
-    We rebuild the full matrix, threshold, build graph, run Louvain.
+    We rebuild the full matrix, threshold, build graph, run Leiden.
     """
     n_reps, n_pairs = null_corr_matrix.shape
     n_items = len(codes)
@@ -120,7 +141,7 @@ def permutation_null_item_modularity(
         corr[np.triu_indices(n_items, 1)] = null_corr_matrix[i]
         corr = corr + corr.T - np.diag(np.diag(corr))
         G = build_signed_graph(corr, codes, threshold)
-        mods[i] = _modularity_fn(G)
+        mods[i] = _modularity_fn_leiden(G)
         if (i + 1) % 50 == 0:
             print(f"    permutation replicate {i + 1}/{n_reps}")
     return mods
@@ -233,7 +254,7 @@ def plot_graph_10(G: nx.Graph, codes: List[str],
                         linewidths=1.5, zorder=3)
 
     ax_left.set_title(
-        f"(a) Item network (|r| > 0.22), coloured by Louvain community\n"
+        f"(a) Item network (|r| > 0.22), coloured by Leiden community\n"
         f"{G.number_of_nodes()} nodes, {G.number_of_edges()} edges, "
         f"{n_comms} communities, Q = {Q_observed:.3f}",
         fontsize=10, loc="left")
@@ -284,7 +305,7 @@ def plot_graph_10(G: nx.Graph, codes: List[str],
 
     ax_right.set_xticks(positions)
     ax_right.set_xticklabels(null_names, fontsize=9)
-    ax_right.set_ylabel("Louvain modularity Q", fontsize=10)
+    ax_right.set_ylabel("Leiden modularity Q", fontsize=10)
     ax_right.set_title(
         "(b) Observed modularity vs three null models\n"
         "Column permutation is the only valid test",
@@ -321,18 +342,24 @@ def run() -> dict:
     print(f"  item graph: {G.number_of_nodes()} nodes, "
           f"{G.number_of_edges()} edges at |r| > {threshold}")
 
-    # Detect communities
-    Q_observed, communities = detect_communities(G)
+    # Detect communities: Compare Louvain and Leiden
+    Q_louvain, comms_louvain = detect_communities_louvain(G)
+    Q_leiden, comms_leiden = detect_communities_leiden(G)
+    print(f"  Louvain: {len(comms_louvain)} communities, Q = {Q_louvain:.4f}")
+    print(f"  Leiden : {len(comms_leiden)} communities, Q = {Q_leiden:.4f}")
+
+    # We proceed with Leiden as requested
+    Q_observed = Q_leiden
+    communities = comms_leiden
     comm_labels = community_labels(codes, communities)
     n_comms = len(communities)
-    print(f"  Louvain: {n_comms} communities, Q = {Q_observed:.4f}")
 
     # Community vs topic-block analysis
     nmi, contingency = community_vs_blocks(codes, comm_labels)
-    print(f"  NMI (community vs topic block) = {nmi:.4f}")
+    print(f"  Leiden NMI (community vs topic block) = {nmi:.4f}")
 
     # --- Null distributions for the ITEM network --------------------------
-    print("  computing null distributions for item network...")
+    print("  computing null distributions for item network (using Leiden)...")
 
     # 1. Permutation null: rebuild from cached correlations
     null_data = np.load(ARTIFACTS / "null_replicates.npz")
@@ -344,12 +371,12 @@ def run() -> dict:
     # 2. Rewiring null
     print("  rewiring null: 200 replicates...")
     rewire_mods = np.array(rewiring_null(
-        G, n_reps=200, seed=SEED, measure_fn=_modularity_fn))
+        G, n_reps=200, seed=SEED, measure_fn=_modularity_fn_leiden))
 
     # 3. ER null
     print("  ER null: 200 replicates...")
     er_mods = np.array(er_null(
-        G, n_reps=200, seed=SEED, measure_fn=_modularity_fn))
+        G, n_reps=200, seed=SEED, measure_fn=_modularity_fn_leiden))
 
     # z-scores
     perm_stats = zscore(Q_observed, perm_mods)
@@ -377,6 +404,7 @@ def run() -> dict:
         "n_edges": G.number_of_edges(),
         "n_communities": n_comms,
         "Q_observed": Q_observed,
+        "Q_louvain": Q_louvain,
         "community_assignments": {
             code: int(comm_labels[code]) for code in codes
         },

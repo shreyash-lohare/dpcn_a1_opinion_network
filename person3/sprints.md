@@ -36,7 +36,7 @@
 | Sprint | Task | Status | Notes / Output |
 | :--- | :--- | :--- | :--- |
 | **S0** | **Setup & Orientation** | [x] | Created `src/person3/`, updated `FIGDIR_P3` config, validated artifacts. |
-| **S1** | **Graph 10: Communities vs Nulls** | [x] | Implemented Louvain on item network, ran permutation/rewiring/ER nulls, computed NMI vs topic blocks. Saved to `graph_10.py` and `graph10_communities.json`. |
+| **S1** | **Graph 10: Communities vs Nulls** | [x] | Implemented Leiden (previously Louvain) on item network, ran permutation/rewiring/ER nulls, computed NMI vs topic blocks. Saved to `graph_10.py` and `graph10_communities.json`. |
 | **S2** | **Graph 11: Structural Balance** | [x] | Computed balanced triads fraction against sign-permutation null. Saved to `graph_11.py` and `graph11_balance_stats.json`. |
 | **S3** | **Graph 6: Reordered Heatmap** | [x] | Plotted MP-denoised correlations ordered by Graph 10 communities. Diverging map + block border strips. Saved to `graph_6.py`. |
 | **S4** | **Exploration Notebook** | [x] | Created `notebooks/person3_exploration.ipynb` referencing P3 modules and showing figures/stats inline. |
@@ -59,10 +59,10 @@
 
 ## Sprint 1 — Graph 10: Communities vs Three Null Models *(effort 5, heaviest)*
 
-**Goal:** Two-panel figure. Left: item network coloured by Louvain community. Right: modularity of the real network versus three null distributions (ER, rewiring, permutation) shown as violins/histograms.
+**Goal:** Two-panel figure. Left: item network coloured by Leiden (previously Louvain) community. Right: modularity of the real network versus three null distributions (ER, rewiring, permutation) shown as violins/histograms.
 
 > [!NOTE]
-> P2's `src/person2/null_comparison.py` already ran the full null experiment on the **respondent network** and cached the results. For Graph 10 you run Louvain on the **item network** (60 nodes, threshold 0.22) and plot its modularity against the same three nulls — some recomputation is needed for the item network specifically.
+> P2's `src/person2/null_comparison.py` already ran the full null experiment on the **respondent network** and cached the results. For Graph 10 you run Leiden (previously Louvain) on the **item network** (60 nodes, threshold 0.22) and plot its modularity against the same three nulls — some recomputation is needed for the item network specifically.
 
 ### Sub-tasks
 
@@ -70,12 +70,12 @@
 |---|---|---|
 | 1.1 | **Load artifacts** | `corr_denoised.npy`, `threshold.json`, `null_modularity_replicates.npz` (P2 cached), `items.json` |
 | 1.2 | **Build signed item graph** | Use the same `build_signed_graph()` logic from `src/person2/graph_7.py`. Threshold = 0.22. Edges get `weight=abs(r)`, `r=signed_r`, `sign=±1` attributes |
-| 1.3 | **Run Louvain on item network** | `nx.community.louvain_communities(G, weight="weight", seed=SEED)`. Record `Q_observed` and community assignments |
+| 1.3 | **Run Leiden (previously Louvain) on item network** | `nx.community.louvain_communities(G, weight="weight", seed=SEED)`. Record `Q_observed` and community assignments |
 | 1.4 | **Compute modularity under all 3 nulls on the item network** | Pull rewiring + ER from P2's cached `.npz` if they cover the item network; otherwise recompute 200 reps each using `src/common/nulls.py`. Check if `null_modularity_replicates.npz` covers item-network or only respondent-network (it is the respondent network — so recompute for item network) |
-| 1.5 | **Pull permutation null replicates** | Load `artifacts/null_replicates.npz` (200 × 1770 permuted correlations). For each replicate: threshold at 0.22 → build graph → run Louvain → get Q. This gives the permutation null distribution for the item network |
+| 1.5 | **Pull permutation null replicates** | Load `artifacts/null_replicates.npz` (200 × 1770 permuted correlations). For each replicate: threshold at 0.22 → build graph → run Leiden (previously Louvain) → get Q. This gives the permutation null distribution for the item network |
 | 1.6 | **Compute z-scores and p-values** | Use `src/common/nulls.zscore(Q_observed, null_samples)` for each of the 3 nulls |
 | 1.7 | **Second analysis — community vs topic label comparison** | Map each of 60 items to its detected community and its T/E/S/V block. Build a 4×n_communities contingency table. Check specifically whether the S block splits. Compute NMI (normalized mutual information) between community labels and block labels |
-| 1.8 | **Left panel** | Spring or Kamada-Kawai layout (seeded). Nodes coloured by Louvain community. Edge colour by sign (+/−). Node size uniform or by degree. Topic-block symbol or border encoding. Save layout coordinates so Graph 6 can reference them if needed |
+| 1.8 | **Left panel** | Spring or Kamada-Kawai layout (seeded). Nodes coloured by Leiden (previously Louvain) community. Edge colour by sign (+/−). Node size uniform or by degree. Topic-block symbol or border encoding. Save layout coordinates so Graph 6 can reference them if needed |
 | 1.9 | **Right panel** | Observed Q as vertical line. Three distributions as violin plots or overlapping histograms. Label each null with its mean ± SD and z. Colour: real=`REAL_COLOR`, null=`NULL_COLOR` (from config) |
 | 1.10 | **Tabular summary** | Print and save to `artifacts/graph10_null_table.json`: observed Q, each null's mean/SD/z/p |
 | 1.11 | **Write `src/person3/graph_10.py`** | Side-effect-free module. Main logic in functions, a `run()` entry point. Saves figure to `figures/person3/graph_10_communities_nulls.{png,pdf}` at DPI 200 |
@@ -87,7 +87,7 @@
 
 **Commit cadence:**
 - `[P3][G10] Load artifacts, build signed item graph at threshold 0.22`
-- `[P3][G10] Louvain communities + three-null distributions computed`
+- `[P3][G10] Leiden (previously Louvain) communities + three-null distributions computed`
 - `[P3][G10] Community vs topic-block NMI analysis`
 - `[P3][G10] Two-panel figure: network layout + null comparison`
 - `[P3][G10] graph_10.py module, figure saved`
@@ -269,7 +269,7 @@ Sprint 7: Final polish & submission
 | Chosen threshold | 0.22 | `artifacts/threshold.json` |
 | Graph at τ=0.22: edges | 131 | `threshold.json` |
 | Graph at τ=0.22: GCC size | 50/60 items (83%) | `threshold.json` |
-| Graph at τ=0.22: communities (Louvain) | 15 | `threshold.json` |
+| Graph at τ=0.22: communities (Leiden (previously Louvain)) | 15 | `threshold.json` |
 | Balanced triads at τ=0.15 | 83% (664 triads) | CLAUDE.md §3 |
 | Balanced triads at τ=0.20 | 96% (137 triads) | CLAUDE.md §3 |
 | Balanced triads at τ=0.25 | 100% (19 triads) | CLAUDE.md §3 |

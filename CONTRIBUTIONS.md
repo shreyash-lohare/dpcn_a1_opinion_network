@@ -47,35 +47,43 @@ Person 2's artefact table.
 
 ### Person 2 deliverables
 
-| Deliverable | Path |
-|---|---|
-| Shared config | `src/common/config.py` |
-| Analysis matrix | `src/common/matrix.py` |
-| Null framework | `src/common/nulls.py` |
-| Graph 4 | `src/person2/graph_4.py` → `figures/person2/graph_4_noise_floor.{png,pdf}` |
-| Graph 5 | `src/person2/graph_5.py` → `figures/person2/graph_5_mp_spectrum.{png,pdf}` |
-| Graph 7 | `src/person2/graph_7.py` → `figures/person2/graph_7_threshold_sweep.{png,pdf}` |
-| Null comparison | `src/person2/null_comparison.py` |
-| Rejected methods | `src/person2/sensitivity.py` |
-| Orchestration | `run_all.py` |
-| Report section | `report/sections/pipeline_followed.tex` |
+| Deliverable      | Path                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Shared config    | `src/common/config.py`                                                            |
+| Analysis matrix  | `src/common/matrix.py`                                                            |
+| Null framework   | `src/common/nulls.py`                                                             |
+| Graph 4          | `src/person2/graph_4.py` → `figures/person2/graph_4_noise_floor.{png,pdf}`     |
+| Graph 5          | `src/person2/graph_5.py` → `figures/person2/graph_5_mp_spectrum.{png,pdf}`     |
+| Graph 7          | `src/person2/graph_7.py` → `figures/person2/graph_7_threshold_sweep.{png,pdf}` |
+| Null comparison  | `src/person2/null_comparison.py`                                                  |
+| Rejected methods | `src/person2/sensitivity.py`                                                      |
+| Orchestration    | `run_all.py`                                                                      |
+| Report section   | `report/sections/pipeline_followed.tex`                                           |
 
 ### Handoff artefacts written for teammates
 
-| File | Consumed by | Contents |
-|---|---|---|
-| `artifacts/corr_raw.npy` | P3 (graph 6) | 60×60 raw correlation matrix |
-| `artifacts/corr_denoised.npy` | P1 (graph 8), P3 (graphs 6, 10, 11) | 60×60 MP-denoised matrix |
-| `artifacts/threshold.json` | P1 (graph 8), P3 (graphs 10, 11) | chosen threshold, rule, resulting stats |
-| `artifacts/chance_edges_by_threshold.csv` | graph 7, P3 (graph 11) | expected chance edges per threshold |
-| `artifacts/null_replicates.npz` | P3 (graph 10) | 200 × 1770 permuted correlations |
-| `artifacts/mp_dimensions.json` | P3 (results section) | 3 dimensions, loadings, names |
-| `artifacts/X_centred.npy`, `X_encoded.npy`, `items.json` | P1, P3 | 86×60 centred / pre-centring matrices, item metadata |
-| `artifacts/null_comparison.json`, `null_modularity_replicates.npz` | P3 (graph 10) | modularity under all three nulls |
-| `artifacts/sensitivity.json` | report | rejected-methods numbers |
+| File                                                                   | Consumed by                         | Contents                                              |
+| ---------------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------- |
+| `artifacts/corr_raw.npy`                                             | P3 (graph 6)                        | 60×60 raw correlation matrix                         |
+| `artifacts/corr_denoised.npy`                                        | P1 (graph 8), P3 (graphs 6, 10, 11) | 60×60 MP-denoised matrix                             |
+| `artifacts/threshold.json`                                           | P1 (graph 8), P3 (graphs 10, 11)    | chosen threshold, rule, resulting stats               |
+| `artifacts/chance_edges_by_threshold.csv`                            | graph 7, P3 (graph 11)              | expected chance edges per threshold                   |
+| `artifacts/null_replicates.npz`                                      | P3 (graph 10)                       | 200 × 1770 permuted correlations                     |
+| `artifacts/mp_dimensions.json`                                       | P3 (results section)                | 3 dimensions, loadings, names                         |
+| `artifacts/X_centred.npy`, `X_encoded.npy`, `items.json`         | P1, P3                              | 86×60 centred / pre-centring matrices, item metadata |
+| `artifacts/null_comparison.json`, `null_modularity_replicates.npz` | P3 (graph 10)                       | modularity under all three nulls                      |
+| `artifacts/sensitivity.json`                                         | report                              | rejected-methods numbers                              |
 
 ## Person 3 — communities, structural balance, reordered heatmap
 
 ```
-(not started)
+2026-09-18 | P3 | branch scaffold, artifact verification, FIGDIR_P3 config, package skeleton                        | 8ed6ae7
+2026-09-18 | P3 | graph 10: communities vs three null models with two-panel figure and NMI analysis               | 175423f
+2026-09-18 | P3 | graph 11: structural balance sweep with sign-permutation null band and triad annotations        | 14ba86a
+2026-09-18 | P3 | graph 6: reordered correlation heatmap with community block strips                              | d1402d7
+2026-09-18 | P3 | notebooks: add person3 exploration notebook                                                     | dfe9f41
+2026-09-18 | P3 | pipeline: wire P3 stages into run_all.py                                                        | 2ebf764
+2026-09-18 | P3 | report: draft P3 sections for graphs 6, 10, 11, results, and conclusion                         | 5f98523
+2026-09-18 | P3 | docs: update sprints.md with S0-S6 progress and completion notes                                | 59a8cce
+2026-09-18 | P3 | refactor: migrate community detection from Louvain to Leiden, update report          | [leiden]
 ```

@@ -660,12 +660,12 @@ variance. Inset: the top six eigenvalues, showing a clear gap between the fourth
 
 Figure~\ref{fig:g6} presents the MP-denoised correlation matrix reordered by the community assignments detected in Graph 10. A diverging colour map (centred at zero) distinguishes positive from negative correlations. The marginal colour strips represent the predefined thematic blocks (Technology, Education, Society/Ethics, Environment).
 
-\textbf{Findings and Implication.} The block-diagonal structure of the reordered matrix confirms that the community detection successfully groups densely connected items. However, inspecting the marginal strips reveals that these data-driven communities cut directly across the survey's predefined thematic blocks. The formal comparison yields a Normalised Mutual Information (NMI) of $0.201$, confirming that respondents' actual opinion structures do not partition neatly into the four hypothesised domains.
+\textbf{Findings and Implication.} The block-diagonal structure of the reordered matrix confirms that the community detection successfully groups densely connected items. However, inspecting the marginal strips reveals that these data-driven communities cut directly across the survey's predefined thematic blocks. The formal comparison yields a Normalised Mutual Information (NMI) of $0.205$, confirming that respondents' actual opinion structures do not partition neatly into the four hypothesised domains.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\columnwidth]{figures/person3/graph_6_reordered_heatmap.pdf}
-\caption{Item--item correlations (MP-denoised), reordered by Louvain community. The 15 communities are separated by black lines, with topic blocks marked in the margins. The communities cut across the predefined topic blocks, highlighting the divergence between the survey's structural design and respondents' actual association patterns.}
+\includegraphics[width=\columnwidth]{../figures/person3/graph_6_reordered_heatmap.pdf}
+\caption{Item--item correlations (MP-denoised), reordered by Leiden community. The 15 communities are separated by black lines, with topic blocks marked in the margins. The communities cut across the predefined topic blocks, highlighting the divergence between the survey's structural design and respondents' actual association patterns.}
 \label{fig:g6}
 \end{figure}
 
@@ -676,7 +676,7 @@ Figure~\ref{fig:g6} presents the MP-denoised correlation matrix reordered by the
 Reporting a network at one threshold invites the obvious objection that the
 threshold was chosen to produce the result. Figure~\ref{fig:g7} answers it by
 rebuilding the signed graph at all $46$ cutoffs from $0.05$ to $0.50$ and
-tracking edge count, giant-component fraction, fragmentation and Louvain
+tracking edge count, giant-component fraction, fragmentation and Leiden
 modularity \cite{blondel2008fast,newman2006modularity} across the whole range, so the chosen value is visibly a point on a curve. The
 sweep also absorbs the giant-component analysis entirely.
 
@@ -712,7 +712,7 @@ to catch.
 \caption{Graph 7. The signed item network rebuilt at all $46$ cutoffs from
 $0.05$ to $0.50$. (a) Edge count against the chance expectation from Graph 4.
 (b) Giant component, which falls below two thirds of the items shortly after the
-chosen cutoff. (c) Components and isolates. (d) Louvain modularity, which rises
+chosen cutoff. (c) Components and isolates. (d) Leiden modularity, which rises
 to $0.72$ only once the graph has broken into $43$ pieces. The vertical line
 marks the selected $|r|>0.22$.}
 \label{fig:g7}
@@ -819,12 +819,12 @@ $+0.1027$ ($z=13.4$, $p<0.0002$) is not approached by any permutation.}
 
 Figure~\ref{fig:g10} compares the observed community structure of the item network at $|r| > 0.22$ against three null models: a degree-preserving rewiring \cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a column-permutation null that scrambles responses independently per item.
 
-\textbf{Findings and Implication.} The Louvain algorithm detects 15 communities, yielding a modularity of $Q=0.472$. This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.407\pm0.017$, $z=3.91$, $p=0.005$) and the rewiring null ($Q=0.326\pm0.014$, $z=10.39$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.624\pm0.046$, $z=-3.32$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
+\textbf{Findings and Implication.} The Leiden algorithm detects 15 communities, yielding a modularity of $Q=0.491$ (improving upon Louvain's $Q=0.472$). This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.420\pm0.016$, $z=4.46$, $p=0.005$) and the rewiring null ($Q=0.333\pm0.013$, $z=12.13$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.629\pm0.044$, $z=-3.14$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/person3/graph_10_communities_nulls.pdf}
-\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Louvain community (borders indicate the predefined thematic block). (b) Observed modularity $Q=0.472$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
+\includegraphics[width=\textwidth]{../figures/person3/graph_10_communities_nulls.pdf}
+\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Leiden community (borders indicate the predefined thematic block). (b) Observed modularity $Q=0.491$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
 \label{fig:g10}
 \end{figure*}
 
@@ -836,7 +836,7 @@ Figure~\ref{fig:g11} tracks the fraction of balanced triads in the signed item n
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\columnwidth]{figures/person3/graph_11_structural_balance.pdf}
+\includegraphics[width=\columnwidth]{../figures/person3/graph_11_structural_balance.pdf}
 \caption{Structural balance as a function of the correlation threshold $|r|$. The fraction of balanced triads rises towards $100\%$ as the threshold tightens and spurious edges are removed, while the sign-permutation null distribution remains anchored near $50\%$. The operating threshold of $|r|=0.22$ is marked.}
 \label{fig:g11}
 \end{figure}
@@ -1038,7 +1038,7 @@ describe a cohort in broad consensus with local, domain-specific disagreement.
 They do not describe two camps.
 
 \paragraph{Communities cut across thematic boundaries.}
-Despite the clear block-diagonal structure of the item network when ordered by community (Graph 6), these data-driven groupings do not align with the four predefined survey themes (Technology, Education, Society/Ethics, Environment). With an NMI of just $0.201$, the structure reveals that associations are formed across distinct themes rather than strictly within them.
+Despite the clear block-diagonal structure of the item network when ordered by community (Graph 6), these data-driven groupings do not align with the four predefined survey themes (Technology, Education, Society/Ethics, Environment). With an NMI of just $0.205$, the structure reveals that associations are formed across distinct themes rather than strictly within them.
 
 \paragraph{Structural balance strengthens with noise filtering.}
 The hypothesis of structural balance is robustly confirmed in Graph 11. As the correlation threshold is tightened from $|r|=0.05$ up to $|r|=0.22$, the fraction of balanced triads monotonically approaches $100\%$, while the sign-permutation null stays flat at $50\%$. The increasing balance indicates that the network encodes genuine, self-consistent opinion structures that crystallise as random noise is removed.
@@ -1153,7 +1153,7 @@ characterisation that survives all of this is a cohort in superficial consensus
 with genuine but local structure --- four modest, largely cross-cutting
 dimensions, not two camps.
 
-Finally, the detected item-network communities do not align cleanly with the predefined thematic blocks (NMI = $0.201$), indicating that respondent opinions are formed across thematic boundaries. However, these opinions exhibit a remarkable internal consistency: as noise edges are removed, structural balance in the network steadily approaches $100\%$, establishing a robust, self-consistent topology despite the absence of distinct ideological camps.
+Finally, the detected item-network communities do not align cleanly with the predefined thematic blocks (NMI = $0.205$), indicating that respondent opinions are formed across thematic boundaries. However, these opinions exhibit a remarkable internal consistency: as noise edges are removed, structural balance in the network steadily approaches $100\%$, establishing a robust, self-consistent topology despite the absence of distinct ideological camps.
 
 % ============================================================
 \section*{Individual Contribution}
