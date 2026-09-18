@@ -1,5 +1,7 @@
 # Opinion Network Formation — DPCN Assignment 1
 
+**Team: Edge Runners**
+
 Constructing and analysing an opinion network from a 96-respondent, 60-item Likert survey
 covering Technology, Education, Society/Ethics and Environment.
 

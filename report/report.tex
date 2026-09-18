@@ -124,7 +124,7 @@ Sections~\ref{sec:discussion}--\ref{sec:conclusion} the findings and their
 limits.
 
 \paragraph{Team and code.}
-Team \textbf{[TEAM NAME]}. All code, figures, and the data pipeline are
+Team \textbf{Edge Runners}. All code, figures, and the data pipeline are
 available at \url{https://github.com/shreyash-lohare/dpcn_a1_opinion_network}.
 The full analysis is reproducible from a fresh clone via
 \texttt{python run\_all.py} followed by the figure modules in \texttt{src/}.
@@ -821,10 +821,15 @@ $+0.1027$ ($z=13.4$, $p<0.0002$) is not approached by any permutation.}
 
 \subsection{Graph 10: Communities against null models}
 
+Figure~\ref{fig:g10} compares the observed community structure of the item network at $|r| > 0.22$ against three null models: a degree-preserving rewiring \cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a column-permutation null that scrambles responses independently per item.
 Figure~\ref{fig:g10} compares the observed community structure of the item network at $|r| > 0.22$ against three null models: a degree-preserving rewiring \cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a column-permutation null that scrambles responses independently per item. We also compare three community detection algorithms to demonstrate their methodological differences.
 
+\textbf{Findings and Implication.} The Louvain algorithm detects 15 communities, yielding a modularity of $Q=0.472$. This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.407\pm0.017$, $z=3.91$, $p=0.005$) and the rewiring null ($Q=0.326\pm0.014$, $z=10.39$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.624\pm0.046$, $z=-3.32$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
+\textbf{Findings and Implication.} The Leiden algorithm detects 15 communities, yielding a modularity of $Q=0.491$ (improving upon Louvain's $Q=0.472$). This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.420\pm0.016$, $z=4.46$, $p=0.005$) and the rewiring null ($Q=0.333\pm0.013$, $z=12.13$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.629\pm0.044$, $z=-3.14$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
+\textbf{Louvain vs. Leiden Community Detection.} Initially, we applied the widely used Louvain algorithm, which detected 15 communities with a modularity of $Q=0.472$. However, Louvain suffers from a well-documented flaw: its greedy aggregation phase can yield internally disconnected or poorly connected communities, artificially capping the quality of the partition \cite{traag2019louvain}. To address this, we subsequently applied the Leiden algorithm, which introduces a refinement phase to guarantee well-connected communities. Leiden successfully found a superior partition on our item network, increasing the modularity to $Q=0.491$ while still resolving into 15 communities. We therefore use the Leiden partition for our primary structural analysis.
 \textbf{Algorithm comparison.} All three algorithms partition the 60-item network, but they use fundamentally different strategies:
 
+\textbf{Findings against Null Models.} The Leiden modularity ($Q=0.491$) decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.420\pm0.016$, $z=4.46$, $p=0.005$) and the degree-preserving rewiring null ($Q=0.333\pm0.013$, $z=12.13$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.629\pm0.044$, $z=-3.14$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
 \begin{itemize}
     \item \textbf{Louvain} \cite{blondel2008fast}: An agglomerative method that greedily merges nodes to maximise modularity. Fast ($O(n \log n)$), but its merge phase can produce poorly-connected communities. Achieved $Q=0.472$, $k=15$.
     \item \textbf{Leiden} \cite{traag2019louvain}: Extends Louvain with a \emph{refinement phase} that breaks merged super-nodes back apart to guarantee well-connected communities. Found a strictly superior partition: $Q=0.491$, $k=15$.
@@ -845,6 +850,8 @@ Leiden achieves the highest peak modularity, confirming it as the best choice fo
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{../figures/person3/graph_10_communities_nulls.pdf}
+\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Louvain community (borders indicate the predefined thematic block). (b) Observed modularity $Q=0.472$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
+\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Leiden community (borders indicate the predefined thematic block). (b) Observed modularity $Q=0.491$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
 \caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Leiden community (borders indicate the predefined thematic block). (b) Observed Leiden modularity $Q=0.491$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
 \label{fig:g10}
 \end{figure*}
