@@ -5,6 +5,7 @@
   "n_communities": 15,
   "Q_observed": 0.4910439505355841,
   "Q_louvain": 0.47214394614043786,
+  "Q_leiden": 0.4910439505355841,
   "community_assignments": {
     "T01": 4,
     "T02": 0,

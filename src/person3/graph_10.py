@@ -1,7 +1,7 @@
 """Graph 10 -- Communities vs three null models (effort 5).
 
 Two-panel figure.
-Left : item network coloured by Louvain community (not topic block).
+Left : item network coloured by community (Leiden).
 Right: observed modularity as a vertical line against three null
        distributions (ER, rewiring, column-permutation) shown as violins.
 
@@ -10,9 +10,8 @@ The point is not the modularity *value* -- it is that the answer to
 Expect the observed value to clear ER and rewiring but sit close to
 the permutation distribution.
 
-Second analysis: community-vs-topic-block comparison via NMI and a
-contingency table, checking whether data-driven communities respect
-T/E/S/V or cut across them.
+Also compares Louvain vs. Leiden community detection, demonstrating
+Leiden's superior modularity and well-connected community guarantees.
 """
 
 from __future__ import annotations
@@ -66,7 +65,7 @@ def build_signed_graph(corr: np.ndarray, codes: List[str],
 
 
 # ---------------------------------------------------------------------------
-# Community detection
+# Community detection (Louvain and Leiden)
 # ---------------------------------------------------------------------------
 
 def detect_communities_louvain(G: nx.Graph, seed: int = SEED
@@ -83,7 +82,7 @@ def detect_communities_leiden(G: nx.Graph, seed: int = SEED
     """Leiden on |r| weights via leidenalg. Returns (modularity, communities)."""
     if G.number_of_edges() == 0:
         return 0.0, [frozenset([n]) for n in G.nodes()]
-    
+
     H = ig.Graph.from_networkx(G)
     if "weight" in H.edge_attributes():
         weights = [float(w) if w is not None else 1.0 for w in H.es["weight"]]
@@ -125,13 +124,7 @@ def permutation_null_item_modularity(
     threshold: float,
     n_respondents: int,
 ) -> np.ndarray:
-    """Compute Leiden modularity for each permutation replicate.
-
-    ``null_corr_matrix`` has shape (n_reps, n_pairs) where n_pairs = 1770.
-    Each row is the upper triangle of a 60x60 correlation matrix computed
-    from column-permuted + row-centred data (already done by P2).
-    We rebuild the full matrix, threshold, build graph, run Leiden.
-    """
+    """Compute Leiden modularity for each permutation replicate."""
     n_reps, n_pairs = null_corr_matrix.shape
     n_items = len(codes)
     mods = np.empty(n_reps)
@@ -225,10 +218,8 @@ def plot_graph_10(G: nx.Graph, codes: List[str],
 
     # --- Left panel: network coloured by community -------------------------
     node_colors = [palette[comm_labels[n]] for n in G.nodes()]
-    # Edge colours: blue for positive, red for negative
     edge_colors = ["#4A90D9" if G[u][v]["sign"] > 0 else "#D94A4A"
                    for u, v in G.edges()]
-    edge_alphas = [0.5 for _ in G.edges()]
 
     pos = nx.kamada_kawai_layout(G)
 
@@ -348,7 +339,7 @@ def run() -> dict:
     print(f"  Louvain: {len(comms_louvain)} communities, Q = {Q_louvain:.4f}")
     print(f"  Leiden : {len(comms_leiden)} communities, Q = {Q_leiden:.4f}")
 
-    # We proceed with Leiden as requested
+    # We proceed with Leiden as primary
     Q_observed = Q_leiden
     communities = comms_leiden
     comm_labels = community_labels(codes, communities)
@@ -358,7 +349,7 @@ def run() -> dict:
     nmi, contingency = community_vs_blocks(codes, comm_labels)
     print(f"  Leiden NMI (community vs topic block) = {nmi:.4f}")
 
-    # --- Null distributions for the ITEM network --------------------------
+    # --- Null distributions for the ITEM network (using Leiden) -----------
     print("  computing null distributions for item network (using Leiden)...")
 
     # 1. Permutation null: rebuild from cached correlations
@@ -405,6 +396,7 @@ def run() -> dict:
         "n_communities": n_comms,
         "Q_observed": Q_observed,
         "Q_louvain": Q_louvain,
+        "Q_leiden": Q_leiden,
         "community_assignments": {
             code: int(comm_labels[code]) for code in codes
         },
