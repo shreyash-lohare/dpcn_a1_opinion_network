@@ -98,6 +98,32 @@ def detect_communities_leiden(G: nx.Graph, seed: int = SEED
     return Q, communities
 
 
+def detect_communities_girvan_newman(
+        G: nx.Graph, max_k: int = 30) -> Tuple[float, List[frozenset], List[Tuple[int, float]]]:
+    """Girvan-Newman: edge-betweenness divisive method.
+
+    Iterates GN splits, records Q at each level, returns the partition with
+    peak modularity and the full (k, Q) curve up to max_k communities.
+    """
+    if G.number_of_edges() == 0:
+        return 0.0, list(nx.connected_components(G)), [(1, 0.0)]
+
+    best_Q, best_comms = -1.0, None
+    curve: List[Tuple[int, float]] = []
+
+    for partition in nx.community.girvan_newman(G):
+        comms = [frozenset(c) for c in partition]
+        Q = float(nx.community.modularity(G, comms, weight="weight"))
+        curve.append((len(comms), Q))
+        if Q > best_Q:
+            best_Q = Q
+            best_comms = comms
+        if len(comms) >= max_k:
+            break
+
+    return best_Q, best_comms, curve
+
+
 def community_labels(codes: List[str],
                      communities: List[frozenset]) -> Dict[str, int]:
     """Map each item code to its community index."""
@@ -198,6 +224,83 @@ def _color_palette(n_communities: int):
     """Generate distinct colours for communities."""
     cmap = plt.colormaps.get_cmap("tab20").resampled(max(n_communities, 3))
     return [cmap(i) for i in range(n_communities)]
+
+
+def plot_algorithm_comparison(
+        G: nx.Graph,
+        Q_louvain: float, comms_louvain: List[frozenset],
+        Q_leiden: float, comms_leiden: List[frozenset],
+        Q_gn: float, comms_gn: List[frozenset],
+        gn_curve: List[Tuple[int, float]],
+        path_stem: str) -> None:
+    """Three-panel comparison figure: bar chart + GN Q-curve + community size distributions."""
+    fig, axes = plt.subplots(1, 3, figsize=(16, 5.2))
+
+    # --- Panel (a): Modularity comparison bar chart -------------------------
+    ax = axes[0]
+    methods = ["Louvain", "Leiden\n(best)", "Girvan-\nNewman"]
+    Qs = [Q_louvain, Q_leiden, Q_gn]
+    colors = ["#5E81AC", "#A3BE8C", "#BF616A"]
+    bars = ax.bar(methods, Qs, color=colors, width=0.55, edgecolor="white", linewidth=1.3)
+    for bar, q in zip(bars, Qs):
+        ax.text(bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.003,
+                f"Q = {q:.3f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
+
+    # Annotate number of communities on each bar
+    for bar, comms in zip(bars, [comms_louvain, comms_leiden, comms_gn]):
+        ax.text(bar.get_x() + bar.get_width() / 2,
+                bar.get_height() / 2,
+                f"k={len(comms)}", ha="center", va="center",
+                fontsize=10, color="white", fontweight="bold")
+
+    ax.set_ylim(0, max(Qs) * 1.20)
+    ax.set_ylabel("Modularity Q (weighted)", fontsize=10)
+    ax.set_title("(a) Modularity by algorithm\n(all at peak k = 15)", fontsize=10, loc="left")
+    ax.grid(axis="y", alpha=0.25)
+    ax.set_axisbelow(True)
+
+    # --- Panel (b): GN Q vs k curve ----------------------------------------
+    ax = axes[1]
+    ks = [r[0] for r in gn_curve]
+    Qk = [r[1] for r in gn_curve]
+    ax.plot(ks, Qk, color="#BF616A", linewidth=2.2, marker="o", markersize=5, label="GN Q(k)")
+    best_k = ks[int(np.argmax(Qk))]
+    best_Qk = max(Qk)
+    ax.axvline(best_k, color="#BF616A", linestyle="--", alpha=0.7, linewidth=1.2)
+    ax.axhline(Q_louvain, color="#5E81AC", linestyle=":", linewidth=1.6, label=f"Louvain Q={Q_louvain:.3f}")
+    ax.axhline(Q_leiden, color="#A3BE8C", linestyle="-.", linewidth=1.6, label=f"Leiden Q={Q_leiden:.3f}")
+    ax.set_xlabel("Number of communities (k)", fontsize=10)
+    ax.set_ylabel("Modularity Q (weighted)", fontsize=10)
+    ax.set_title("(b) Girvan-Newman Q vs k\n(dotted = Louvain, dash-dot = Leiden)", fontsize=10, loc="left")
+    ax.legend(fontsize=8.5, framealpha=0.9)
+    ax.grid(alpha=0.22)
+    ax.set_axisbelow(True)
+
+    # --- Panel (c): Community size distributions ----------------------------
+    ax = axes[2]
+    sizes_lou = sorted([len(c) for c in comms_louvain], reverse=True)
+    sizes_lei = sorted([len(c) for c in comms_leiden], reverse=True)
+    sizes_gn = sorted([len(c) for c in comms_gn], reverse=True)
+    x = np.arange(len(sizes_lei))
+    width = 0.28
+    ax.bar(x - width, sizes_lou[:len(x)], width, color="#5E81AC", label="Louvain", alpha=0.85)
+    ax.bar(x, sizes_lei[:len(x)], width, color="#A3BE8C", label="Leiden", alpha=0.85)
+    max_gn = len(sizes_gn)
+    ax.bar(x[:max_gn] + width, sizes_gn[:max_gn], width, color="#BF616A", label="Girvan-Newman", alpha=0.85)
+    ax.set_xlabel("Community rank (largest first)", fontsize=10)
+    ax.set_ylabel("Community size (# items)", fontsize=10)
+    ax.set_title("(c) Community size distributions\n(rank-ordered, 60 items total)", fontsize=10, loc="left")
+    ax.legend(fontsize=9, framealpha=0.9)
+    ax.grid(axis="y", alpha=0.22)
+    ax.set_axisbelow(True)
+    ax.set_xticks(x)
+    ax.set_xticklabels([str(i + 1) for i in x], fontsize=8)
+
+    fig.tight_layout()
+    for ext in ("png", "pdf"):
+        fig.savefig(f"{path_stem}.{ext}", dpi=DPI, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_graph_10(G: nx.Graph, codes: List[str],
@@ -333,21 +436,31 @@ def run() -> dict:
     print(f"  item graph: {G.number_of_nodes()} nodes, "
           f"{G.number_of_edges()} edges at |r| > {threshold}")
 
-    # Detect communities: Compare Louvain and Leiden
+    # --- Compare three community detection algorithms ----------------------
+    print("\n  === Community detection comparison ===")
     Q_louvain, comms_louvain = detect_communities_louvain(G)
     Q_leiden, comms_leiden = detect_communities_leiden(G)
-    print(f"  Louvain: {len(comms_louvain)} communities, Q = {Q_louvain:.4f}")
-    print(f"  Leiden : {len(comms_leiden)} communities, Q = {Q_leiden:.4f}")
+    Q_gn, comms_gn, gn_curve = detect_communities_girvan_newman(G, max_k=30)
 
-    # We proceed with Leiden as primary
+    print(f"  Louvain       : k={len(comms_louvain):2d}, Q={Q_louvain:.4f}  | Approach: agglomerative, greedy modularity")
+    print(f"  Leiden        : k={len(comms_leiden):2d}, Q={Q_leiden:.4f}  | Approach: agglomerative + refinement phase")
+    print(f"  Girvan-Newman : k={len(comms_gn):2d}, Q={Q_gn:.4f}  | Approach: divisive, edge-betweenness removal")
+
+    # Plot the three-way comparison figure
+    plot_algorithm_comparison(
+        G, Q_louvain, comms_louvain, Q_leiden, comms_leiden, Q_gn, comms_gn, gn_curve,
+        str(FIGDIR_P3 / "graph_10_algorithm_comparison"))
+    print(f"  wrote {FIGDIR_P3 / 'graph_10_algorithm_comparison'}.png / .pdf")
+
+    # We proceed with Leiden as the primary algorithm
     Q_observed = Q_leiden
     communities = comms_leiden
     comm_labels = community_labels(codes, communities)
     n_comms = len(communities)
 
-    # Community vs topic-block analysis
+    # Community vs topic-block analysis (Leiden)
     nmi, contingency = community_vs_blocks(codes, comm_labels)
-    print(f"  Leiden NMI (community vs topic block) = {nmi:.4f}")
+    print(f"\n  Leiden NMI (community vs topic block) = {nmi:.4f}")
 
     # --- Null distributions for the ITEM network (using Leiden) -----------
     print("  computing null distributions for item network (using Leiden)...")
@@ -381,7 +494,7 @@ def run() -> dict:
         print(f"  {name:<20} {s['null_mean']:>8.3f} {s['null_sd']:>8.3f} "
               f"{s['z']:>8.2f} {s['p']:>8.3f}")
 
-    # Plot
+    # Plot main network + null comparison
     plot_graph_10(G, codes, communities, Q_observed,
                   perm_mods, rewire_mods, er_mods,
                   comm_labels,
@@ -397,6 +510,11 @@ def run() -> dict:
         "Q_observed": Q_observed,
         "Q_louvain": Q_louvain,
         "Q_leiden": Q_leiden,
+        "Q_girvan_newman": Q_gn,
+        "k_louvain": len(comms_louvain),
+        "k_leiden": len(comms_leiden),
+        "k_girvan_newman": len(comms_gn),
+        "gn_curve": gn_curve,
         "community_assignments": {
             code: int(comm_labels[code]) for code in codes
         },
