@@ -1,8 +1,8 @@
 %%%%%%%% ICML 2025 PAPER FILE %%%%%%%%%%%%%%%%%
 %
-% BUILD NOTE: this file needs icml2025.sty / icml2025.bst from the official
-% ICML 2025 style bundle in the same directory. Figures are read from
-% ../figures/ and ../outputs/, so compile from inside report/.
+% BUILD NOTE: this file needs icml2025.sty from the official ICML 2025 style
+% bundle in the same directory. Figures are read from ../figures/ and
+% ../outputs/, so compile from inside report/.
 %
 % Sections marked [TO BE COMPLETED] are placeholders for teammates.
 
@@ -95,11 +95,11 @@ become vertices and statistical association becomes weighted edges.
 Turning a questionnaire into a network is not mechanical. Three decisions
 determine whether the graph carries signal or merely re-describes the response
 format. \textbf{How missing data is handled}: abandonment and deliberate
-non-response are different mechanisms \cite{rubin1976inference}, and assigning
+non-response are different mechanisms, and assigning
 Neutral to a withheld answer invents data. \textbf{Whether response style is
 removed}: when respondents agree with almost everything, every pair of items
-correlates through shared agreeableness rather than content
-\cite{paulhus1991measurement}. \textbf{What the network is compared against}: a
+correlates through shared agreeableness rather than content.
+\textbf{What the network is compared against}: a
 correlation-derived graph has transitivity built into its construction, so
 clustering and modularity appear even in structureless data. This report
 addresses all three, and reports the alternatives that failed alongside the
@@ -121,7 +121,7 @@ The questionnaire contains 60 items in four blocks of 15 --- technology
 symmetrically as $\text{SD}=-2$ through $\text{SA}=+2$, which represents the
 ordering without asserting equal spacing; a sixth option, \emph{No Comments}
 (NC), is treated as missing. Internal consistency varies sharply by block:
-Cronbach's $\alpha$ \cite{cronbach1951coefficient} is $0.87$ for environment and
+Cronbach's $\alpha$ is $0.87$ for environment and
 $0.82$ for society but only $0.65$ for technology and $0.58$ for education.
 
 \subsection{The response ceiling}
@@ -183,7 +183,7 @@ $4.15$, $p=0.27$), so there is no basis for assigning it any fixed category.
 
 \paragraph{Recovery by ordinal regression.} For target item $j$ the other 59
 items form the predictor vector, and we fit one regularised proportional-odds
-ordinal logistic regression \cite{mccullagh1980regression} per item, with
+ordinal logistic regression per item, with
 latent score $z_i=\beta_0+\boldsymbol{\beta}^{\top}\mathbf{x}_{i,-j}$ and
 ordered thresholds $\theta_1<\cdots<\theta_4$; the prediction is the
 maximum-probability category. This respects the ordering of the scale without
@@ -425,7 +425,7 @@ excess over chance.}
 Graph 4 establishes that a noise floor exists but not how many genuine
 dimensions sit above it. PCA cannot settle this: PC1 explains only $8.3\%$ of
 variance, equally consistent with weak structure and with none.
-Marchenko--Pastur theory \cite{marchenko1967distribution} answers it exactly ---
+Marchenko--Pastur theory answers it exactly ---
 for a correlation matrix from $T$ observations of $N$ pure-noise variables the
 eigenvalues fall inside an analytically known band, and anything above its upper
 edge carries more structure than $T$ observations could produce by chance.
@@ -485,7 +485,7 @@ Reporting a network at one threshold invites the objection that the threshold
 was chosen to produce the result. Figure~\ref{fig:g7} answers it by rebuilding
 the signed graph at all $46$ cutoffs from $0.05$ to $0.50$ and tracking edge
 count, giant component, fragmentation and Louvain modularity
-\cite{blondel2008fast,newman2006modularity} across the range, so the chosen
+across the range, so the chosen
 value is visibly a point on a curve. The sweep also absorbs the
 giant-component analysis entirely.
 
@@ -582,17 +582,17 @@ under $5{,}000$ reshufflings of the block labels. The observed gap $+0.1027$
 \label{sec:g10}
 
 Figure~\ref{fig:g10} compares the community structure of the item network at
-$|r|>0.22$ against three nulls: degree-preserving rewiring
-\cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a
+$|r|>0.22$ against three nulls: degree-preserving rewiring,
+an Erd\H{o}s--R\'enyi graph, and a
 column-permutation null that scrambles responses independently per item.
 Figure~\ref{fig:g10alg} compares three detection algorithms on the same graph.
 
-\textbf{Which algorithm.} We began with Louvain \cite{blondel2008fast}, which
+\textbf{Which algorithm.} We began with Louvain, which
 found 15 communities at $Q=0.472$. Louvain has a documented flaw: its greedy
 aggregation phase can leave communities internally disconnected, capping
-partition quality \cite{traag2019louvain}. Leiden adds a refinement phase that
+partition quality. Leiden adds a refinement phase that
 guarantees well-connected communities and found a strictly better partition,
-$Q=0.491$, again at $k=15$. Girvan-Newman \cite{newman2006modularity}, a
+$Q=0.491$, again at $k=15$. Girvan-Newman, a
 divisive method that repeatedly removes the highest-betweenness edge, peaks at
 $Q=0.447$ --- also at $k=15$ --- and then declines monotonically. That all three
 strategies converge on the same 15 communities makes the partition size a
@@ -633,7 +633,7 @@ mirroring the artefact found independently in the respondent network.}
 
 \subsection{Graph 11: Structural balance}
 
-Figure~\ref{fig:g11} tracks the fraction of balanced triads in the signed item network as the edge-inclusion threshold $|r|$ tightens, comparing it against a sign-permutation null model \cite{cartwright1956structural}.
+Figure~\ref{fig:g11} tracks the fraction of balanced triads in the signed item network as the edge-inclusion threshold $|r|$ tightens, comparing it against a sign-permutation null model.
 
 \textbf{Findings and Implication.} The observed fraction of balanced triads is remarkably high and strengthens monotonically as noise is filtered out. At $|r|>0.15$, $99.1\%$ of triads are balanced. At $|r|>0.20$ this rises to $99.5\%$, and for $|r| \ge 0.22$, all triads ($100\%$) are balanced. The sign-permutation null stays flat at roughly $50\%$ across all thresholds. That the balance fraction approaches unity as weak edges are removed constitutes strong evidence that the network's local topology reflects genuine structural balance, rather than random assortment.
 
@@ -658,8 +658,7 @@ component.
 
 Opinions $x_i\in[0,1]$ are seeded from E03 (compulsory attendance, the most
 contested item), rescaled by $s(x)=(x+2)/4$. At each step a random edge is
-drawn and the pair moves to its midpoint if they are close enough
-\cite{deffuant2000mixing}:
+drawn and the pair moves to its midpoint if they are close enough:
 \begin{equation}
 |x_u - x_v| < \varepsilon
 \ \Longrightarrow\
@@ -762,7 +761,7 @@ This is the sharpest negative result, and which null is used decides it. A
 correlation-derived network has transitivity built into its construction: if A
 correlates with B and B with C, A and C are pulled toward correlation
 automatically, and that alone manufactures modularity in structureless data.
-Rewiring \cite{maslov2002specificity} and Erd\H{o}s--R\'enyi nulls take the
+Rewiring and Erd\H{o}s--R\'enyi nulls take the
 \emph{finished graph} as given, so neither can detect structure the
 construction itself created. Only a column-permutation null --- destroying
 association in the raw responses, then regenerating the entire chain of centre,
@@ -837,7 +836,7 @@ chance. On respondents it leaves 22 components and 20 isolates. \\
 \addlinespace
 Louvain for communities
 & Superseded by Leiden: its greedy phase can leave communities internally
-disconnected \cite{traag2019louvain}; Leiden improves $Q$ from $0.472$ to
+disconnected; Leiden improves $Q$ from $0.472$ to
 $0.491$ at the same $k=15$. \\
 \bottomrule
 \end{tabular}
@@ -919,9 +918,5 @@ Girvan--Newman comparison; null-model evaluation of the item partition
 \end{tabular}
 \end{center}
 \end{table}
-
-\bibliography{references}
-% falls back to a standard style when icml2025.bst is absent
-\IfFileExists{icml2025.bst}{\bibliographystyle{icml2025}}{\bibliographystyle{plain}}
 
 \end{document}
