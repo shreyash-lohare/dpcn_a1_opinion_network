@@ -1,14 +1,14 @@
 """Reproduce every figure and number in the report from a fresh clone.
 
     python run_all.py              # everything, in dependency order
-    python run_all.py --only P2    # one owner's stages
+    python run_all.py --only Shreyash    # one owner's stages
     python run_all.py --list       # show the stage table and exit
 
 Orchestration only: no analysis logic lives here. Each stage is a callable in
 somebody's module, and the stage table below is the dependency order.
 
 Stage 1 fits per-item ordinal regression models and is by far the slowest part
-of the run; everything Person 2 owns completes in a few seconds.
+of the run; everything Shreyash owns completes in a few seconds.
 """
 
 from __future__ import annotations
@@ -29,16 +29,16 @@ ARTIFACTS = ROOT / "artifacts"
 
 # Which person owes which artefact, so a missing input names its owner.
 ARTEFACT_OWNER = {
-    "outputs/sanitised_data/dataset_imputed.csv": "P1 (src/pipeline.py, stage 1)",
-    "outputs/sanitised_data/row_centred_data.csv": "P1 (src/pipeline.py, stage 1)",
-    "outputs/block_connectivity/block_means_centred.csv": "P1 (src/block_connectivity.py)",
-    "artifacts/chance_edges_by_threshold.csv": "P2 (src/person2/graph_4.py, stage 3)",
-    "artifacts/null_replicates.npz": "P2 (src/person2/graph_4.py, stage 3)",
-    "artifacts/corr_raw.npy": "P2 (src/person2/graph_5.py, stage 4)",
-    "artifacts/corr_denoised.npy": "P2 (src/person2/graph_5.py, stage 4)",
-    "artifacts/mp_dimensions.json": "P2 (src/person2/graph_5.py, stage 4)",
-    "artifacts/threshold.json": "P2 (src/person2/graph_7.py, stage 5)",
-    "artifacts/null_comparison.json": "P2 (src/person2/null_comparison.py, stage 6)",
+    "outputs/sanitised_data/dataset_imputed.csv": "Arijeet (src/preprocessing/pipeline.py, stage 1)",
+    "outputs/sanitised_data/row_centred_data.csv": "Arijeet (src/preprocessing/pipeline.py, stage 1)",
+    "outputs/block_connectivity/block_means_centred.csv": "Arijeet (src/viz/block_connectivity.py)",
+    "artifacts/chance_edges_by_threshold.csv": "Shreyash (src/analysis/noise_floor.py, stage 3)",
+    "artifacts/null_replicates.npz": "Shreyash (src/analysis/noise_floor.py, stage 3)",
+    "artifacts/corr_raw.npy": "Shreyash (src/analysis/spectrum.py, stage 4)",
+    "artifacts/corr_denoised.npy": "Shreyash (src/analysis/spectrum.py, stage 4)",
+    "artifacts/mp_dimensions.json": "Shreyash (src/analysis/spectrum.py, stage 4)",
+    "artifacts/threshold.json": "Shreyash (src/analysis/threshold.py, stage 5)",
+    "artifacts/null_comparison.json": "Shreyash (src/analysis/null_models.py, stage 6)",
 }
 
 THRESHOLD_RULE = (
@@ -63,14 +63,14 @@ class Stage:
 
 
 def _p1_pipeline():
-    from src.config import PipelineConfig
-    from src.pipeline import run_pipeline
+    from src.preprocessing.settings import PipelineConfig
+    from src.preprocessing.pipeline import run_pipeline
 
     return run_pipeline(PipelineConfig())
 
 
 def _p1_diagnostics():
-    from src.diagnostics import (
+    from src.viz.diagnostics import (
         plot_item_variance_ranking,
         plot_missingness_and_response_distribution,
         plot_row_centring_effect,
@@ -81,32 +81,39 @@ def _p1_diagnostics():
     plot_row_centring_effect()
 
 
+def _p1_dataset_figures():
+    from src.viz.report_figures import plot_contested_items, plot_response_ceiling
+
+    plot_response_ceiling()
+    plot_contested_items()
+
+
 def _p1_graph_9():
-    from src.block_connectivity import plot_block_connectivity
+    from src.viz.block_connectivity import plot_block_connectivity
 
     return plot_block_connectivity()
 
 
 def _p1_graph_12():
-    from src.dynamics import plot_opinion_dynamics
+    from src.viz.dynamics import plot_opinion_dynamics
 
     return plot_opinion_dynamics()
 
 
 def _p2_graph_4():
-    from src.person2.graph_4 import main
+    from src.analysis.noise_floor import main
 
     return main()
 
 
 def _p2_graph_5():
-    from src.person2.graph_5 import main
+    from src.analysis.spectrum import main
 
     return main()
 
 
 def _p2_graph_7():
-    from src.person2.graph_7 import finalise, print_table, run_sweep
+    from src.analysis.threshold import finalise, print_table, run_sweep
 
     table, chance, _ = run_sweep()
     print_table(table, chance)
@@ -114,66 +121,69 @@ def _p2_graph_7():
 
 
 def _p2_null_comparison():
-    from src.person2.null_comparison import main
+    from src.analysis.null_models import main
 
     return main()
 
 
 def _p2_sensitivity():
-    from src.person2.sensitivity import main
+    from src.analysis.sensitivity import main
 
     return main()
 
 
 def _p3_graph_10():
-    from src.person3.graph_10 import run
+    from src.communities.detection import run
     return run()
 
 
 def _p3_graph_11():
-    from src.person3.graph_11 import run
+    from src.communities.balance import run
     return run()
 
 
 def _p3_graph_6():
-    from src.person3.graph_6 import run
+    from src.communities.heatmap import run
     return run()
 
 
 STAGES: List[Stage] = [
-    Stage("P1", "Sanitise, impute, row-centre, item network", _p1_pipeline,
+    Stage("Arijeet", "Sanitise, impute, row-centre, item network", _p1_pipeline,
           produces=["outputs/sanitised_data/dataset_imputed.csv",
                     "outputs/sanitised_data/row_centred_data.csv"]),
-    Stage("P1", "Graphs 1-3 (missingness, item variance, centring effect)", _p1_diagnostics,
+    Stage("Arijeet", "Graphs 1-3 (missingness, item variance, centring effect)", _p1_diagnostics,
           requires=["outputs/sanitised_data/dataset_imputed.csv"]),
-    Stage("P1", "Graph 9: topic-block connectivity (4x4)", _p1_graph_9,
+    Stage("Arijeet", "Dataset figures: response ceiling, contested items", _p1_dataset_figures,
+          requires=["outputs/sanitised_data/dataset_imputed.csv"],
+          produces=["figures/fig_response_ceiling.png"]),
+    Stage("Arijeet", "Graph 9: topic-block connectivity (4x4)", _p1_graph_9,
           requires=["outputs/sanitised_data/dataset_imputed.csv"],
           produces=["outputs/block_connectivity/block_means_centred.csv"]),
-    Stage("P1", "Graph 12: Deffuant-Weisbuch opinion dynamics", _p1_graph_12,
+    Stage("Arijeet", "Graph 12: Deffuant-Weisbuch opinion dynamics", _p1_graph_12,
           requires=["outputs/sanitised_data/row_centred_data.csv",
                     "outputs/sanitised_data/dataset_imputed.csv"]),
-    Stage("P2", "Graph 4: noise floor + permutation null framework", _p2_graph_4,
+    Stage("Shreyash", "Graph 4: noise floor + permutation null framework", _p2_graph_4,
           produces=["artifacts/chance_edges_by_threshold.csv", "artifacts/null_replicates.npz"]),
-    Stage("P2", "Graph 5: Marchenko-Pastur denoising", _p2_graph_5,
+    Stage("Shreyash", "Graph 5: Marchenko-Pastur denoising", _p2_graph_5,
           produces=["artifacts/corr_raw.npy", "artifacts/corr_denoised.npy",
                     "artifacts/mp_dimensions.json"]),
-    Stage("P2", "Graph 7: threshold sweep and selection", _p2_graph_7,
+    Stage("Shreyash", "Graph 7: threshold sweep and selection", _p2_graph_7,
           requires=["artifacts/corr_denoised.npy", "artifacts/chance_edges_by_threshold.csv"],
           produces=["artifacts/threshold.json"]),
-    Stage("P2", "Null comparison: permutation vs rewiring vs ER", _p2_null_comparison,
+    Stage("Shreyash", "Null comparison: permutation vs rewiring vs ER", _p2_null_comparison,
           produces=["artifacts/null_comparison.json",
                     "artifacts/null_modularity_replicates.npz"]),
-    Stage("P2", "Sensitivity annex: methods tried and rejected", _p2_sensitivity,
+    Stage("Shreyash", "Sensitivity annex: methods tried and rejected", _p2_sensitivity,
           requires=["artifacts/corr_raw.npy", "artifacts/threshold.json"],
           produces=["artifacts/sensitivity.json"]),
-    Stage("P3", "Graph 10: communities vs three null models", _p3_graph_10,
+    Stage("Dev", "Graph 10: communities vs three null models", _p3_graph_10,
           requires=["artifacts/corr_denoised.npy", "artifacts/threshold.json",
                     "artifacts/null_replicates.npz"],
           produces=["artifacts/graph10_communities.json"]),
-    Stage("P3", "Graph 11: structural balance vs threshold", _p3_graph_11,
+    Stage("Dev", "Graph 11: structural balance vs threshold", _p3_graph_11,
           requires=["artifacts/corr_denoised.npy", "artifacts/threshold.json"],
           produces=["artifacts/graph11_balance_stats.json"]),
-    Stage("P3", "Graph 6: reordered correlation heatmap", _p3_graph_6,
+    Stage("Dev", "Graph 6: reordered correlation heatmap", _p3_graph_6,
           requires=["artifacts/corr_denoised.npy", "artifacts/graph10_communities.json"])
 ]
 
@@ -190,7 +200,7 @@ def check_requirements(stage: Stage) -> List[str]:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--only", metavar="OWNER", help="run only P1, P2 or P3 stages")
+    parser.add_argument("--only", metavar="OWNER", help="run only Arijeet, Shreyash or Dev stages")
     parser.add_argument("--list", action="store_true", help="print the stage table and exit")
     parser.add_argument("--keep-going", action="store_true",
                         help="continue after a failing stage instead of stopping")
@@ -204,9 +214,9 @@ def main(argv=None) -> int:
             return 2
 
     if args.list:
-        print(f"{'#':>2}  {'owner':<6} stage")
+        print(f"{'#':>2}  {'owner':<9} stage")
         for i, s in enumerate(STAGES, 1):
-            print(f"{i:>2}  {s.owner:<6} {s.name}")
+            print(f"{i:>2}  {s.owner:<9} {s.name}")
         return 0
 
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
@@ -214,7 +224,7 @@ def main(argv=None) -> int:
     failures = 0
 
     for i, stage in enumerate(stages, 1):
-        header = f"[{i}/{len(stages)}] {stage.owner}  {stage.name}"
+        header = f"[{i}/{len(stages)}] {stage.owner:<9} {stage.name}"
         print("\n" + "=" * 78)
         print(header)
         print("=" * 78)

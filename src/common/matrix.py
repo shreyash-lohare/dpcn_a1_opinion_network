@@ -1,10 +1,10 @@
-"""Analysis matrix for the Person 2 stages.
+"""Analysis matrix for the Shreyash stages.
 
 **Team decision (2026-09-17):** the project keeps all 91 non-empty respondents
-and recovers missing cells with Person 1's question-wise regularised
-proportional-odds ordinal regression (``src/imputation.py``), rather than
+and recovers missing cells with Arijeet's question-wise regularised
+proportional-odds ordinal regression (``src/preprocessing/imputation.py``), rather than
 dropping the ten respondents with more than twelve missing items and filling
-the remainder with a column statistic. This module therefore consumes Person 1's
+the remainder with a column statistic. This module therefore consumes Arijeet's
 imputed matrix directly; it does not re-impute anything.
 
 Two matrices come out, and the distinction matters:
@@ -18,8 +18,8 @@ Two matrices come out, and the distinction matters:
 pipeline. It is retained solely so the report can quantify what the respondent
 filter changes (Section ``sec:rejected-p2``), not as an analysis path.
 
-Correlations are Pearson throughout the Person 2 stages, per the frozen decision
-in CLAUDE.md section 2. Person 1's own network uses Spearman; the difference is
+Correlations are Pearson throughout the Shreyash stages, per the frozen decision
+for this project. Arijeet's own network uses Spearman; the difference is
 deliberate and noted in the report, because Marchenko-Pastur theory is derived
 for Pearson-type correlation matrices and the eigenvalue band has no equivalent
 closed form for rank correlations.
@@ -37,7 +37,7 @@ import numpy as np
 import pandas as pd
 
 from src.common.config import ARTIFACTS, DATA, MAX_MISSING_ITEMS, N_ITEMS, ROOT
-from src.loader import encode_responses, load_data, parse_question_columns
+from src.preprocessing.loader import encode_responses, load_data, parse_question_columns
 
 IMPUTED_CSV = ROOT / "outputs" / "sanitised_data" / "dataset_imputed.csv"
 
@@ -73,11 +73,11 @@ def _raw_encoded():
 
 
 def build_matrices(imputed_csv: Path = IMPUTED_CSV) -> AnalysisMatrix:
-    """Primary path: Person 1's 91-respondent ordinal-imputed matrix, row-centred."""
+    """Primary path: Arijeet's 91-respondent ordinal-imputed matrix, row-centred."""
     if not imputed_csv.exists():
         raise FileNotFoundError(
-            f"{imputed_csv.relative_to(ROOT)} is missing. It is produced by Person 1's "
-            "stage 1 (src/pipeline.py). Run `python run_all.py --only P1` first, or "
+            f"{imputed_csv.relative_to(ROOT)} is missing. It is produced by Arijeet's "
+            "stage 1 (src/preprocessing/pipeline.py). Run `python run_all.py --only Arijeet` first, or "
             "`python run_all.py` to run everything in dependency order."
         )
     raw, _, _, question_text, encoded_all = _raw_encoded()
@@ -108,7 +108,7 @@ def build_matrices(imputed_csv: Path = IMPUTED_CSV) -> AnalysisMatrix:
         respondent_ids=frame[frame.columns[0]].reset_index(drop=True),
         dropped_ids=all_ids[~all_ids.isin(kept_ids)].reset_index(drop=True),
         n_imputed=n_imputed,
-        source="P1 ordinal-regression imputation (91 respondents)",
+        source="Arijeet ordinal-regression imputation (91 respondents)",
     )
 
 
@@ -148,7 +148,7 @@ def upper_triangle(matrix: np.ndarray) -> np.ndarray:
 
 
 def save_matrices(am: AnalysisMatrix) -> None:
-    """Persist the handoff artefacts Person 1 and Person 3 also read."""
+    """Persist the handoff artefacts Arijeet and Dev also read."""
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     np.save(ARTIFACTS / "X_encoded.npy", am.encoded.to_numpy())
     np.save(ARTIFACTS / "X_centred.npy", am.centred.to_numpy())

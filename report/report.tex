@@ -87,279 +87,120 @@ and a well-mixed population is a genuine effect of topology.
 \section{Introduction}
 % ============================================================
 
-Likert-scale questionnaires are a natural setting for studying how attitudes
-in different domains relate to one another. Although each item is answered
-independently, responses exhibit substantial dependence across questions and
-across thematic domains. Network representations model these dependencies
-directly: questionnaire items (or respondents) become vertices, and
-statistical association becomes weighted edges.
+Likert questionnaires are a natural setting for studying how attitudes in
+different domains relate. Each item is answered independently, yet responses
+depend on one another, and a network makes those dependencies explicit: items
+become vertices and statistical association becomes weighted edges.
 
-Turning a questionnaire into a network is not, however, a mechanical step.
-Three decisions determine whether the resulting graph carries signal or
-merely re-describes the response format.
-
-\textbf{How missing data is handled.} Missing responses arise both from
-respondents stopping before reaching later questions and from respondents
-declining to answer a particular item. These are different mechanisms
-\cite{rubin1976inference} and should not be silently merged, and assigning a
-numerical value such as Neutral to a declined answer injects information the
-respondent never supplied.
-
-\textbf{Whether response style is removed.} When respondents agree with almost
-everything, correlation between any two items is inflated by a shared
-``agreeableness'' component rather than genuine item association
-\cite{paulhus1991measurement}. Unless this is removed, the network largely
-encodes response style.
-
-\textbf{What the network is compared against.} A correlation-derived network
-has transitivity built into its construction, so clustering and modularity
-appear even in structureless data. Any structural claim needs a null model
-beside it.
-
-This report addresses all three. Section~\ref{sec:data} documents the dataset
-and its ceiling effect, Section~\ref{sec:handling} the sanitisation,
-imputation and row-centring pipeline, Section~\ref{sec:analysis} the
-individual analyses and visualisations, and
-Sections~\ref{sec:discussion}--\ref{sec:conclusion} the findings and their
-limits.
+Turning a questionnaire into a network is not mechanical. Three decisions
+determine whether the graph carries signal or merely re-describes the response
+format. \textbf{How missing data is handled}: abandonment and deliberate
+non-response are different mechanisms \cite{rubin1976inference}, and assigning
+Neutral to a withheld answer invents data. \textbf{Whether response style is
+removed}: when respondents agree with almost everything, every pair of items
+correlates through shared agreeableness rather than content
+\cite{paulhus1991measurement}. \textbf{What the network is compared against}: a
+correlation-derived graph has transitivity built into its construction, so
+clustering and modularity appear even in structureless data. This report
+addresses all three, and reports the alternatives that failed alongside the
+pipeline that survived.
 
 \paragraph{Team and code.}
-Team \textbf{Edge Runners}. All code, figures, and the data pipeline are
-available at \url{https://github.com/shreyash-lohare/dpcn_a1_opinion_network}.
-The full analysis is reproducible from a fresh clone via
-\texttt{python run\_all.py} followed by the figure modules in \texttt{src/}.
+Team \textbf{Edge Runners}. All code, figures and data are at
+\url{https://github.com/shreyash-lohare/dpcn_a1_opinion_network} and the whole
+analysis regenerates from a fresh clone with \texttt{python run\_all.py}.
 
 % ============================================================
-\section{Dataset Documentation}
+\section{Data and Preparation}
 \label{sec:data}
 % ============================================================
 
-The questionnaire contains 60 items in four thematic blocks of 15: technology
-(T01--T15), education (E01--E15), society and ethics (S01--S15), and
-environment (V01--V15). Each item offers five ordered categories plus an
-explicit \emph{No Comments} option. For numerical analysis the categories are
-encoded symmetrically,
-\[
-\text{SD}=-2,\quad \text{D}=-1,\quad \text{N}=0,\quad \text{A}=+1,\quad
-\text{SA}=+2,
-\]
-which represents the ordering of the categories without asserting that
-adjacent categories are equally spaced. Descriptive statistics in this section
-are reported on the original $1$--$5$ scale (subtract $3$ to recover the
-encoding above).
-
-The raw file contains 96 respondent records and $96\times 60 = 5{,}760$ cells,
-of which $5{,}255$ were answered and $5{,}218$ carry a substantive ordinal
-response. Blocks are internally consistent to varying degrees: Cronbach's
-$\alpha$ \cite{cronbach1951coefficient} is $0.87$ for environment and $0.82$
-for society, but only $0.65$ for technology and $0.58$ for education, and
-$0.885$ across all 60 items.
+The questionnaire contains 60 items in four blocks of 15 --- technology
+(T01--T15), education (E01--E15), society and ethics (S01--S15) and environment
+(V01--V15) --- answered by 96 respondents. Five ordered categories are encoded
+symmetrically as $\text{SD}=-2$ through $\text{SA}=+2$, which represents the
+ordering without asserting equal spacing; a sixth option, \emph{No Comments}
+(NC), is treated as missing. Internal consistency varies sharply by block:
+Cronbach's $\alpha$ \cite{cronbach1951coefficient} is $0.87$ for environment and
+$0.82$ for society but only $0.65$ for technology and $0.58$ for education.
 
 \subsection{The response ceiling}
 
-The single most consequential property of this dataset is its ceiling.
-Figure~\ref{fig:ceiling}(a) shows that $79.8\%$ of valid answers are
-\emph{Agree} or \emph{Strongly Agree}, with \emph{Strongly Agree} alone
-accounting for $43.1\%$; only $7.0\%$ of answers fall on the disagree side.
-The grand mean is $4.138$ on the $1$--$5$ scale, i.e.\ $\mathbf{+1.14}$ on the
-$[-2,+2]$ encoding.
+The most consequential property of this dataset is its ceiling.
+Figure~\ref{fig:ceiling} shows $79.8\%$ of valid answers on the agree side,
+$43.1\%$ \emph{Strongly Agree}, and only $7.0\%$ disagreeing. The grand mean is
+$\mathbf{+1.14}$ on the $[-2,+2]$ scale. Two consequences drive every later
+decision: item means barely discriminate, so the signal is in \emph{which}
+statements attract disagreement; and two respondents look similar under any raw
+similarity measure simply by both being agreeable.
 
-Two consequences follow, and both shape every later decision. Item means
-barely discriminate between statements, so the informative signal is in
-\emph{which} statements attract disagreement rather than in overall agreement
-level. And because almost every respondent agrees with almost everything, two
-respondents will look similar under a raw similarity measure simply by both
-being agreeable. Section~\ref{sec:centring} removes this component explicitly.
+The ceiling is not uniform. Environment ($\mu=4.39$ on the $1$--$5$ scale,
+$89.5\%$ agree) and society ($\mu=4.28$) are near consensus, while technology
+($\mu=3.99$) and education ($\mu=3.91$, $13.8\%$ disagree) retain real
+disagreement --- and those two blocks also have the weakest internal
+consistency, consistent with their items tapping several distinct opinions
+rather than one settled disposition.
 
-Figure~\ref{fig:ceiling}(b) shows the ceiling is not uniform across topics.
-Environment ($\mu=4.39$, $89.5\%$ agree) and society ($\mu=4.28$, $86.0\%$)
-are close to settled consensus, whereas technology ($\mu=3.99$, $8.1\%$
-disagree) and especially education ($\mu=3.91$, $13.8\%$ disagree) retain
-real disagreement. Notably, the blocks with the most disagreement are also
-those with the lowest internal consistency, consistent with their items
-tapping several distinct opinions rather than one settled disposition.
+Ranked by disagreement, the twelve most contested items are seven
+education, four technology, one society, none environment. Compulsory
+attendance (E03, mean $2.06$, $70.1\%$ disagreeing) is the only statement the
+cohort actively rejects; written examinations (E02, $2.84$) is next. The
+pattern is specific rather than oppositional --- the same cohort agrees at
+$94.3\%$ that curricula should be updated more often (E11). What is contested
+is assessment and teaching format, not the institution. Technology behaves
+likewise: teaching AI (T04) and AI as a learning aid (T02) score above $79\%$,
+while AI-assisted diagnosis (T08, $3.08$) and autonomous vehicles (T09, $3.28$)
+sit lowest. Since robots in hazardous work (T07) scores $82.4\%$, the objection
+is to delegating consequential judgment, not to automation.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.88\textwidth]{../figures/fig_response_ceiling.png}
-\caption{The response ceiling. (a) Distribution of all $5{,}218$ valid
-answers: nearly four in five are on the agree side and $43\%$ are
-\emph{Strongly Agree}. (b) Agreement profile per block, centred on neutral,
-with block mean and Cronbach's $\alpha$. Environment and society are near
-consensus; education carries the most disagreement and the weakest internal
-consistency.}
+\includegraphics[width=0.80\textwidth]{../figures/fig_response_ceiling.png}
+\caption{The response ceiling. (a) All $5{,}218$ valid answers: nearly four in
+five are on the agree side. (b) Agreement profile per block with block mean and
+Cronbach's $\alpha$. Environment and society are near consensus; education
+carries the most disagreement and the weakest consistency.}
 \label{fig:ceiling}
 \end{figure*}
 
-\subsection{Where the disagreement lives}
-
-Figure~\ref{fig:contested} ranks the twelve items attracting the most
-disagreement. Seven are education items and four are technology items; only
-one comes from society, and none from environment. Compulsory class attendance
-(E03, mean $2.06$) is the only statement the cohort actively rejects, with
-$70.1\%$ disagreeing and $40\%$ strongly disagreeing. Written examinations as
-a measure of knowledge (E02, mean $2.84$) is the next most rejected.
-
-The pattern is specific rather than generally oppositional: the same cohort
-returns $94.3\%$ agreement that curricula should be updated more often (E11)
-and that universities should prioritise problem-solving over rote learning
-(E10). What is contested is assessment and teaching format, not the
-institution.
-
-The technology items behave similarly. Teaching AI (T04, $81.3\%$), AI as a
-learning aid (T02, $79.1\%$), and AI accelerating research (T05, $81.3\%$) all
-score high, whereas AI-assisted medical diagnosis (T08, mean $3.08$) and
-autonomous vehicles (T09, mean $3.28$) are the two lowest technology items by
-a clear margin. Since robots in hazardous occupations (T07) scores $82.4\%$
-agreement, the objection is not to automation in general but to delegating
-consequential judgment.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.92\columnwidth]{../figures/fig_contested_items.png}
-\caption{The twelve items attracting the most disagreement, as diverging
-response profiles centred on neutral, with item mean on the right. Labels are
-coloured by block. Disagreement concentrates in education (7 of 12) and
-technology (4 of 12).}
-\label{fig:contested}
-\end{figure}
-
-\subsection{Missingness and data-quality notes}
-
-Of the 96 records, 85 are complete, 5 are entirely empty, 4 stop after the
-technology block, and 2 stop partway through environment. Dropout is therefore
-\emph{monotone}---a truncated tail rather than scattered gaps---which matters
-because it means later blocks rest on a slightly smaller base ($n=84$--$91$)
-than earlier ones. Separately, 37 cells carry \emph{No Comments}, scattered
-across 17 respondents who otherwise completed the questionnaire.
-
-Three limitations should be carried into every result below. Items with means
-above roughly $4.5$ measure social-desirability agreement more than strength
-of preference. Only a small minority of statements are worded to invite
-disagreement from an otherwise positive respondent, so acquiescence bias and
-a genuine ceiling cannot be fully separated here. And the file contains no
-demographic fields, so no finding can be attributed to a subgroup.
-
-% ============================================================
-\section{Data Handling}
-\label{sec:handling}
-% ============================================================
-
-\subsection{Dataset sanitation}
-\label{sec:sanitation}
-
-\paragraph{Missingness structure.}
-Five entirely empty records are excluded, leaving \textbf{91 respondents}. No
-respondent is excluded for being merely incomplete: the four who stopped after
-technology and the two who stopped during environment are retained, and their
-unanswered items are treated as missing data to be recovered rather than as
-grounds for deletion. This yields $205$ contiguous structural blank cells and
-$37$ NC cells, $242$ missing cells in total among the retained respondents.
-
-We distinguish
-\[
-\text{structural blank} = \text{question not reached},
-\]
-from
-\[
-\text{NC} = \text{deliberate non-response}.
-\]
-Both become missing values during modelling, but their original types are
-retained so that preprocessing never silently conflates abandonment with an
-explicit decision to withhold an answer.
-
-\paragraph{Why NC is not Neutral.}
-Recoding NC as Neutral would assign a substantive response to a cell for which
-none was supplied. As a diagnostic we fitted a two-way additive model with
-respondent and item effects on the clean responses,
-$\hat{x}_{iq} = \bar{\mu} + a_i + b_q$. The fitted value at the 37 NC cells
-averaged $3.92$ on the $1$--$5$ scale against $3$ for Neutral, so recoding
-would impose a systematic downward shift of about $0.92$ scale points. This
-model is used only as a diagnostic, not as the imputation method.
-
-\paragraph{Empirical NC diagnostics.}
-NC usage shows no systematic item- or respondent-level structure under the
-tests applied. NC counts per item have a dispersion index of $1.10$ and a
-chi-squared test of item-level uniformity gives $p=0.27$; no item carries more
-than three NC responses; the correlation between NC frequency and item
-standard deviation is $r=-0.02$. At respondent level, NC users have mean score
-$4.01$ against $4.15$ for non-users ($p=0.27$), and neutral-response rates of
-$0.123$ against $0.142$ ($p=0.82$). There is therefore no empirical basis for
-assigning NC a fixed ordinal category, and we retain it as unobserved.
-
-\paragraph{Sensitivity to NC treatment.}
-Table~\ref{tab:sens} compares four NC treatments on the item-correlation
-network at $\tau=0.30$. Dropping NC users would remove 17 respondents, roughly
-a fifth of the sample, to eliminate only 37 cells, and it is the only
-treatment that materially disturbs the recovered community structure
-(AMI $0.337$). Correlations are far more stable than partitions across all
-four treatments---a warning that stability of a correlation matrix should
-never be read as evidence that a particular partition of it is stable.
-
-\begin{table}[t]
-\caption{Sensitivity of the item-correlation network to NC treatment at
-$\tau=0.30$, against pairwise deletion as reference. Computed at an earlier
-86-respondent configuration; ordering of the treatments is the result of
-interest rather than the absolute counts.}
-\label{tab:sens}
-\vskip 0.05in
-\begin{center}
-\footnotesize
-\begin{tabular}{lrrrrr}
-\toprule
-Treatment & $N$ & $E$ & $r$ & Jacc. & AMI \\
-\midrule
-Pairwise delete (ref.) & 86 & 325 & -- & -- & -- \\
-Recode $\rightarrow$ Neutral & 86 & 333 & .993 & .875 & .662 \\
-Drop NC users & 69 & 362 & .947 & .616 & .337 \\
-Two-way impute & 86 & 335 & .997 & .924 & .670 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\vskip -0.1in
-\end{table}
-
-\subsection{Missing-value imputation}
+\subsection{Missing data and how it was recovered}
 \label{sec:imputation}
 
-\paragraph{Ordinal regression formulation.}
-For target item $j$ the remaining 59 items form the predictor vector
-$\mathbf{x}_{i,-j}$, and the target satisfies
-$y_{ij}\in\{-2,-1,0,+1,+2\}$. We fit one regularised proportional-odds ordinal
-logistic regression \cite{mccullagh1980regression} per item, with latent score
-$z_i = \beta_0 + \boldsymbol{\beta}^{\top}\mathbf{x}_{i,-j}$ and ordered
-thresholds $\theta_1<\theta_2<\theta_3<\theta_4$ inducing the five response
-intervals. The prediction is the maximum-probability category,
-\[
-\hat{y}_{ij} = \arg\max_k P(y_{ij}=k \mid \mathbf{x}_{i,-j}).
-\]
-This preserves the ordering of the Likert responses while avoiding the
-interval-scale assumption of linear regression, and unlike nominal multiclass
-classification it retains the relative order of the five outcomes.
+Of 96 records, 85 are complete, 5 are entirely empty, and 6 stop partway. The
+five empty records are dropped, leaving \textbf{91 respondents}; none is
+dropped merely for being incomplete. That leaves $205$ structural blanks plus
+$37$ NC cells, $\mathbf{242}$ in total. Dropout is \emph{monotone} --- a
+truncated tail, not scattered gaps --- so later blocks rest on a slightly
+smaller base.
 
-\paragraph{Missing predictors and regularisation.}
-A respondent may have several missing cells, so predictors that are themselves
-missing cannot be encoded as Neutral. They are instead filled with the
-training-fold column median before standardisation, with the statistic
-computed only from training data in each fold to prevent leakage from held-out
-responses. A ridge penalty controls complexity in the 59-dimensional predictor
-space, and the target is always excluded from its own predictor vector, giving
-$M_j:\mathbf{X}_{-j}\rightarrow Y_j$ for $j=1,\ldots,60$.
+\paragraph{NC is not Neutral.} Recoding a withheld answer as Neutral asserts a
+response nobody gave. A two-way additive model
+$\hat{x}_{iq}=\bar{\mu}+a_i+b_q$ fitted on the clean responses predicts $3.92$
+at the 37 NC cells against $3$ for Neutral, so recoding would impose a
+systematic $0.92$-point downward shift. NC use also shows no item- or
+respondent-level structure (item-uniformity $p=0.27$; NC users' mean $4.01$ vs
+$4.15$, $p=0.27$), so there is no basis for assigning it any fixed category.
 
-\paragraph{Validation.}
-The true values of the $242$ genuinely missing cells are unavailable, so the
-pipeline is evaluated by artificial masking of responses whose values are
-known, under two mechanisms matched to the two missingness types.
-\emph{Scattered masking} hides 37 observed cells at random inside otherwise
-complete respondents, approximating NC, over 40 trials. \emph{Suffix masking}
-hides a contiguous tail after a simulated stopping point drawn from the
-observed stopping pattern, for 15 respondents per trial over 15 trials; items
-after the stopping point are withheld from the predictor so the model cannot
-use information unavailable in practice.
+\paragraph{Recovery by ordinal regression.} For target item $j$ the other 59
+items form the predictor vector, and we fit one regularised proportional-odds
+ordinal logistic regression \cite{mccullagh1980regression} per item, with
+latent score $z_i=\beta_0+\boldsymbol{\beta}^{\top}\mathbf{x}_{i,-j}$ and
+ordered thresholds $\theta_1<\cdots<\theta_4$; the prediction is the
+maximum-probability category. This respects the ordering of the scale without
+assuming equal intervals. Predictors that are themselves missing are filled
+with the training-fold column median, computed per fold to prevent leakage, and
+a ridge penalty controls the 59-dimensional fit.
+
+\paragraph{Does it work?} The true values are unavailable, so we validate by
+artificial masking under both mechanisms: \emph{scattered} masking hides 37
+observed cells inside complete respondents (40 trials), \emph{suffix} masking
+hides a contiguous tail after a simulated stopping point (15 respondents per
+trial, 15 trials). Because the target is ordinal, MAE matters more than exact
+accuracy: being one category out is not the same error as being four.
 
 \begin{table}[t]
-\caption{Artificial-masking validation. Accuracy is exact-category; MAE is
-mean absolute error on the five-point scale.}
+\caption{Artificial-masking validation. The model beats a modal baseline under
+both mechanisms, by a wider margin where more co-answered items survive.}
 \label{tab:val}
 \vskip 0.05in
 \begin{center}
@@ -378,52 +219,45 @@ Suffix (structural) & .498 & .612 & .482 & .655 \\
 \vskip -0.1in
 \end{table}
 
-Because the target is ordinal, MAE is the more informative metric: a
-prediction one category away is not the same error as one at the opposite end
-of the scale. Table~\ref{tab:val} shows the model beats a modal-response
-baseline under both mechanisms, by a wider margin under scattered masking
-where more co-answered items remain available. Performance is lower under
-suffix masking precisely because fewer predictors survive the stopping point,
-so the two settings should be read separately rather than averaged into one
-number. The final model imputes all $242$ missing cells, with every recovered
-value restricted to the original five-level support.
+One caution carries forward. Comparing four NC treatments at $\tau=0.30$, the
+correlation matrices agree at $r>0.94$ while their community assignments agree
+at AMI as low as $0.337$ (dropping NC users, which discards 17 respondents to
+remove 37 cells). \emph{Stability of a correlation matrix is not evidence that
+a partition of it is stable} --- a warning that Section~\ref{sec:nulls} makes
+quantitative.
 
 \subsection{Row-centring}
 \label{sec:centring}
 
-Imputation yields a complete $91\times 60$ matrix on the original scale, but
-not one that can be correlated directly. Because the grand mean is $+1.14$
-(Section~\ref{sec:data}), a respondent who agrees with everything raises all
-60 of their entries together, which appears as association between every pair
-of items at once. We therefore replace each entry by its deviation from that
+Imputation yields a complete $91\times 60$ matrix, but not one that can be
+correlated directly: with a grand mean of $+1.14$, a respondent who agrees with
+everything raises all 60 entries together, which reads as association between
+every pair of items at once. We replace each entry by its deviation from that
 respondent's own mean,
 \begin{equation}
 x'_{i,j} = x_{i,j} - \bar{x}_{i\cdot},
 \qquad
-\bar{x}_{i\cdot} = \frac{1}{60}\sum_{k=1}^{60} x_{i,k}.
+\bar{x}_{i\cdot} = \tfrac{1}{60}\textstyle\sum_{k} x_{i,k}.
 \end{equation}
+Centring is applied strictly after imputation and strictly before correlation.
+Note that rank correlation does \emph{not} remove this bias automatically:
+Spearman is invariant to a monotone transform of a column, not to an additive
+shift that differs by row. Figure~\ref{fig:g3} measures how much it matters.
 
-Two points are worth stating precisely. First, centring is applied strictly
-\emph{after} imputation and strictly \emph{before} correlation: the imputation
-model predicts on the original $-2$ to $+2$ scale, and centring is a
-network-construction step, not a data-cleaning one. Second, rank correlation
-does not remove this bias automatically---Spearman correlation is invariant to
-a monotone transform of a single column, not to an additive shift that differs
-from row to row. The magnitude of the effect is reported as Graph~3
-(Section~\ref{sec:g3}).
+\subsection{What the network is}
 
-\subsection{Network construction}
-
-On the sanitised, row-centred matrix we build a weighted undirected graph
-$G=(V,E,W)$ whose 60 vertices are the questionnaire items. Because responses
-are ordered categories, the primary association measure is the Spearman rank
-correlation $\rho_{qr}$, and edge weights are signed correlations, with
-$|\rho_{qr}|$ used for edge magnitude in visualisation and sign distinguished
-by colour. We retain the full weighted matrix and threshold only for display,
-showing an edge when $|\rho_{qr}| \geq \tau$. The association step is
-implemented modularly so a latent-variable ordinal measure such as polychoric
-correlation can replace Spearman without changing graph construction. A second,
-\emph{respondent}-level network is introduced in Section~\ref{sec:g12} for the
+\textbf{Vertices are the 60 questionnaire items. Edges are signed correlations
+between items, computed on the row-centred matrix and retained with their sign.
+Edges are weighted by default and binarised only where a metric requires it}
+(path lengths, triad counts). Items were chosen over respondents deliberately:
+a respondent network must be built by a neighbourhood rule such as
+$k$-nearest-neighbours, and Section~\ref{sec:nulls} shows that rule manufactures
+its own community structure, whereas an item network is thresholded directly on
+a measured quantity and every vertex carries an interpretable label. Signs are
+kept because a negative edge --- two questions dividing the cohort in opposite
+directions --- is a stronger statement than mere association, and because the
+structural-balance analysis is defined on the signs of triads. A second,
+respondent-level network appears only in Section~\ref{sec:g12}, for the
 dynamics experiment.
 
 % ============================================================
@@ -446,35 +280,32 @@ $n=91$, and small deviations from those reference numbers are expected.
 \subsection{Graph 1: Missingness map and response distribution}
 \label{sec:g1}
 
-Figure~\ref{fig:g1} shows every cell of the raw $96\times 60$ matrix as
-missing or present, with respondents sorted by missing count, beside the
-distribution of per-respondent mean scores.
+Figure~\ref{fig:g1} shows every cell of the raw $96\times60$ matrix as missing
+or present, respondents sorted by missing count, beside the distribution of
+per-respondent means.
 
 \textbf{Findings.} The $542$ missing cells ($505$ structural blanks plus $37$
-NC) are extremely unevenly distributed. Five respondents are entirely empty
-and account for $300$ of them; the remaining $242$ are spread thinly across
-the other 91, a missing rate of $4.4\%$. Below the cutoff the map is almost
-clean, with scattered single cells and two visible tails from the respondents
-who stopped early. The right panel locates the grand mean at $1.14$, with the
-bulk of respondents between $0.75$ and $1.50$ and only one respondent below
-zero.
+NC) are extremely unevenly distributed: five entirely empty respondents account
+for $300$ of them, and the remaining $242$ spread thinly across the other 91 --
+a rate of $4.4\%$. Below the cutoff the map is almost clean, with two visible
+tails from respondents who stopped early. The right panel locates the grand
+mean at $1.14$, with only one respondent below zero.
 
-\textbf{Implication.} The missingness structure justifies the retention policy
-directly. Because all but five respondents answered at least $80\%$ of items,
-there is no population of badly-incomplete respondents whose removal would
-simplify the analysis, and a count-based exclusion rule would discard usable
-respondents to remove very few cells. The right panel is the first direct
-evidence of the acquiescence problem that Section~\ref{sec:centring} corrects.
+\textbf{Implication.} This justifies the retention policy directly: all but
+five respondents answered at least $80\%$ of items, so there is no population
+of badly-incomplete respondents whose removal would simplify anything, and a
+count-based exclusion rule would discard usable respondents to remove very few
+cells. The right panel is the first direct evidence of the acquiescence problem
+that row-centring corrects.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.86\textwidth]{../figures/graph1_missingness_response_distribution.png}
-\caption{Graph 1. Left: missingness map over all 96 raw respondents, sorted by
-missing-item count; dark cells are missing for either reason. The dashed line
-marks this project's exclusion rule---only the five entirely empty records are
-dropped, and the remaining 91 respondents have their $242$ missing cells
-imputed. Right: per-respondent mean over answered items only, with the grand
-mean at $1.14$.}
+\includegraphics[width=0.78\textwidth]{../figures/fig01_missingness.png}
+\caption{Left: missingness map over all 96 raw respondents, sorted by
+missing-item count. The dashed line marks the exclusion rule --- only the five
+entirely empty records are dropped, and the remaining 91 have their $242$
+missing cells imputed. Right: per-respondent mean over answered items, grand
+mean $1.14$.}
 \label{fig:g1}
 \end{figure*}
 
@@ -482,94 +313,81 @@ mean at $1.14$.}
 \label{sec:g2}
 
 Figure~\ref{fig:g2} ranks all 60 items by standard deviation on the
-\emph{uncentred} imputed matrix. Centring is deliberately not applied here: it
-changes each item's variance and would answer a different question (spread
-after removing each respondent's baseline) than the one asked (how divided the
-cohort is on the statement as posed).
+\emph{uncentred} matrix. Centring is deliberately not applied here: it changes
+each item's variance and would answer a different question (spread after
+removing each respondent's baseline) than the one asked (how divided the cohort
+is on the statement as posed).
 
-\textbf{Findings.} Item SD ranges from $0.50$ (E15, ``continuous learning is
-essential'', near-unanimous) to $1.18$ (E04, online learning). The five most
-contested items are E04, E03, E02, T08 and T07; the least contested include
-V13, V06, S05 and E15. By block mean SD the order is technology $0.92$,
-education $0.88$, society $0.79$, environment $0.72$.
+\textbf{Findings.} Item SD ranges from $0.50$ (E15, near-unanimous) to $1.18$
+(E04, online learning). The five most contested are E04, E03, E02, T08, T07. By
+block mean SD: technology $0.92$, education $0.88$, society $0.79$, environment
+$0.72$.
 
-\textbf{Implication.} The block averages and the extremes tell slightly
-different stories, and both matter. Technology has the highest average
-variance, but the \emph{sharpest} disagreements are educational: three of the
-five most divided items are E02--E04, all concerning assessment and teaching
-format. Environment contributes none of the top ten. This is a property of the
-survey instrument, not of preprocessing: the questionnaire contains a settled
-domain (environment), a moderately settled one (society), and two live ones
-(technology, education). Consensus items carry little information for a
-correlation network---an item everyone endorses cannot covary with anything---
-so the network's signal is necessarily concentrated in the contested tail.
+\textbf{Implication.} Technology has the highest average variance, but the
+\emph{sharpest} disagreements are educational --- three of the five most divided
+items are E02--E04, all about assessment and teaching format --- and environment
+contributes none of the top ten. This is a property of the instrument, not of
+preprocessing: the questionnaire contains one settled domain, one moderately
+settled, and two live ones. Consensus items carry little information for a
+correlation network, since an item everyone endorses cannot covary with
+anything, so the signal is necessarily concentrated in the contested tail.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.66\columnwidth]{../figures/graph2_item_variance_ranking.png}
-\caption{Graph 2. All 60 items ranked by standard deviation on the uncentred
-imputed matrix, coloured by block. Contested items (top) concentrate in
-education and technology; environment items cluster at the consensus end.}
+\includegraphics[width=0.66\columnwidth]{../figures/fig02_item_variance.png}
+\caption{All 60 items by standard deviation on the uncentred matrix, coloured
+by block. Contested items concentrate in education and technology; environment
+clusters at the consensus end.}
 \label{fig:g2}
 \end{figure}
 
 \subsection{Graph 3: The effect of row-centring}
 \label{sec:g3}
 
-Figure~\ref{fig:g3} overlays the distribution of all
-$\binom{60}{2}=1{,}770$ pairwise item correlations computed before and after
-row-centring, on identical bin edges.
+Figure~\ref{fig:g3} overlays all $\binom{60}{2}=1{,}770$ pairwise item
+correlations before and after row-centring, on identical bin edges.
 
-\textbf{Findings.} The raw distribution is displaced positive, with mean
-$r=0.151$ and median $0.151$; almost no pair is appreciably negative. After
-centring the distribution sits essentially on zero, mean $r=-0.004$, median
-$-0.008$, with positive skew ($0.221$) leaving a heavier right tail of
-genuinely co-varying pairs. At a fixed threshold of $|r|\geq 0.30$ the number
-of surviving pairs falls from $\mathbf{327}$ to $\mathbf{42}$, a reduction of
-$87\%$.
+\textbf{Findings.} The raw distribution is displaced positive (mean and median
+both $0.151$), with almost no pair appreciably negative. After centring it sits
+on zero (mean $-0.004$, median $-0.008$) with positive skew $0.221$ leaving a
+heavier right tail of genuinely co-varying pairs. At $|r|\geq0.30$ the surviving
+pairs fall from $\mathbf{327}$ to $\mathbf{42}$ --- a reduction of $87\%$.
 
-\textbf{Implication.} This converts the claim of Section~\ref{sec:centring}
-from an assertion into a measurement: roughly seven eighths of the apparent
-association in the raw matrix is shared response style, not item
-relationship. Had the network been built on raw scores it would have been
+\textbf{Implication.} This converts the centring argument from an assertion
+into a measurement: seven eighths of the apparent association in the raw matrix
+is shared response style. Built on raw scores the network would have been
 dense, almost entirely positive, and would have supported confident but
-spurious conclusions about item structure. The surviving $42$ pairs are the
-only ones worth interpreting, and the emergence of negative correlations after
-centring---impossible to see in the raw distribution---is what later permits a
-signed-network analysis at all.
+spurious conclusions. The emergence of negative correlations after centring ---
+invisible in the raw distribution --- is also what makes the signed analysis of
+Graph 11 possible at all.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.94\columnwidth]{../figures/graph3_row_centring_effect.png}
-\caption{Graph 3. Distribution of all $1{,}770$ pairwise item correlations
-before and after row-centring, on shared bin edges. Centring moves the mean
-from $0.151$ to $-0.004$ and removes $87\%$ of the pairs exceeding
-$|r|\geq0.30$.}
+\includegraphics[width=0.94\columnwidth]{../figures/fig03_row_centring.png}
+\caption{All $1{,}770$ pairwise item correlations before and after
+row-centring, shared bin edges. Centring moves the mean from $0.151$ to
+$-0.004$ and removes $87\%$ of pairs exceeding $|r|\geq0.30$.}
 \label{fig:g3}
 \end{figure}
 
 \subsection{Graph 4: Real versus shuffled correlations}
-
 \label{sec:g4}
 
-Figure~\ref{fig:g4} compares the observed distribution of all $1{,}770$
-item--item correlations against a null that destroys inter-item association
-while preserving every item's marginal distribution exactly. Each of $200$
-replicates permutes \emph{every column independently} and then re-runs the full
-pipeline---row-centre, then correlate---on the shuffled matrix. This detail is
-not cosmetic: applying a single permutation to all columns, or permuting rows,
-merely relabels respondents and leaves the correlation structure numerically
-untouched.
+Every analysis below runs on the same $91$-respondent, ordinal-imputed matrix,
+so no part of this report silently uses a different sample.
 
-All Person 2 analyses run on the same $91$-respondent, ordinal-imputed matrix
-described in Section~\ref{sec:imputation}, so no part of this report silently
-uses a different sample.
+Figure~\ref{fig:g4} compares the $1{,}770$ observed item--item correlations
+against a null that destroys inter-item association while preserving every
+item's marginal exactly. Each of $200$ replicates permutes \emph{every column
+independently} and re-runs the full pipeline --- row-centre, then correlate ---
+on the shuffled matrix. This detail is not cosmetic: one permutation applied to
+all columns, or permuting rows, merely relabels respondents and leaves the
+correlation structure numerically untouched.
 
-\textbf{Findings.} Correlations estimated from $n=91$ respondents scatter about
-zero with standard deviation $1/\sqrt{n-3}=0.107$ even when nothing is related.
-The permuted null reproduces this closely at $\mathbf{0.106}$, against
-$\mathbf{0.139}$ for the observed matrix. Real structure exists, but it is
-modest, and it lives in the tails rather than the bulk:
+\textbf{Findings.} Correlations from $n=91$ respondents scatter about zero with
+SD $1/\sqrt{n-3}=0.107$ even when nothing is related. The permuted null
+reproduces this at $\mathbf{0.106}$, against $\mathbf{0.139}$ observed. Real
+structure exists but is modest, and lives in the tails:
 
 \begin{center}\footnotesize
 \begin{tabular}{lrrrr}
@@ -583,76 +401,63 @@ Chance fraction & $57\%$ & $40\%$ & $26\%$ & $14\%$ \\
 \end{tabular}
 \end{center}
 
-\textbf{Implication.} At the conventional cutoff $|r|>0.15$ well over half the
+\textbf{Implication.} At the conventional cutoff $|r|>0.15$ more than half the
 surviving edges are what $1{,}770$ simultaneous estimates from $91$ people
-produce by luck alone. A network drawn there is mostly noise with a real signal
-embedded in it, and no amount of downstream community detection can separate the
-two after the fact. This figure is therefore a precondition for
-Section~\ref{sec:g7}: it converts threshold selection from a matter of
-convention into a measured trade-off, and it supplies the chance-expectation
-curve that the sweep is read against.
+produce by luck. A network drawn there is mostly noise, and no downstream
+community detection can separate the two after the fact. This makes threshold
+selection a measured trade-off rather than a convention, and supplies the
+chance curve that Graph 7 is read against.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{../figures/person2/graph_4_noise_floor.png}
-\caption{Graph 4. (a) Observed item--item correlations against a $200$-replicate
-permutation null that re-runs the whole pipeline on independently shuffled
-columns; observed SD $0.139$ against $0.106$ for the null, with the excess
-confined to the tails. (b) Surviving edges against edges expected from sampling
-scatter alone, log scale; the shaded band is the excess over chance. At
-$|r|>0.15$ more than half of surviving edges are chance.}
+\includegraphics[width=0.76\textwidth]{../figures/fig04_noise_floor.png}
+\caption{(a) Observed correlations against a $200$-replicate permutation null
+that re-runs the whole pipeline on independently shuffled columns; SD $0.139$
+against $0.106$, the excess confined to the tails. (b) Surviving edges against
+edges expected from sampling scatter alone (log scale); shaded band is the
+excess over chance.}
 \label{fig:g4}
 \end{figure*}
 
 \subsection{Graph 5: Eigenvalue spectrum against Marchenko--Pastur}
-
 \label{sec:g5}
 
 Graph 4 establishes that a noise floor exists but not how many genuine
-dimensions sit above it. Principal component analysis alone cannot settle this:
-PC1 explains only $8.3\%$ of variance, and that number is equally consistent
-with weak structure and with none. Marchenko--Pastur theory
-\cite{marchenko1967distribution} answers it exactly. For a correlation matrix
-built from $T$ observations of $N$ pure-noise variables, the eigenvalues fall
-inside an analytically known band, and anything above its upper edge carries
-more structure than $T$ observations could have produced by chance.
+dimensions sit above it. PCA cannot settle this: PC1 explains only $8.3\%$ of
+variance, equally consistent with weak structure and with none.
+Marchenko--Pastur theory \cite{marchenko1967distribution} answers it exactly ---
+for a correlation matrix from $T$ observations of $N$ pure-noise variables the
+eigenvalues fall inside an analytically known band, and anything above its upper
+edge carries more structure than $T$ observations could produce by chance.
 
-\textbf{Findings.} With $T=91$ and $N=60$, $Q=T/N=1.517$ and
-$\lambda_+=(1+1/\sqrt{Q})^2=\mathbf{3.283}$. Figure~\ref{fig:g5} shows the bulk
-of the spectrum tracking the theoretical density closely, with
-\textbf{exactly four} eigenvalues clearing the band---$4.38$, $4.06$, $3.55$ and
-$3.35$---together carrying $\mathbf{25.6\%}$ of total variance. The count is
-comfortable rather than marginal: the fourth mode clears the edge by $2.0\%$
-while the fifth, at $2.86$, sits well inside the noise band.
+\textbf{Findings.} With $T=91$, $N=60$, $Q=1.517$ and
+$\lambda_+=(1+1/\sqrt{Q})^2=\mathbf{3.283}$. The bulk of the spectrum tracks the
+theoretical density closely and \textbf{exactly four} eigenvalues clear the band
+--- $4.38$, $4.06$, $3.55$, $3.35$ --- carrying $\mathbf{25.6\%}$ of variance
+(Figure~\ref{fig:g5}). The count is comfortable rather than marginal: the fourth
+clears by $2.0\%$ while the fifth, at $2.86$, sits well inside the band.
 
-Reading the item loadings, the four modes correspond to (i)~environmental and
-social commitment against technology governance and assessment tradition,
-(ii)~developmental optimism against regulatory caution, (iii)~AI-enabled
-education and industry against environmental stewardship, and (iv)~systemic
-technological action against individual and community obligation. Modes (i)
-and (iii) split cleanly along topic blocks; (ii) and (iv) cut across them, and
-we offer those two as readings of the loadings rather than as established
-constructs.
+Reading the loadings, the four modes are (i) environmental and social
+commitment against technology governance and assessment tradition,
+(ii) developmental optimism against regulatory caution, (iii) AI-enabled
+education and industry against environmental stewardship, and (iv) systemic
+technological action against individual and community obligation. Modes (i) and
+(iii) split cleanly along topic blocks; (ii) and (iv) cut across them and are
+offered as readings of the loadings rather than established constructs.
 
 \textbf{Implication.} Three quarters of this correlation matrix is sampling
-noise. That is the single most important quantitative statement in the analysis,
-and it disciplines everything downstream: the network is rebuilt from the four
-significant modes alone, with the diagonal restored to unity, so that later
+noise. That disciplines everything downstream: the network is rebuilt from the
+four significant modes alone, with the diagonal restored to unity, so later
 community and balance analyses operate on the part of the matrix that $91$
-respondents can actually support. It also reinforces the reading of
-Section~\ref{sec:discussion}: four modest, largely cross-cutting dimensions
-carrying roughly a quarter of variance is the signature of a broadly agreeing cohort
-with local structure, not of a polarised one.
+respondents can actually support.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.90\textwidth]{../figures/person2/graph_5_mp_spectrum.png}
-\caption{Graph 5. Eigenvalue spectrum of the row-centred item correlation matrix
-against the Marchenko--Pastur density for pure noise of the same shape
-($T=91$, $N=60$, $Q=1.517$). The bulk tracks the theoretical curve; exactly
-four eigenvalues exceed $\lambda_+=3.283$, carrying $25.6\%$ of total
-variance. Inset: the top six eigenvalues, showing a clear gap between the fourth
-($3.35$) and the fifth ($2.86$).}
+\includegraphics[width=0.74\textwidth]{../figures/fig05_eigenvalue_spectrum.png}
+\caption{Eigenvalue spectrum of the row-centred item correlation matrix against
+the Marchenko--Pastur density for pure noise of the same shape ($T=91$, $N=60$).
+Exactly four eigenvalues exceed $\lambda_+=3.283$, carrying $25.6\%$ of
+variance. Inset: a clear gap between the fourth ($3.35$) and fifth ($2.86$).}
 \label{fig:g5}
 \end{figure*}
 
@@ -663,196 +468,166 @@ Figure~\ref{fig:g6} presents the MP-denoised correlation matrix reordered by the
 \textbf{Findings and Implication.} The block-diagonal structure of the reordered matrix confirms that the community detection successfully groups densely connected items. However, inspecting the marginal strips reveals that these data-driven communities cut directly across the survey's predefined thematic blocks. The formal comparison yields a Normalised Mutual Information (NMI) of $0.201$, confirming that respondents' actual opinion structures do not partition neatly into the four hypothesised domains.
 \textbf{Findings and Implication.} The block-diagonal structure of the reordered matrix confirms that the community detection successfully groups densely connected items. However, inspecting the marginal strips reveals that these data-driven communities cut directly across the survey's predefined thematic blocks. The formal comparison yields a Normalised Mutual Information (NMI) of $0.205$, confirming that respondents' actual opinion structures do not partition neatly into the four hypothesised domains.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{../figures/person3/graph_6_reordered_heatmap.pdf}
-\caption{Item--item correlations (MP-denoised), reordered by Louvain community. The 15 communities are separated by black lines, with topic blocks marked in the margins. The communities cut across the predefined topic blocks, highlighting the divergence between the survey's structural design and respondents' actual association patterns.}
-\caption{Item--item correlations (MP-denoised), reordered by Leiden community. The 15 communities are separated by black lines, with topic blocks marked in the margins. The communities cut across the predefined topic blocks, highlighting the divergence between the survey's structural design and respondents' actual association patterns.}
+\includegraphics[width=\columnwidth]{../figures/fig06_reordered_heatmap.pdf}
+\caption{Item--item correlations (MP-denoised), reordered by Leiden community.
+The 15 communities are separated by black lines, with topic blocks marked in
+the margins. The communities cut across the predefined topic blocks, showing
+that respondents' association patterns do not follow the survey's own design.}
 \label{fig:g6}
 \end{figure}
 
 \subsection{Graph 7: Threshold and percolation sweep}
-
 \label{sec:g7}
 
-Reporting a network at one threshold invites the obvious objection that the
-threshold was chosen to produce the result. Figure~\ref{fig:g7} answers it by
-rebuilding the signed graph at all $46$ cutoffs from $0.05$ to $0.50$ and
-tracking edge count, giant-component fraction, fragmentation and Louvain
-tracking edge count, giant-component fraction, fragmentation and Leiden
-modularity \cite{blondel2008fast,newman2006modularity} across the whole range, so the chosen value is visibly a point on a curve. The
-sweep also absorbs the giant-component analysis entirely.
+Reporting a network at one threshold invites the objection that the threshold
+was chosen to produce the result. Figure~\ref{fig:g7} answers it by rebuilding
+the signed graph at all $46$ cutoffs from $0.05$ to $0.50$ and tracking edge
+count, giant component, fragmentation and Louvain modularity
+\cite{blondel2008fast,newman2006modularity} across the range, so the chosen
+value is visibly a point on a curve. The sweep also absorbs the
+giant-component analysis entirely.
 
-\textbf{Findings.} The two constraints pull in opposite directions. Raising the
+\textbf{Findings.} The two constraints pull opposite ways: raising the
 threshold lowers the chance fraction from Graph 4, but the graph eventually
-shatters: by $|r|>0.27$ the giant component holds under half the items. We
-therefore state the rule explicitly---\emph{the highest cutoff at which the
+shatters --- by $|r|>0.27$ the giant component holds under half the items. We
+therefore state the rule explicitly: \emph{the highest cutoff at which the
 giant component still spans more than two thirds of the items and mean degree
-remains above $4$}, so that community and path-based metrics stay
-meaningful---and note that spectral denoising has already removed the sampling
-noise the chance column measures, so raising the cutoff further would penalise
-the same noise twice. This selects $\boldsymbol{|r|>0.22}$, giving
-$\mathbf{131}$ edges ($68$ positive, $63$ negative), mean degree $4.37$, a giant
-component of $50$ of $60$ items ($83\%$), and modularity $Q=0.472$. At the next
-step up, $|r|>0.23$, mean degree falls to $3.47$ and the rule stops being
-satisfied.
+remains above $4$}, so community and path metrics stay meaningful. Since
+spectral denoising has already removed the sampling noise the chance column
+measures, raising the cutoff further would penalise the same noise twice. This
+selects $\boldsymbol{|r|>0.22}$: $\mathbf{131}$ edges ($68$ positive, $63$
+negative), mean degree $4.37$, a giant component of $50$ of $60$ items
+($83\%$), modularity $Q=0.472$. At the next step, $|r|>0.23$, mean degree falls
+to $3.47$ and the rule stops being satisfied.
 
-Two independent controls agree at this cutoff despite sharing no machinery. The
+Two independent controls agree there despite sharing no machinery. The
 permutation null implies the raw graph's $205$ edges contain about $67$ chance
-edges, leaving roughly $138$ real ones; spectral denoising, which never sees the
-null, retains $131$. The estimates differ by about $5\%$.
+edges, leaving roughly $138$ real; spectral denoising, which never sees the
+null, retains $131$ --- a $5\%$ difference.
 
-\textbf{Implication.} Panel~(d) is the cautionary one. Modularity climbs
-steadily to $0.72$ as the threshold rises---but at that point the graph is $43$
+\textbf{Implication.} Panel (d) is the cautionary one. Modularity climbs
+steadily to $0.72$ as the threshold rises, but by then the graph is $43$
 components with $38$ isolated items. Quoting a single high modularity without
-the sweep beside it would report fragmentation as community structure, which is
-precisely the error the null models of Section~\ref{sec:nulls-p2} are designed
-to catch.
+the sweep beside it would report fragmentation as community structure --- the
+exact error the null models of Section~\ref{sec:nulls} are designed to catch.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{../figures/person2/graph_7_threshold_sweep.png}
-\caption{Graph 7. The signed item network rebuilt at all $46$ cutoffs from
-$0.05$ to $0.50$. (a) Edge count against the chance expectation from Graph 4.
-(b) Giant component, which falls below two thirds of the items shortly after the
-chosen cutoff. (c) Components and isolates. (d) Louvain modularity, which rises
-chosen cutoff. (c) Components and isolates. (d) Leiden modularity, which rises
-to $0.72$ only once the graph has broken into $43$ pieces. The vertical line
-marks the selected $|r|>0.22$.}
+\includegraphics[width=0.80\textwidth]{../figures/fig07_threshold_sweep.png}
+\caption{The signed item network rebuilt at all $46$ cutoffs from $0.05$ to
+$0.50$. (a) Edge count against the chance expectation from Graph 4. (b) Giant
+component. (c) Components and isolates. (d) Louvain modularity, which reaches
+$0.72$ only once the graph has broken into $43$ pieces. The vertical line marks
+the selected $|r|>0.22$.}
 \label{fig:g7}
 \end{figure*}
 
-\subsection{Graph 8: Main item network}
-
-\todoblock{Graph 8 --- owner: P1, blocked on Graph 7}{%
-The item--item network at the threshold selected in Graph 7, nodes coloured by
-thematic block, edges signed and weighted by correlation magnitude.\\[0.25em]
-\emph{Dependency:} the threshold must come from the Graph 7 sweep rather than
-being chosen here.\\[0.25em]
-\emph{Findings + implication:} to be written. Report the number of connected
-items and isolates at the chosen threshold, which items act as hubs, and
-whether edges respect block boundaries.}
-
 \subsection{Graph 9: Topic-block connectivity}
-
 \label{sec:g9}
 
-The questionnaire arrives with its own partition: fifteen items each for
-technology, education, society and environment. That partition is an editorial
-claim about what belongs together. Whether it is also a \emph{statistical} one
-is a separate question, and it is the first thing the network should be asked,
-because every later community result is interpreted against it. We collapse the
-$60\times60$ item correlation matrix into a $4\times4$ block matrix by averaging
-within each block pair. Off-diagonal cells average all $225$ cross-block pairs;
-diagonal cells average only the $105$ \emph{distinct} within-block pairs, with
-self-correlations excluded---retaining the unit diagonal would add a constant to
-every diagonal cell and manufacture exactly the block structure being tested
-for.
+The questionnaire arrives with its own partition --- fifteen items each for
+technology, education, society and environment --- which is an editorial claim
+about what belongs together. Whether it is also a \emph{statistical} one should
+be asked before any community result is interpreted against it. We collapse the
+$60\times60$ correlation matrix into a $4\times4$ block matrix, averaging the
+$105$ \emph{distinct} within-block pairs on the diagonal (self-correlations
+excluded: keeping the unit diagonal would manufacture the very block structure
+being tested). Significance comes from a \textbf{block-label permutation} ---
+the matrix is held fixed and the T/E/S/V labels reshuffled over $5{,}000$ seeded
+draws --- which needs no threshold and is immune to any constant offset in the
+matrix.
 
-Significance comes from a \textbf{block-label permutation}: the correlation
-matrix is held fixed and the T/E/S/V labels are reshuffled across the $60$
-items, preserving the $15/15/15/15$ design, over $5{,}000$ seeded draws. This is
-deliberately not the response-permutation null of
-Section~\ref{sec:g4}, which regenerates the whole pipeline to ask whether the
-network is meaningful at all. The question here is narrower and needs no
-threshold: given this matrix, is the survey's own partition better aligned with
-it than an arbitrary partition of the same shape? Because only labels move, the
-test is immune to any constant offset in the matrix.
+\textbf{Findings.} Row-centring is what makes the design visible at all. On the
+raw matrix (Figure~\ref{fig:g9}, left) all sixteen cells are positive
+($+0.041$ to $+0.377$): acquiescence makes every topic look connected to every
+other. After centring, the sign pattern separates cleanly --- \textbf{every
+diagonal cell positive, every off-diagonal negative}. Within-block mean
+$r=+0.0746$ against between-block $-0.0282$ gives a gap of $\mathbf{+0.1027}$
+against a null of $-0.00003\pm0.0077$: $\mathbf{z=13.4}$, with no permutation in
+$5{,}000$ reaching the observed value ($p<0.0002$).
 
-\textbf{Findings.} Row-centring is what makes the block structure visible at
-all. On the raw matrix (Figure~\ref{fig:g9}, left) every one of the sixteen
-cells is positive, from $+0.041$ to $+0.377$: acquiescence makes all four topics
-appear mutually connected, and the thematic design is invisible underneath it.
-On the row-centred matrix (centre) the sign pattern separates cleanly---
-\textbf{every diagonal cell positive, every off-diagonal cell negative}. The
-partition is strongly significant: within-block mean $r=+0.0746$ against
-between-block $-0.0282$, a gap of $\mathbf{+0.1027}$ against a null of
-$-0.00003\pm0.0077$, giving $\mathbf{z=13.4}$ with no permutation out of $5{,}000$
-reaching the observed value ($p<0.0002$).
+The blocks are not equally coherent: environment $+0.136$, technology $+0.066$,
+education $+0.054$, society/ethics $+0.042$. Environment is more than three
+times as internally consistent as ethics. S--V is the one seam, at $-0.004$ the
+only pair not clearly separated and the strongest off-diagonal cell in the raw
+matrix ($+0.256$).
 
-The blocks are not equally coherent. Ranking the diagonal gives environment
-$+0.136$, technology $+0.066$, education $+0.054$ and society/ethics $+0.042$:
-environment is more than three times as internally consistent as ethics.
-Among cross-block pairs, S--V is the one seam in the partition: at
-$-0.004$ it is the only pair not clearly separated, and it is also the
-strongest off-diagonal cell in the raw matrix ($+0.256$). T--V is the most
-separated pair ($-0.046$). This reproduces the ordering of the
-respondent-level block-score correlations computed independently on the raw
-file (T--E weakest at $0.29$, S--V strongest at $0.70$), though those are a
-different quantity---correlations between block \emph{average scores} rather
-than means of item--item correlations---and the two should not be compared
-numerically.
-
-One reading caveat matters. The negative off-diagonal cells do \emph{not}
-indicate opposition between topics. Row-centring forces every row to sum to
-zero, which pushes the grand mean of all $1{,}770$ pairwise correlations
-slightly negative; measured, it is $-0.0038$. The off-diagonal values should be
-read relative to each other and to the diagonal, not as evidence that
-technology views oppose environmental ones. The permutation null is unaffected,
-since observed and null statistics are computed on the same shifted matrix.
-
-\textbf{Implication.} The survey's thematic design is real and should be
-carried into the interpretation of every later partition: a detected community
-that aligns with a block is recovering something the instrument built in, and a
-community that cuts across blocks is the more informative object. The uneven
-diagonal sharpens this. Environmental attitudes travel as a package---agreement
-with one environmental item predicts agreement with others---whereas ethics
-items are close to independent of one another, so respondents hold ethical
-positions issue by issue rather than as a doctrine. The society--environment
-seam is where a genuine cross-block community is most likely to appear, and the
-community structure reported in Graph~10 should be checked against that
-expectation rather than treated as a discovery if it reproduces it.
+\textbf{Implication.} The thematic design is statistically real, so a later
+community that aligns with a block is recovering something the instrument built
+in, while one that cuts across blocks is the more informative object --- which
+is exactly what Graph 10 finds (NMI $0.205$). The uneven diagonal sharpens
+this: environmental attitudes travel as a package, whereas ethics items are
+close to independent, so respondents hold ethical positions issue by issue
+rather than as a doctrine. One caveat: the negative off-diagonals do \emph{not}
+mean topics oppose one another. Row-centring forces each row to sum to zero,
+pushing the grand mean of all $1{,}770$ correlations to $-0.0038$; the values
+should be read relative to the diagonal, not as opposition.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.98\textwidth]{../figures/graph9_topic_block_connectivity.png}
-\caption{Graph 9. Topic-block connectivity, $91$ respondents $\times$ $60$
-items. \textbf{Left:} mean item--item Spearman correlation within and between
-the four thematic blocks on the raw matrix---every cell positive, the design
-invisible under acquiescence. \textbf{Centre:} the same collapse on the
-row-centred matrix, sharing a colour scale; the diagonal turns positive and all
-off-diagonal cells negative. Diagonal cells average the $105$ distinct
-within-block pairs, excluding self-correlations. \textbf{Right:} null
-distribution of the within-minus-between gap under $5{,}000$ reshufflings of
-the T/E/S/V labels with the correlation matrix held fixed. The observed gap of
-$+0.1027$ ($z=13.4$, $p<0.0002$) is not approached by any permutation.}
+\includegraphics[width=0.82\textwidth]{../figures/fig09_block_connectivity.png}
+\caption{Topic-block connectivity. \textbf{Left:} mean item--item correlation
+within and between blocks on the raw matrix --- every cell positive, the design
+invisible under acquiescence. \textbf{Centre:} the same collapse after
+row-centring, shared colour scale; diagonal positive, all off-diagonals
+negative. \textbf{Right:} null distribution of the within-minus-between gap
+under $5{,}000$ reshufflings of the block labels. The observed gap $+0.1027$
+($z=13.4$) is not approached by any permutation.}
 \label{fig:g9}
 \end{figure*}
 
 \subsection{Graph 10: Communities against null models}
+\label{sec:g10}
 
-Figure~\ref{fig:g10} compares the observed community structure of the item network at $|r| > 0.22$ against three null models: a degree-preserving rewiring \cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a column-permutation null that scrambles responses independently per item.
-Figure~\ref{fig:g10} compares the observed community structure of the item network at $|r| > 0.22$ against three null models: a degree-preserving rewiring \cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a column-permutation null that scrambles responses independently per item. We also compare three community detection algorithms to demonstrate their methodological differences.
+Figure~\ref{fig:g10} compares the community structure of the item network at
+$|r|>0.22$ against three nulls: degree-preserving rewiring
+\cite{maslov2002specificity}, an Erd\H{o}s--R\'enyi graph, and a
+column-permutation null that scrambles responses independently per item.
+Figure~\ref{fig:g10alg} compares three detection algorithms on the same graph.
 
-\textbf{Findings and Implication.} The Louvain algorithm detects 15 communities, yielding a modularity of $Q=0.472$. This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.407\pm0.017$, $z=3.91$, $p=0.005$) and the rewiring null ($Q=0.326\pm0.014$, $z=10.39$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.624\pm0.046$, $z=-3.32$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
-\textbf{Findings and Implication.} The Leiden algorithm detects 15 communities, yielding a modularity of $Q=0.491$ (improving upon Louvain's $Q=0.472$). This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.420\pm0.016$, $z=4.46$, $p=0.005$) and the rewiring null ($Q=0.333\pm0.013$, $z=12.13$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.629\pm0.044$, $z=-3.14$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
-\textbf{Louvain vs. Leiden Community Detection.} Initially, we applied the widely used Louvain algorithm, which detected 15 communities with a modularity of $Q=0.472$. However, Louvain suffers from a well-documented flaw: its greedy aggregation phase can yield internally disconnected or poorly connected communities, artificially capping the quality of the partition \cite{traag2019louvain}. To address this, we subsequently applied the Leiden algorithm, which introduces a refinement phase to guarantee well-connected communities. Leiden successfully found a superior partition on our item network, increasing the modularity to $Q=0.491$ while still resolving into 15 communities. We therefore use the Leiden partition for our primary structural analysis.
-\textbf{Algorithm comparison.} All three algorithms partition the 60-item network, but they use fundamentally different strategies:
+\textbf{Which algorithm.} We began with Louvain \cite{blondel2008fast}, which
+found 15 communities at $Q=0.472$. Louvain has a documented flaw: its greedy
+aggregation phase can leave communities internally disconnected, capping
+partition quality \cite{traag2019louvain}. Leiden adds a refinement phase that
+guarantees well-connected communities and found a strictly better partition,
+$Q=0.491$, again at $k=15$. Girvan-Newman \cite{newman2006modularity}, a
+divisive method that repeatedly removes the highest-betweenness edge, peaks at
+$Q=0.447$ --- also at $k=15$ --- and then declines monotonically. That all three
+strategies converge on the same 15 communities makes the partition size a
+robust feature rather than an artefact of one optimiser, so Leiden is used for
+the primary analysis.
 
-\textbf{Findings against Null Models.} The Leiden modularity ($Q=0.491$) decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.420\pm0.016$, $z=4.46$, $p=0.005$) and the degree-preserving rewiring null ($Q=0.333\pm0.013$, $z=12.13$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.629\pm0.044$, $z=-3.14$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
-\begin{itemize}
-    \item \textbf{Louvain} \cite{blondel2008fast}: An agglomerative method that greedily merges nodes to maximise modularity. Fast ($O(n \log n)$), but its merge phase can produce poorly-connected communities. Achieved $Q=0.472$, $k=15$.
-    \item \textbf{Leiden} \cite{traag2019louvain}: Extends Louvain with a \emph{refinement phase} that breaks merged super-nodes back apart to guarantee well-connected communities. Found a strictly superior partition: $Q=0.491$, $k=15$.
-    \item \textbf{Girvan-Newman} \cite{newman2006modularity}: A \emph{divisive} method that works top-down by iteratively removing the edge with the highest betweenness centrality, splitting the network progressively. The $Q(k)$ curve (Figure~\ref{fig:g10alg}b) peaks at $k=15$, $Q=0.447$, then monotonically declines, confirming 15 as the natural scale of community structure. GN is the only method that reveals how modularity evolves across all partition sizes.
-\end{itemize}
-
-Leiden achieves the highest peak modularity, confirming it as the best choice for the primary analysis. The consistent agreement of all three algorithms on $k=15$ communities reinforces this as a robust structural feature of the network.
-
-\textbf{Findings against null models (Leiden, Q=0.491).} This value decisively clears the Erd\H{o}s--R\'enyi null ($Q=0.420\pm0.016$, $z=4.46$, $p=0.005$) and the degree-preserving rewiring null ($Q=0.333\pm0.013$, $z=12.13$, $p=0.005$). However, it fails to exceed the column-permutation null ($Q=0.629\pm0.044$, $z=-3.14$, $p=1.000$). This corroborates the respondent-network results (Section~\ref{sec:nulls-p2}): the modularity is an artefact of thresholding a correlation matrix derived from small-$N$ data, not an emergent property of the opinion network itself.
+\textbf{And then the nulls disagree.} Leiden's $Q=0.491$ clears the
+Erd\H{o}s--R\'enyi null ($0.420\pm0.016$, $z=4.46$) and the rewiring null
+($0.333\pm0.013$, $z=12.13$) decisively. Against the column-permutation null it
+does not merely fail, it falls \emph{below} it: $0.629\pm0.044$, $z=-3.14$,
+$p=1.000$. Scrambled data pushed through the identical pipeline produces
+\emph{more} modular graphs than the real data does. This is the same verdict the
+respondent network returns in Section~\ref{sec:nulls}, reached independently on
+a different network: the modularity is manufactured by thresholding a
+correlation matrix estimated from 91 respondents, not carried by the opinions.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{../figures/person3/graph_10_algorithm_comparison.pdf}
-\caption{Three-algorithm comparison on the item network. (a) Peak modularity $Q$ for each algorithm; all converge on $k=15$ communities, with Leiden finding the highest $Q=0.491$. (b) The Girvan-Newman $Q(k)$ curve showing how modularity rises to a clear peak at $k=15$ before declining; horizontal lines mark Louvain and Leiden peak values for reference. (c) Rank-ordered community size distributions; all three algorithms produce similarly distributed community sizes, confirming the partition is structurally stable across methods.}
+\includegraphics[width=0.84\textwidth]{../figures/fig10b_algorithm_comparison.pdf}
+\caption{Three-algorithm comparison on the item network. (a) Peak modularity
+per algorithm; all converge on $k=15$, Leiden highest at $Q=0.491$. (b) The
+Girvan-Newman $Q(k)$ curve rising to a clear peak at $k=15$ before declining,
+with Louvain and Leiden peaks marked. (c) Rank-ordered community sizes, similar
+across all three methods.}
 \label{fig:g10alg}
 \end{figure*}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{../figures/person3/graph_10_communities_nulls.pdf}
-\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Louvain community (borders indicate the predefined thematic block). (b) Observed modularity $Q=0.472$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
-\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Leiden community (borders indicate the predefined thematic block). (b) Observed modularity $Q=0.491$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
-\caption{(a) The item network thresholded at $|r|>0.22$, nodes coloured by Leiden community (borders indicate the predefined thematic block). (b) Observed Leiden modularity $Q=0.491$ sits comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls, but fails to exceed the rigorous column-permutation null, mirroring the topological artefact found in the respondent network.}
+\includegraphics[width=0.84\textwidth]{../figures/fig10_communities_vs_nulls.pdf}
+\caption{(a) The item network at $|r|>0.22$, nodes coloured by Leiden
+community, borders marking the predefined thematic block. (b) Observed
+modularity $Q=0.491$ sits comfortably above the Erd\H{o}s--R\'enyi and
+degree-preserving rewiring nulls but \emph{below} the column-permutation null,
+mirroring the artefact found independently in the respondent network.}
 \label{fig:g10}
 \end{figure*}
 
@@ -862,9 +637,9 @@ Figure~\ref{fig:g11} tracks the fraction of balanced triads in the signed item n
 
 \textbf{Findings and Implication.} The observed fraction of balanced triads is remarkably high and strengthens monotonically as noise is filtered out. At $|r|>0.15$, $99.1\%$ of triads are balanced. At $|r|>0.20$ this rises to $99.5\%$, and for $|r| \ge 0.22$, all triads ($100\%$) are balanced. The sign-permutation null stays flat at roughly $50\%$ across all thresholds. That the balance fraction approaches unity as weak edges are removed constitutes strong evidence that the network's local topology reflects genuine structural balance, rather than random assortment.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{../figures/person3/graph_11_structural_balance.pdf}
+\includegraphics[width=\columnwidth]{../figures/fig11_structural_balance.pdf}
 \caption{Structural balance as a function of the correlation threshold $|r|$. The fraction of balanced triads rises towards $100\%$ as the threshold tightens and spurious edges are removed, while the sign-permutation null distribution remains anchored near $50\%$. The operating threshold of $|r|=0.22$ is marked.}
 \label{fig:g11}
 \end{figure}
@@ -872,318 +647,239 @@ Figure~\ref{fig:g11} tracks the fraction of balanced triads in the signed item n
 \subsection{Graph 12: Opinion dynamics}
 \label{sec:g12}
 
-This is the only analysis involving an actual dynamical process; everything
-above describes a fixed dataset. Because each opinion is one respondent's
-answer to one item, the vertices here are \emph{respondents}, not items, so a
-second network is required.
+This is the only analysis involving an actual process; everything above
+describes a fixed dataset. Opinions belong to respondents, so the vertices here
+are \emph{respondents}. From the row-centred matrix we connect each respondent
+to their $k=4$ most similar peers, symmetrised by union --- mutual $k$NN
+fragments this data, and disconnected components cannot merge at any
+confidence threshold, which would inflate the cluster count for reasons
+unrelated to the dynamics. The result is $91$ nodes, $298$ edges, one connected
+component.
 
-\paragraph{The respondent network.}
-From the row-centred matrix we compute the $91\times91$ Pearson correlation
-between respondents and connect each respondent to their $k=4$ most similar
-peers, symmetrising by union. Union rather than mutual $k$NN is deliberate:
-mutual $k$NN fragments this data badly, and disconnected components cannot
-merge at any confidence threshold, which would inflate the final cluster count
-for reasons unrelated to the dynamics. The result has $91$ nodes, $298$ edges,
-mean degree $6.55$, and forms a \emph{single connected component}.
-
-\paragraph{The model.}
-Opinions $x_i\in[0,1]$ are seeded from item E03 (compulsory attendance, SD
-$1.12$), rescaled by $s(x)=(x+2)/4$. At each step a random edge $(u,v)$ is
-drawn, and if the two opinions lie within the confidence threshold they move
-to their midpoint \cite{deffuant2000mixing}:
+Opinions $x_i\in[0,1]$ are seeded from E03 (compulsory attendance, the most
+contested item), rescaled by $s(x)=(x+2)/4$. At each step a random edge is
+drawn and the pair moves to its midpoint if they are close enough
+\cite{deffuant2000mixing}:
 \begin{equation}
 |x_u - x_v| < \varepsilon
 \ \Longrightarrow\
 x_u,x_v \leftarrow \tfrac{1}{2}\left(x_u + x_v\right).
 \end{equation}
-We sweep $\varepsilon$ from $0.05$ to $0.60$ in steps of $0.05$, with 20
-seeded repetitions of up to $60{,}000$ interactions each, terminating early on
-convergence, and count final clusters by rounding to two decimals.
+We sweep $\varepsilon$ from $0.05$ to $0.60$, 20 seeded repetitions each.
 
-\paragraph{Findings.}
-Results appear in Figure~\ref{fig:g12} and Table~\ref{tab:dw}. Cluster count
-is exactly $5.00\pm0.00$ for every $\varepsilon\leq0.25$, then falls to $4.45$
-at $\varepsilon=0.30$, $3.35$ at $0.40$, $2.00$ at $0.50$, approaching
-consensus near $0.55$--$0.60$.
+\textbf{Findings.} The cluster count is exactly $5.00\pm0.00$ for every
+$\varepsilon\leq0.25$, then falls to $4.45$ at $0.30$, $3.35$ at $0.40$ and
+$2.00$ at $0.50$ (Figure~\ref{fig:g12}).
 
-\paragraph{The plateau is an artefact, and provably so.}
-The specification for this analysis requires stating that the low-$\varepsilon$
-plateau is partly an artefact of the discrete five-point grid. In fact the
-claim can be made exactly. Under $s(x)=(x+2)/4$ the five categories map to
-$\{0,\tfrac14,\tfrac12,\tfrac34,1\}$, so any two distinct initial opinions
-differ by at least $\tfrac14$. For any $\varepsilon\leq0.25$ the condition
-$|x_u-x_v|<\varepsilon$ is therefore \emph{never} satisfied by a pair with
-distinct opinions: the initial state is a fixed point and the final count
-equals the number of occupied categories, on any graph whatsoever.
+\textbf{The plateau is an artefact --- provably.} Under $s(x)=(x+2)/4$ the five
+categories map to $\{0,\tfrac14,\tfrac12,\tfrac34,1\}$, so any two distinct
+opinions differ by at least $\tfrac14$. For $\varepsilon\leq0.25$ the merge
+condition is therefore \emph{never} satisfied: the initial state is a fixed
+point and the final count equals the number of occupied categories, on any
+graph whatsoever. Three checks confirm it empirically. The plateau has
+\emph{zero} variance across 20 seeded runs, which no emergent outcome would. A
+complete graph --- a maximally different topology --- returns the identical
+$5.00\pm0.00$. And jittering the seeds by $\pm0.125$, destroying the grid while
+preserving the distribution, removes the plateau entirely
+($35.95\rightarrow8.95$ clusters across $\varepsilon=0.05\ldots0.25$). The five
+clusters are the original response categories failing to merge, not opinion
+groups forming, and the break at $\varepsilon=0.30$ is arithmetic rather than a
+discovered threshold.
 
-Three observations confirm this empirically. The plateau has \emph{zero}
-variance across 20 randomly seeded runs, which no genuine emergent outcome
-would. A complete graph---a maximally different topology---returns the
-identical $5.00\pm0.00$ over the same range. And re-running with seeds
-jittered by $\pm0.125$, which destroys the grid while preserving the
-distribution's shape, removes the plateau entirely, yielding
-$35.95\rightarrow26.35\rightarrow21.05\rightarrow14.20\rightarrow8.95$
-clusters across $\varepsilon=0.05\ldots0.25$. The five clusters below
-$\varepsilon=0.25$ are the original response categories failing to merge, not
-opinion groups forming, and the break in the curve at $\varepsilon=0.30$ is
-arithmetic rather than a discovered threshold.
-
-\paragraph{What is not an artefact.}
-The substantive result lies above $\varepsilon=0.25$. Comparing the real
-network against an identically seeded complete graph---the same dynamics with
-topology removed---the well-mixed population collapses to about $2$ clusters
-across $\varepsilon=0.30$--$0.45$, while the sparse $k$NN network sustains
-$3.15$--$4.45$. Network structure therefore \emph{sustains opinion diversity
-that a well-mixed population loses at the same tolerance}: when respondents
-interact only with their nearest neighbours in opinion space, locally cohesive
-groups stabilise before global consensus can propagate. This is the one result
-in the figure that is neither a scale artefact nor a restatement of the input
-distribution, and it is what justifies studying the process on a network at
-all.
-
-\begin{table}[t]
-\caption{Deffuant--Weisbuch final cluster counts (mean $\pm$ sd over 20
-repetitions). The plateau at $\varepsilon\leq0.25$ is forced by the response
-grid and appears identically on any topology; the gap between the $k$NN and
-complete graphs above it is the genuine topological effect.}
-\label{tab:dw}
-\vskip 0.05in
-\begin{center}
-\footnotesize
-\begin{tabular}{lccc}
-\toprule
-$\varepsilon$ & $k$NN graph & Complete graph & Jittered control \\
-\midrule
-$\leq 0.25$ & $5.00\pm0.00$ & $5.00\pm0.00$ & $36.0\rightarrow9.0$ \\
-0.30 & $4.45\pm1.12$ & $2.45\pm0.50$ & $6.50\pm1.60$ \\
-0.35 & $4.00\pm1.55$ & $2.00\pm0.00$ & $5.10\pm1.09$ \\
-0.40 & $3.35\pm0.79$ & $2.00\pm0.00$ & $3.95\pm1.28$ \\
-0.45 & $3.15\pm0.85$ & $2.25\pm0.43$ & $2.95\pm0.92$ \\
-0.50 & $2.00\pm0.77$ & $2.05\pm0.22$ & $2.35\pm0.79$ \\
-0.55 & $1.65\pm0.48$ & $1.95\pm0.22$ & $1.65\pm0.48$ \\
-0.60 & $1.30\pm0.46$ & $1.65\pm0.48$ & $1.20\pm0.40$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-\vskip -0.1in
-\end{table}
+\textbf{What is not an artefact.} Above $\varepsilon=0.25$ the comparison is
+meaningful. An identically seeded complete graph --- the same dynamics with
+topology removed --- collapses to about $2$ clusters across
+$\varepsilon=0.30$--$0.45$, while the sparse $k$NN network sustains
+$3.15$--$4.45$. \emph{Network structure sustains opinion diversity that a
+well-mixed population loses at the same tolerance}: interacting only with
+nearest neighbours lets locally cohesive groups stabilise before global
+consensus propagates. This is the one result here that is neither a scale
+artefact nor a restatement of the input distribution.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.84\textwidth]{../figures/graph12_deffuant_weisbuch.png}
-\caption{Graph 12. Top: mean final cluster count against confidence threshold
-$\varepsilon$ on a log scale, with error bars over 20 repetitions. The
-$k$NN network and the complete graph coincide exactly below
-$\varepsilon=0.25$---the signature of an arithmetic artefact---and diverge
-above it, where topology matters. The jittered control destroys the response
-grid and removes the plateau entirely. Bottom: individual opinion trajectories
-at a low and a high $\varepsilon$, showing frozen categories against rapid
-collapse.}
+\includegraphics[width=0.78\textwidth]{../figures/fig12_opinion_dynamics.png}
+\caption{Deffuant--Weisbuch dynamics seeded on E03. Left: final cluster count
+against confidence threshold $\varepsilon$ for the $k$NN respondent network, a
+complete graph, and a jittered-seed control. The flat $5.00\pm0.00$ plateau
+below $\varepsilon=0.25$ is forced by the five-point grid and vanishes under
+jitter. Right: above the plateau the sparse network sustains more opinion
+clusters than the well-mixed population at the same tolerance.}
 \label{fig:g12}
 \end{figure*}
 
-% ============================================================
 \section{Results and Discussion}
 \label{sec:discussion}
 % ============================================================
 
 \subsection{What the data supports}
 
-\paragraph{Superficial consensus with genuine local structure.}
-The headline finding is not polarisation. Agreement runs at $79.8\%$ across
-every block and the leading principal component explains only about $8\%$ of
-variance, so there is no evidence of two opposed camps. What exists instead is
-a broad agreeable consensus with real but local disagreement concentrated in
-specific, identifiable places.
+\paragraph{Superficial consensus, genuine local structure.}
+The headline is not polarisation. Agreement runs at $79.8\%$ across every block
+and PC1 explains about $8\%$ of variance, so there are no two opposed camps.
+There is a broad agreeable consensus with real disagreement concentrated in
+identifiable places.
 
 \paragraph{Disagreement is domain-specific, not dispositional.}
-Environment and society are effectively settled; technology and education are
-not. Within education the cohort is precise about what it rejects---compulsory
-attendance and written examinations---while endorsing curriculum reform and
-problem-solving at above $94\%$. Within technology the objection tracks
-delegated consequential judgment (medical diagnosis, autonomous vehicles)
-rather than automation as such.
+Environment and society are settled; technology and education are not. Within
+education the cohort is precise about what it rejects --- compulsory attendance
+and written examinations --- while endorsing curriculum reform above $94\%$.
+Within technology the objection tracks delegated consequential judgment
+(diagnosis, autonomous vehicles) rather than automation as such: robots in
+hazardous work still score $82.4\%$.
 
 \paragraph{Most apparent structure was response style.}
 Row-centring removes $87\%$ of the item pairs exceeding $|r|\geq0.30$. Any
-analysis of this questionnaire that skips this step will find dense, uniformly
-positive structure and will be measuring agreeableness.
+analysis skipping this step finds dense, uniformly positive structure and is
+measuring agreeableness.
 
-\paragraph{Topology has a measurable dynamical consequence.}
-In the bounded-confidence model, the sparse respondent network sustains
-noticeably more opinion clusters than a well-mixed population at the same
-tolerance, over the range where the dynamics are genuinely active.
+\paragraph{Opinions are internally consistent.}
+Structural balance (Figure~\ref{fig:g11}) rises monotonically to $100\%$ of
+triads as weak edges are removed, against a sign-permutation null flat at
+$50\%$. A spurious effect would not sharpen as noise is filtered out.
 
-\subsection{What the data does not support}
+\paragraph{Communities ignore the survey's own design.}
+The 15 detected communities align poorly with the four thematic blocks
+(NMI $=0.205$). Respondents associate ideas across topic boundaries, not within
+the categories the questionnaire was built from.
 
-\paragraph{Four fifths of the correlation matrix is noise.}
-Section~\ref{sec:g5} puts a number on how much of this matrix is interpretable:
-exactly four eigenvalue modes exceed the Marchenko--Pastur band, carrying
-$25.6\%$ of total variance. The remaining $74.4\%$ is what $91$ respondents
-answering $60$ items generate by chance. Any claim resting on a single
-correlation, or on the fine structure of the full matrix, is unsupported.
+\subsection{What failed, and what that tells us}
+\label{sec:nulls}
 
-\paragraph{The community structure does not survive its own null.}
-\label{sec:nulls-p2}
-This is the sharpest negative result in the report, and which null model is used
-decides it. A correlation-derived network has transitivity built into its
-construction: if A correlates with B and B with C, A and C are pulled toward
-correlation automatically, and that alone manufactures clustering and modularity
-in data with no association whatsoever. Degree-preserving rewiring
-\cite{maslov2002specificity} and Erd\H{o}s--R\'enyi nulls both take the
-\emph{finished graph} as given, so neither can detect structure that the
-construction itself created. Only a permutation null---destroying association in
-the raw responses, then regenerating the entire chain of centre, correlate,
-threshold and measure---tests the claim actually being made. On the respondent
-network ($91$ nodes, $298$ edges, one component, symmetrised $k$NN at $k=4$),
-observed modularity is $0.421$ and average clustering $0.219$:
+Three results did not come out the way the analysis was set up to expect. They
+are reported because each one changes what may legitimately be claimed.
+
+\paragraph{1. Most of the correlation matrix is noise.}
+Marchenko--Pastur filtering (Section~\ref{sec:g5}) leaves exactly four
+eigenvalue modes above the band, carrying $25.6\%$ of total variance. The other
+$74.4\%$ is what $91$ respondents answering $60$ items generate by chance. Any
+claim resting on a single correlation, or on fine structure of the full matrix,
+is unsupported --- which is why every downstream network is built from the
+denoised matrix rather than the raw one.
+
+\paragraph{2. The community structure does not survive its own null.}
+This is the sharpest negative result, and which null is used decides it. A
+correlation-derived network has transitivity built into its construction: if A
+correlates with B and B with C, A and C are pulled toward correlation
+automatically, and that alone manufactures modularity in structureless data.
+Rewiring \cite{maslov2002specificity} and Erd\H{o}s--R\'enyi nulls take the
+\emph{finished graph} as given, so neither can detect structure the
+construction itself created. Only a column-permutation null --- destroying
+association in the raw responses, then regenerating the entire chain of centre,
+correlate, threshold, measure --- tests the claim being made. Both networks were
+tested independently and both return the same verdict:
 
 \begin{center}\footnotesize
-\begin{tabular}{lrrr}
+\begin{tabular}{llrr}
 \toprule
-Null model & Mean & SD & $z$ \\
+Network & Null & $Q_{\text{null}}$ & $z$ \\
 \midrule
-Degree-preserving rewiring & $0.337$ & $0.011$ & $7.46$ \\
-Erd\H{o}s--R\'enyi $G(n,m)$ & $0.337$ & $0.011$ & $7.28$ \\
-Column permutation & $0.404$ & $0.018$ & $\mathbf{0.91}$ \\
+Respondent & Rewiring & $0.337\pm.011$ & $7.46$ \\
+($Q=0.421$) & Erd\H{o}s--R\'enyi & $0.337\pm.011$ & $7.28$ \\
+            & \textbf{Permutation} & $0.404\pm.018$ & $\mathbf{0.91}$ \\
+\addlinespace
+Item & Rewiring & $0.333\pm.013$ & $12.13$ \\
+($Q=0.491$) & Erd\H{o}s--R\'enyi & $0.420\pm.016$ & $4.46$ \\
+            & \textbf{Permutation} & $0.629\pm.044$ & $\mathbf{-3.14}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \noindent
-Against the two graph-level nulls the structure looks overwhelming, at $z$
-approaching $7.5$. Against the null that reproduces the construction it vanishes
-($p=0.19$). We report this as a finding rather than a failure: those communities
-are an artefact of correlating and then applying a neighbourhood rule. It is
-also the reason the item network, thresholded directly on a measured quantity,
-is the primary object of this report and the respondent network is used only for
-the dynamics of Section~\ref{sec:g12}.
+Against the graph-level nulls the structure looks overwhelming, at $z$ up to
+$12$. Against the null that reproduces the construction it vanishes on the
+respondent network ($p=0.19$) and \emph{inverts} on the item network: scrambled
+data pushed through the identical pipeline yields more modular graphs than the
+real data. Had we stopped at the conventional rewiring null we would have
+reported a strong, entirely spurious finding. The communities are real as a
+description of the graph; they are not evidence about the cohort.
 
-\paragraph{And therefore, not polarisation.}
-Four largely cross-cutting modes carrying roughly a quarter of variance,
-communities that fail their own null, and $79.8\%$ agreement across every block
-describe a cohort in broad consensus with local, domain-specific disagreement.
-They do not describe two camps.
+\paragraph{3. The dimension count depends on who you keep.}
+Filling the same $242$ cells by column mean, column median or ordinal
+regression all yield exactly four modes ($24.7\%$, $25.0\%$, $25.6\%$ of
+variance) --- the structure is a property of the data, not of the imputer. But
+dropping the ten respondents with more than twelve missing items and filling the
+rest with a column statistic gives only \emph{three} modes at $19.3\%$. The
+count is robust to \emph{how} missing cells are filled and fragile to
+\emph{which} respondents are retained. Keeping all 91 is the better-supported
+choice --- discarding usable respondents to avoid modelling $4.4\%$ of cells
+trades away more than it protects --- but the result is conditional on it.
 
-\paragraph{Communities cut across thematic boundaries.}
-Despite the clear block-diagonal structure of the item network when ordered by community (Graph 6), these data-driven groupings do not align with the four predefined survey themes (Technology, Education, Society/Ethics, Environment). With an NMI of just $0.201$, the structure reveals that associations are formed across distinct themes rather than strictly within them.
-Despite the clear block-diagonal structure of the item network when ordered by community (Graph 6), these data-driven groupings do not align with the four predefined survey themes (Technology, Education, Society/Ethics, Environment). With an NMI of just $0.205$, the structure reveals that associations are formed across distinct themes rather than strictly within them.
+\subsection{Methods tried and rejected}
+\label{sec:rejected}
 
-\paragraph{Structural balance strengthens with noise filtering.}
-The hypothesis of structural balance is robustly confirmed in Graph 11. As the correlation threshold is tightened from $|r|=0.05$ up to $|r|=0.22$, the fraction of balanced triads monotonically approaches $100\%$, while the sign-permutation null stays flat at $50\%$. The increasing balance indicates that the network encodes genuine, self-consistent opinion structures that crystallise as random noise is removed.
+Alternatives were measured rather than argued about.
 
-\subsection{Methods considered and rejected}
-
-Documenting what did not work is part of the analysis. Four alternatives were
-evaluated and set aside.
-
-\textbf{Recoding NC as Neutral} imposes a systematic shift of about $0.92$
-scale points at those cells and asserts a response that was explicitly
-withheld. \textbf{Dropping NC users} removes roughly a fifth of the sample to
-eliminate 37 cells and is the only NC treatment that substantially disturbs
-the recovered partition (AMI $0.337$). \textbf{Excluding respondents by
-missing-item count} was rejected because, once the five empty records are
-removed, no substantial population of badly-incomplete respondents remains:
-the rest are $95.6\%$ complete, and model-based recovery is preferable to
-discarding usable respondents. \textbf{Mutual $k$NN} for the respondent
-network fragments the graph into many components, which would inflate cluster
-counts in the dynamics for reasons unrelated to the process being studied;
-union $k$NN yields a single connected component.
-
-\label{sec:rejected-p2}
-Four further alternatives were measured rather than argued about.
-
-\textbf{Percentile thresholding} at p90 fixes the edge count by construction, so
-it cannot say whether any edge beats chance --- the objection is structural, not
-empirical. Measured, it behaves very differently on the two networks: on the
-item network it implies $|r|>0.229$ and leaves $177$ edges in a single
-component, while on the respondent network it implies $|r|>0.506$ and leaves
-$410$ edges across $22$ components with $20$ isolates.
-
-\textbf{Raw uncentred similarity} leaves $624$ of $1{,}770$ pairs above
-$|r|>0.22$ --- a $35\%$-dense graph in which $83\%$ of all correlations are
-positive. This is the same acquiescence effect quantified in
-Section~\ref{sec:g3}, restated at the threshold actually used.
-
-\textbf{Simple column fills instead of the ordinal model} were tested rather
-than assumed. Filling the same $242$ cells in the same $91$ respondents with the
-column mean gives correlation SD $0.135$ and $185$ edges at $|r|>0.22$; the
-column median gives $0.136$ and $184$; the adopted ordinal-regression imputation
-gives $0.139$ and $205$. Critically, \emph{all three recover exactly four
-significant eigenvalue modes}, carrying $24.7\%$, $25.0\%$ and $25.6\%$ of
-variance respectively. The dimensional structure is therefore a property of the
-data rather than of the imputer, which is the strongest available defence of the
-modelling choice: it is not doing the work that the conclusions rest on.
-
-\textbf{Dropping the ten respondents with more than twelve missing items},
-leaving $86$ and filling the remaining $47$ cells with a column statistic, is
-the one alternative that does change a headline. At $T=86$, $Q=1.433$ and
-$\lambda_+=3.368$, and only \emph{three} modes clear the band, carrying
-$19.3\%$ of variance. We report this rather than bury it: the count of
-significant dimensions is robust to how missing cells are filled but not to
-which respondents are retained. Keeping all $91$ non-empty respondents is the
-better-supported choice --- discarding usable respondents to avoid modelling
-$4.4\%$ of cells trades more information than it protects --- but the reader
-should know the result is conditional on it.
+\begin{center}\footnotesize
+\begin{tabular}{p{0.30\columnwidth}p{0.62\columnwidth}}
+\toprule
+Approach & Why it was rejected \\
+\midrule
+Recode NC as Neutral
+& Imposes a $0.92$-point downward shift at those cells; asserts a response that
+was explicitly withheld. \\
+\addlinespace
+Drop the 17 NC users
+& Discards a fifth of the sample to remove 37 cells, and is the only NC
+treatment that disturbs the recovered partition (AMI $0.337$). \\
+\addlinespace
+Mutual $k$NN (respondents)
+& Shatters the graph: 66 edges, 37 components, giant component $49.5\%$. Union
+$k$NN keeps one component. \\
+\addlinespace
+Raw uncentred similarity
+& $624$ of $1{,}770$ pairs survive $|r|>0.22$, $83\%$ of them positive --- a
+$35\%$-dense graph measuring agreeableness. \\
+\addlinespace
+Percentile threshold (p90)
+& Fixes the edge count by construction, so it cannot say whether any edge beats
+chance. On respondents it leaves 22 components and 20 isolates. \\
+\addlinespace
+Louvain for communities
+& Superseded by Leiden: its greedy phase can leave communities internally
+disconnected \cite{traag2019louvain}; Leiden improves $Q$ from $0.472$ to
+$0.491$ at the same $k=15$. \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \subsection{Limitations}
 
-Four limits bound every claim above. The response ceiling means items with
-means above roughly $4.5$ measure social desirability more than preference
-strength, and because few items are reverse-worded, acquiescence and a genuine
-ceiling cannot be fully separated. The sample is $n=96$ from a single
-institution, so differences of a few percentage points between statements are
-noise and only the large gaps are safely above sampling variation. Dropout is
-monotone, so later blocks rest on a slightly smaller base than earlier ones.
-And the file carries no demographic fields, so no finding can be attributed to
-any subgroup without additional joined data.
-
-A methodological limitation deserves separate mention: correlation stability
-under perturbation does not imply partition stability. Table~\ref{tab:sens}
-shows correlation matrices agreeing at $r>0.94$ across NC treatments whose
-community assignments agree at only AMI $0.337$. Conclusions drawn at the
-level of communities require their own stability analysis, by respondent-level
-bootstrap resampling, before being treated as findings.
+Items with means above roughly $4.5$ measure social desirability more than
+preference strength, and with few reverse-worded items acquiescence and a
+genuine ceiling cannot be fully separated. The sample is $n=96$ from a single
+institution, so only large gaps between statements sit safely above sampling
+variation, and monotone dropout leaves later blocks on a slightly smaller base.
+No demographic fields exist, so nothing can be attributed to a subgroup.
+Finally, and most importantly for the network claims: correlation stability
+does not imply partition stability. Across NC treatments the correlation
+matrices agree at $r>0.94$ while their community assignments agree at AMI as
+low as $0.337$. Community-level conclusions need their own bootstrap stability
+analysis before being treated as findings.
 
 % ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ============================================================
 
-We presented an end-to-end pipeline from a raw ordinal questionnaire to an
-opinion network and a dynamical process on it. Sanitisation preserves the
-distinction between abandonment and deliberate non-response, retains all 91
-non-empty respondents, and recovers $242$ missing cells by question-wise
-regularised proportional-odds ordinal regression, which beats a modal baseline
-under both scattered and structural artificial masking. Row-centring then
-removes the acquiescence component that would otherwise dominate every
-correlation, an intervention whose magnitude we quantify rather than assume:
-it eliminates $87\%$ of item pairs correlated at $|r|\geq0.30$. On the
-resulting matrix we build signed item and respondent networks and run
-bounded-confidence dynamics, showing by direct argument and controlled
-experiment that the small-$\varepsilon$ cluster plateau is forced by the
-five-point response grid, while the diversity sustained by the sparse network
-relative to a well-mixed population is a genuine topological effect.
+We built an end-to-end pipeline from a raw ordinal questionnaire to a signed
+opinion network and a process on it, measuring each intervention rather than
+asserting it: ordinal-regression recovery of $242$ cells beats a modal baseline
+under both masking mechanisms, and row-centring eliminates $87\%$ of item pairs
+correlated at $|r|\geq0.30$. A permutation null puts the noise floor at $0.106$
+against an observed spread of $0.139$, Marchenko--Pastur filtering leaves four
+modes carrying $25.6\%$ of variance, and the threshold came from a $46$-point
+sweep by a stated rule at $|r|>0.22$.
 
-On that matrix we then measured how much is interpretable at all. A
-permutation null that regenerates the whole pipeline from independently shuffled
-columns puts the noise floor at $0.106$ against an observed correlation spread
-of $0.139$, and Marchenko--Pastur filtering leaves exactly four modes above the
-band, carrying $25.6\%$ of variance. The edge threshold was then selected from a
-$46$-point sweep by a stated rule rather than convention, at $|r|>0.22$, where
-the giant component still spans $83\%$ of the items.
-
-The same null framework delivers the report's sharpest negative result. The
-respondent network's community structure clears a degree-preserving rewiring
-null at $z=7.46$ and an Erd\H{o}s--R\'enyi null at $z=7.28$, but fails the
-permutation null at $z=0.91$ ($p=0.19$): it is an artefact of correlating and
-then applying a neighbourhood rule, not a property of the responses. The
-characterisation that survives all of this is a cohort in superficial consensus
-with genuine but local structure --- four modest, largely cross-cutting
-dimensions, not two camps.
-
-Finally, the detected item-network communities do not align cleanly with the predefined thematic blocks (NMI = $0.201$), indicating that respondent opinions are formed across thematic boundaries. However, these opinions exhibit a remarkable internal consistency: as noise edges are removed, structural balance in the network steadily approaches $100\%$, establishing a robust, self-consistent topology despite the absence of distinct ideological camps.
-Finally, the detected item-network communities do not align cleanly with the predefined thematic blocks (NMI = $0.205$), indicating that respondent opinions are formed across thematic boundaries. However, these opinions exhibit a remarkable internal consistency: as noise edges are removed, structural balance in the network steadily approaches $100\%$, establishing a robust, self-consistent topology despite the absence of distinct ideological camps.
+The same framework produced the most useful negative result. Community
+structure clears rewiring and Erd\H{o}s--R\'enyi nulls on \emph{both} networks
+and fails the permutation null on both --- a finding we would have missed
+entirely had we used only the conventional null, and the clearest argument in
+this report for choosing a null that reproduces the construction. What survives
+is a cohort in superficial consensus with genuine but local structure: four
+modest cross-cutting dimensions, communities that ignore the survey's own
+thematic design (NMI $0.205$), and a signed topology that becomes perfectly
+balanced as noise is stripped away. Not two camps.
 
 % ============================================================
 \section*{Individual Contribution}
@@ -1205,14 +901,20 @@ $k$NN network; repository structure and \texttt{run\_all.py}. \\
 \addlinespace
 Shreyash Lohare &
 Noise-floor analysis and the permutation null framework
-(\texttt{src/common/nulls.py}); Marchenko--Pastur spectral denoising; threshold
-sweep and selection; the three-null comparison of
-Section~\ref{sec:nulls-p2}; sensitivity analysis of the rejected methods in
-Section~\ref{sec:rejected-p2}; shared configuration and the spec-conformant
-analysis matrix (\texttt{src/common/}); Graphs 4, 5 and 7; this section and
-Section~\ref{sec:g4}--\ref{sec:g7}. Commits tagged \texttt{[P2]}. \\
+(\texttt{src/common/nulls.py}); Marchenko--Pastur spectral denoising and the
+denoised correlation matrix; the threshold sweep and its selection rule; the
+three-null comparison on the respondent network (Section~\ref{sec:nulls});
+sensitivity analysis of the rejected methods (Section~\ref{sec:rejected});
+shared configuration and analysis matrix (\texttt{src/common/},
+\texttt{src/analysis/}); Graphs 4, 5 and 7; repository structure and
+\texttt{run\_all.py}. \\
 \addlinespace
-Dev Patel & Developed \texttt{src/person3} modules and exploration notebooks. Conducted community analysis and null model comparisons on the item network (Graph 10). Performed structural balance percolation sweep (Graph 11) and constructed the reordered MP-denoised correlation heatmap (Graph 6). Drafted corresponding report sections (Graphs 6, 10, 11, Discussion, and Conclusion). Commits tagged \texttt{[P3]} or related to Graph 6/10/11. \\
+Dev Patel &
+Community detection on the item network and the Louvain / Leiden /
+Girvan--Newman comparison; null-model evaluation of the item partition
+(Graph 10); structural balance sweep against a sign-permutation null
+(Graph 11); the reordered MP-denoised correlation heatmap (Graph 6);
+\texttt{src/communities/}; report sections for Graphs 6, 10 and 11. \\
 \bottomrule
 \end{tabular}
 \end{center}

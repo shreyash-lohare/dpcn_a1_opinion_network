@@ -120,7 +120,7 @@ def zscore(observed: float, null_sample: Sequence[float]) -> dict:
 
 
 def cache_replicates(path: Path, **arrays: np.ndarray) -> None:
-    """Cache replicate outputs so Person 3 never re-runs a multi-minute job."""
+    """Cache replicate outputs so Dev never re-runs a multi-minute job."""
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(path, **arrays)
 

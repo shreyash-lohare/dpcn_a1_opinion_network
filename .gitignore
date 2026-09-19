@@ -1,19 +1,20 @@
-.venv/
+# Python
 __pycache__/
 *.pyc
-.ipynb_checkpoints/
-person2_files/
-
-# LaTeX build artifacts
-*.aux
-*.log
-*.out
-*.bbl
-*.blg
+.venv/
+venv/
 
 # LaTeX build artefacts
+report/*.aux
 report/*.log
 report/*.blg
-report/*.aux
-report/*.out
 report/*.bbl
+report/*.out
+report/*.synctex.gz
+
+# Regenerable pipeline outputs (rebuilt by `python run_all.py`)
+outputs/sanitised_data/full_network.png
+outputs/sanitised_data/ordinal_models.pkl
+
+# Local working notes, not part of the submission
+person2_files/

@@ -61,8 +61,8 @@ are unknown. Two mechanisms are evaluated separately: scattered NC-like masking 
 contiguous structural suffix masking. In structural validation, answers after the
 simulated stopping point are hidden from the predictor row before prediction.
 
-- NC-like scattered masking: accuracy=0.465, MAE=0.712
-- Structural suffix masking: accuracy=0.487, MAE=0.608
+- NC-like scattered masking: accuracy=0.465, MAE=0.711
+- Structural suffix masking: accuracy=0.486, MAE=0.608
 
 ## Final Imputation
 
