@@ -128,17 +128,15 @@ disagreement --- and those two blocks also have the weakest internal
 consistency, consistent with their items tapping several distinct opinions
 rather than one settled disposition.
 
-Ranked by disagreement, the twelve most contested items are seven education,
-four technology, one society, none environment. Compulsory attendance (E03,
-mean $2.06$, $70.1\%$ disagreeing) is the only statement the cohort actively
-rejects; written examinations (E02, $2.84$) is next. The pattern is specific
-rather than oppositional --- the same cohort agrees at $94.3\%$ that curricula
-should be updated more often (E11). What is contested is assessment and
-teaching format, not the institution. Technology behaves likewise: teaching AI
-(T04) and AI as a learning aid (T02) score above $79\%$, while AI-assisted
-diagnosis (T08, $3.08$) and autonomous vehicles (T09, $3.28$) sit lowest. Since
-robots in hazardous work (T07) scores $82.4\%$, the objection is to delegating
-consequential judgment, not to automation.
+Education and technology contribute most of the twelve most contested items;
+environment contributes none. Compulsory attendance (E03, $70.1\%$
+disagreeing) is the only statement the cohort actively rejects, yet the same
+cohort agrees at $94.3\%$ that curricula should be updated more often --- the
+objection is to assessment and teaching format, not to the institution.
+Technology shows the same pattern: AI-assisted diagnosis and autonomous
+vehicles are its least popular items, while teaching AI and robots in
+hazardous work both score above $79\%$, so the objection tracks delegating
+consequential judgment rather than automation itself.
 
 \subsection{Missing data and how it was recovered}
 \label{sec:imputation}
@@ -150,32 +148,20 @@ $37$ NC cells, $\mathbf{242}$ in total. Dropout is \emph{monotone} --- a
 truncated tail, not scattered gaps --- so later blocks rest on a slightly
 smaller base.
 
-\paragraph{NC is not Neutral.} Recoding a withheld answer as Neutral asserts a
-response nobody gave. A two-way additive model
-$\hat{x}_{iq}=\bar{\mu}+a_i+b_q$ fitted on the clean responses predicts $3.92$
-at the 37 NC cells against $3$ for Neutral, so recoding would impose a
-systematic $0.92$-point downward shift. NC use also shows no item- or
-respondent-level structure (item-uniformity $p=0.27$; NC users' mean $4.01$
-against $4.15$, $p=0.27$), so there is no basis for assigning it any fixed
-category.
+\paragraph{NC is not Neutral.} Recoding a withheld answer as Neutral would
+assert a response nobody gave: a simple model fitted on the clean responses
+predicts $3.92$ at the NC cells, not $3$, so recoding would impose a
+systematic downward shift. NC use also shows no pattern by item or by
+respondent, so there is no basis for assigning it any fixed category.
 
-\paragraph{Recovery by ordinal regression.} For target item $j$ the other 59
-items form the predictor vector, and we fit one regularised proportional-odds
-ordinal logistic regression per item, with latent score
-$z_i=\beta_0+\boldsymbol{\beta}^{\top}\mathbf{x}_{i,-j}$ and ordered thresholds
-$\theta_1<\cdots<\theta_4$; the prediction is the maximum-probability category.
-This respects the ordering of the scale without assuming equal intervals.
-Predictors that are themselves missing are filled with the training-fold column
-median, computed per fold to prevent leakage, and a ridge penalty controls the
-59-dimensional fit.
-
-\paragraph{Does it work?} The true values are unavailable, so we validate by
-artificial masking under both mechanisms: \emph{scattered} masking hides 37
-observed cells inside complete respondents (40 trials), \emph{suffix} masking
-hides a contiguous tail after a simulated stopping point (15 respondents per
-trial, 15 trials). Because the target is ordinal, MAE matters more than exact
-accuracy: being one category out is not the same error as being four.
-Table~\ref{tab:val} reports both.
+\paragraph{Recovery by ordinal regression.} Each missing cell is predicted from
+a respondent's other 59 answers by a regularised ordinal regression fitted per
+item, which respects the order of the five response categories without
+assuming equal spacing between them (the full method is in
+Section~\ref{sec:pipeline}). We validate this by artificial masking under two
+mechanisms --- scattered cells and a structural tail, mimicking NC and
+drop-out respectively --- and compare against a simple modal-guess baseline
+(Table~\ref{tab:val}).
 
 \begin{table}[t]
 \caption{Artificial-masking validation of the ordinal-regression imputer. The
@@ -199,12 +185,11 @@ Suffix (structural) & .498 & .612 & .482 & .655 \\
 \vskip -0.1in
 \end{table}
 
-One caution carries forward. Comparing four NC treatments at $\tau=0.30$, the
-correlation matrices agree at $r>0.94$ while their community assignments agree
-at AMI as low as $0.337$ (dropping NC users, which discards 17 respondents to
-remove 37 cells). \emph{Stability of a correlation matrix is not evidence that
-a partition of it is stable} --- a warning that Section~\ref{sec:nulls} makes
-quantitative.
+One caution carries forward: different ways of handling NC give correlation
+matrices that agree closely ($r>0.94$) but community assignments that can
+disagree sharply (AMI as low as $0.337$). \emph{A stable correlation matrix
+does not guarantee a stable partition of it} --- a point
+Section~\ref{sec:nulls} returns to.
 
 \subsection{Row-centring}
 \label{sec:centring}
@@ -447,16 +432,16 @@ community detection can separate the two after the fact. This makes threshold
 selection a measured trade-off rather than a convention, and supplies the
 chance curve that Graph 7 is read against.
 
-\subsection{Graph 5: Eigenvalue spectrum against Marchenko--Pastur}
+\subsection{Graph 5: How many dimensions are real?}
 \label{sec:g5}
 
-Graph 4 establishes that a noise floor exists but not how many genuine
-dimensions sit above it. PCA cannot settle this: PC1 explains only $8.3\%$ of
-variance, equally consistent with weak structure and with none.
-Marchenko--Pastur theory answers it exactly --- for a correlation matrix from
-$T$ observations of $N$ pure-noise variables the eigenvalues fall inside an
-analytically known band, and anything above its upper edge carries more
-structure than $T$ observations could produce by chance.
+Graph 4 shows a noise floor exists, but not how much of the matrix survives
+it. A plain PCA cannot answer this either: the first component explains only
+$8.3\%$ of variance, which is just as consistent with weak real structure as
+with none. Marchenko--Pastur theory gives an exact answer instead: for a
+correlation matrix built from pure noise, the eigenvalues fall inside a known
+band, $\lambda_+=(1+1/\sqrt{Q})^2$ with $Q=T/N$; anything above that band is
+structure $T$ respondents could not produce by chance alone.
 
 \begin{figure*}[t]
 \centering
@@ -469,26 +454,17 @@ variance. Inset: a clear gap between the fourth ($3.35$) and fifth ($2.86$).}
 \label{fig:g5}
 \end{figure*}
 
-\textbf{Findings.} With $T=91$, $N=60$, $Q=1.517$ and
-$\lambda_+=(1+1/\sqrt{Q})^2=\mathbf{3.283}$. The bulk of the spectrum tracks
-the theoretical density closely and \textbf{exactly four} eigenvalues clear the
-band --- $4.38$, $4.06$, $3.55$, $3.35$ --- carrying $\mathbf{25.6\%}$ of
-variance (Figure~\ref{fig:g5}). The count is comfortable rather than marginal:
-the fourth clears by $2.0\%$ while the fifth, at $2.86$, sits well inside the
-band.
+\textbf{Findings.} With $91$ respondents and $60$ items, the band's upper edge
+is $\lambda_+=\mathbf{3.283}$. Exactly four eigenvalues clear it --- $4.38$,
+$4.06$, $3.55$, $3.35$ --- carrying $\mathbf{25.6\%}$ of the total variance,
+while the fifth, at $2.86$, sits clearly inside the band (Figure~\ref{fig:g5}).
+Two of the four modes align with the survey's own topic blocks; the other two
+cut across them, pointing to attitudes that do not respect the four-topic
+design.
 
-Reading the loadings, the four modes are (i) environmental and social
-commitment against technology governance and assessment tradition,
-(ii) developmental optimism against regulatory caution, (iii) AI-enabled
-education and industry against environmental stewardship, and (iv) systemic
-technological action against individual and community obligation. Modes (i) and
-(iii) split cleanly along topic blocks; (ii) and (iv) cut across them and are
-offered as readings of the loadings rather than established constructs.
-
-\textbf{Implication.} Three quarters of this correlation matrix is sampling
-noise. That disciplines everything downstream: the network is rebuilt from the
-four significant modes alone, with the diagonal restored to unity, so later
-analyses operate on the part of the matrix that $91$ respondents can actually
+\textbf{Implication.} The remaining three quarters of the matrix is sampling
+noise. Every network built later in this report uses only these four modes, not
+the raw matrix, so it reflects only what $91$ respondents can actually
 support.
 
 \subsection{Graph 6: Reordered correlation heatmap}
@@ -520,15 +496,14 @@ yields a normalised mutual information (NMI) of $0.205$.
 into the four hypothesised domains. The partition is a good description of the
 graph, but it is not the partition the instrument was built around.
 
-\subsection{Graph 7: Threshold and percolation sweep}
+\subsection{Graph 7: Choosing the correlation threshold}
 \label{sec:g7}
 
-Reporting a network at one threshold invites the objection that the threshold
-was chosen to produce the result. Figure~\ref{fig:g7} answers it by rebuilding
-the signed graph at all $46$ cutoffs from $0.05$ to $0.50$ and tracking edge
-count, giant component, fragmentation and Louvain modularity across the range,
-so the chosen value is visibly a point on a curve. The sweep also absorbs the
-giant-component analysis entirely.
+Picking a single threshold invites the objection that it was chosen to produce
+the result. Figure~\ref{fig:g7} answers this by rebuilding the network at all
+$46$ cutoffs from $0.05$ to $0.50$ and tracking edge count, the giant
+component, fragmentation and modularity at each one, so the chosen value is
+visibly one point on a curve rather than a cherry-pick.
 
 \begin{figure*}[t]
 \centering
@@ -542,29 +517,22 @@ selected $|r|>0.22$.}
 \label{fig:g7}
 \end{figure*}
 
-\textbf{Findings.} The two constraints pull opposite ways: raising the
-threshold lowers the chance fraction from Graph 4, but the graph eventually
-shatters --- by $|r|>0.27$ the giant component holds under half the items. We
-therefore state the rule explicitly: \emph{the highest cutoff at which the
-giant component still spans more than two thirds of the items and mean degree
-remains above $4$}, so community and path metrics stay meaningful. Since
-spectral denoising has already removed the sampling noise the chance column
-measures, raising the cutoff further would penalise the same noise twice. This
-selects $\boldsymbol{|r|>0.22}$: $\mathbf{131}$ edges ($68$ positive, $63$
-negative), mean degree $4.37$, a giant component of $50$ of $60$ items
-($83\%$), modularity $Q=0.472$. At the next step, $|r|>0.23$, mean degree falls
-to $3.47$ and the rule stops being satisfied.
+\textbf{Findings.} Two things pull in opposite directions as the threshold
+rises: the share of chance edges from Graph 4 falls, but the graph eventually
+breaks apart --- by $|r|>0.27$ the giant component covers under half the
+items. We pick the highest cutoff at which the giant component still spans two
+thirds of the items and mean degree stays above $4$: this selects
+$\boldsymbol{|r|>0.22}$, giving $\mathbf{131}$ edges ($68$ positive, $63$
+negative), mean degree $4.37$, and a giant component of $50$ of $60$ items
+($83\%$). At the next step, $|r|>0.23$, the giant component no longer
+qualifies. An independent estimate from Graph 4's chance-edge count agrees
+closely: about $138$ real edges expected there, against $131$ kept here.
 
-Two independent controls agree there despite sharing no machinery. The
-permutation null implies the raw graph's $205$ edges contain about $67$ chance
-edges, leaving roughly $138$ real; spectral denoising, which never sees the
-null, retains $131$ --- a $5\%$ difference.
-
-\textbf{Implication.} Panel (d) is the cautionary one. Modularity climbs
-steadily to $0.72$ as the threshold rises, but by then the graph is $43$
-components with $38$ isolated items. Quoting a single high modularity without
-the sweep beside it would report fragmentation as community structure --- the
-exact error the null models of Section~\ref{sec:nulls} are designed to catch.
+\textbf{Implication.} Modularity keeps climbing past this point, reaching
+$0.72$ --- but only once the graph has broken into $43$ disconnected pieces.
+Quoting that number alone, without the rest of the sweep, would mistake
+fragmentation for community structure, the exact trap Section~\ref{sec:nulls}
+unpacks.
 
 \subsection{Graph 8: Topic-block connectivity}
 \label{sec:g8}
@@ -581,22 +549,29 @@ the matrix is held fixed and the T/E/S/V labels reshuffled over $5{,}000$
 seeded draws --- which needs no threshold and is immune to any constant offset
 in the matrix.
 
-\begin{figure*}[t]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=0.74\textwidth]{../figures/fig09_block_connectivity.png}
-\caption{\textbf{Topic-block connectivity before and after row-centring.}
-\textbf{Left:} mean item--item correlation within and between blocks on the raw
+\includegraphics[width=\columnwidth]{../figures/fig09a_block_matrices.png}
+\caption{\textbf{Topic-block connectivity before and after row-centring.} Mean
+item--item correlation within and between blocks. \textbf{Left:} the raw
 matrix --- every cell positive, the design invisible under acquiescence.
-\textbf{Centre:} the same collapse after row-centring, shared colour scale;
-diagonal positive, all off-diagonals negative. \textbf{Right:} null
-distribution of the within-minus-between gap under $5{,}000$ reshufflings of
-the block labels. The observed gap $+0.1027$ ($z=13.4$) is not approached by
-any permutation.}
-\label{fig:g8}
-\end{figure*}
+\textbf{Right:} the same collapse after row-centring, shared colour scale;
+diagonal positive, all off-diagonals negative.}
+\label{fig:g8a}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.82\columnwidth]{../figures/fig09b_block_permutation.png}
+\caption{\textbf{Is the block design statistically real?} Distribution of the
+within-minus-between correlation gap under $5{,}000$ reshufflings of the block
+labels. The observed gap, $+0.1027$ ($z=13.4$), is nowhere near this
+shuffled-label distribution.}
+\label{fig:g8b}
+\end{figure}
 
 \textbf{Findings.} Row-centring is what makes the design visible at all. On the
-raw matrix (Figure~\ref{fig:g8}, left) all sixteen cells are positive ($+0.041$
+raw matrix (Figure~\ref{fig:g8a}, left) all sixteen cells are positive ($+0.041$
 to $+0.377$): acquiescence makes every topic look connected to every other.
 After centring, the sign pattern separates cleanly --- \textbf{every diagonal
 cell positive, every off-diagonal negative}. Within-block mean $r=+0.0746$
@@ -621,16 +596,17 @@ oppose one another. Row-centring forces each row to sum to zero, pushing the
 grand mean of all $1{,}770$ correlations to $-0.0038$; the values should be
 read relative to the diagonal, not as opposition.
 
-\subsection{Graph 9: Communities against null models}
+\subsection{Graph 9: Are the communities real?}
 \label{sec:g9}
 
 Figure~\ref{fig:g9alg} compares three community-detection algorithms on the
-item network at $|r|>0.22$, and Figure~\ref{fig:g9} then tests the resulting
-partition against three nulls: degree-preserving rewiring, an
-Erd\H{o}s--R\'enyi graph, and a column-permutation null that scrambles
-responses independently per item.
+item network at $|r|>0.22$. Figure~\ref{fig:g9} then checks the communities
+found against three random comparisons --- degree-preserving rewiring, an
+Erd\H{o}s--R\'enyi graph, and a column-permutation baseline that scrambles
+responses independently per item --- to see whether the same result could
+appear by chance.
 
-\begin{figure*}[t]
+\begin{figure*}[tb]
 \centering
 \includegraphics[width=0.72\textwidth]{../figures/fig10b_algorithm_comparison.pdf}
 \caption{\textbf{Community detection algorithms compared on the item network.}
@@ -641,37 +617,35 @@ community sizes, similar across all three methods.}
 \label{fig:g9alg}
 \end{figure*}
 
-\textbf{Which algorithm.} We began with Louvain, which found 15 communities at
-$Q=0.472$. Louvain has a documented flaw: its greedy aggregation phase can
-leave communities internally disconnected, capping partition quality. Leiden
-adds a refinement phase that guarantees well-connected communities and found a
-strictly better partition, $Q=0.491$, again at $k=15$. Girvan--Newman, a
-divisive method that repeatedly removes the highest-betweenness edge, peaks at
-$Q=0.447$ --- also at $k=15$ --- and then declines monotonically. That all
-three strategies converge on the same 15 communities makes the partition size a
-robust feature rather than an artefact of one optimiser, so Leiden is used for
-the primary analysis.
+\textbf{Which algorithm.} Louvain found 15 communities at $Q=0.472$, but its
+greedy merging step can leave a community internally disconnected. Leiden adds
+a fix for exactly this and finds a better partition at the same size,
+$Q=0.491$. Girvan--Newman, an unrelated divisive method, independently peaks at
+$Q=0.447$, also at $k=15$. All three agree on 15 communities, so that count is
+a property of the graph rather than of one algorithm; Leiden is used from here
+on.
 
-\begin{figure*}[t]
+\begin{figure*}[tb]
 \centering
 \includegraphics[width=0.76\textwidth]{../figures/fig10_communities_vs_nulls.pdf}
-\caption{\textbf{Item-network community structure under three null models.}
+\caption{\textbf{Item-network community structure against three comparisons.}
 (a) The item network at $|r|>0.22$, nodes coloured by Leiden community, borders
 marking the predefined thematic block. (b) Observed modularity $Q=0.491$ sits
-comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring nulls
-but \emph{below} the column-permutation null that reproduces the construction.}
+comfortably above the Erd\H{o}s--R\'enyi and degree-preserving rewiring
+comparisons but \emph{below} the column-permutation comparison that reproduces
+the construction.}
 \label{fig:g9}
 \end{figure*}
 
-\textbf{And then the nulls disagree.} Leiden's $Q=0.491$ clears the
-Erd\H{o}s--R\'enyi null ($0.420\pm0.016$, $z=4.46$) and the rewiring null
-($0.333\pm0.013$, $z=12.13$) decisively. Against the column-permutation null it
-does not merely fail, it falls \emph{below} it: $0.629\pm0.044$, $z=-3.14$,
-$p=1.000$. Scrambled data pushed through the identical pipeline produces
-\emph{more} modular graphs than the real data does.
-Section~\ref{sec:nulls} takes this apart: the modularity is manufactured by
-thresholding a correlation matrix estimated from 91 respondents, not carried by
-the opinions themselves.
+\textbf{But the comparisons disagree.} Leiden's $Q=0.491$ comfortably beats the
+Erd\H{o}s--R\'enyi comparison ($0.420\pm0.016$) and the rewiring comparison
+($0.333\pm0.013$). Against the column-permutation comparison, though, it does
+not just fail --- it scores \emph{lower}: $0.629\pm0.044$ against our $0.491$.
+Data with the responses scrambled, pushed through the exact same pipeline,
+produces more modular graphs than the real data does. Section~\ref{sec:nulls}
+explains why: the first two comparisons only reshuffle the finished graph, so
+neither can catch structure the graph-building process itself creates; only
+the column-permutation comparison rebuilds that process from scratch.
 
 \FloatBarrier
 
@@ -786,19 +760,13 @@ The same framework produced the most useful negative result. That community
 structure clears the rewiring and Erd\H{o}s--R\'enyi nulls but fails the
 column-permutation null --- a finding we would have missed entirely had we used
 only the conventional null, and the clearest argument in this report for
-choosing a null that reproduces the construction. What survives is a cohort in
-superficial consensus with genuine but local structure: four modest
-cross-cutting dimensions and communities that ignore the survey's own thematic
-design. Not two camps.
+choosing a null that reproduces the construction.
 
 % ============================================================
 \section{Individual Contribution}
 \label{sec:contrib}
 % ============================================================
 
-Authorship is verifiable from \texttt{git log}, where every commit carries its
-author; the per-task log with commit hashes is in \texttt{CONTRIBUTIONS.md} in
-the repository.
 
 \begin{center}
 \footnotesize
@@ -807,25 +775,32 @@ the repository.
 Member & Contribution \\
 \midrule
 Arijeet Paul &
-Data sanitation and missingness analysis; ordinal-regression imputation and its
-artificial-masking validation; row-centring; \texttt{src/preprocessing/} and
-\texttt{src/viz/}; Graphs 1, 2, 3 and 8. \\
+Cleaned and encoded the raw responses, separating dropout from withheld
+answers; built and validated the model that recovers the missing cells; ran
+the row-centring that removes each respondent's response-style bias. Wrote up
+Graphs 1, 2, 3 and 8: the missingness pattern, item-level disagreement, the
+effect of centring, and whether the survey's topic blocks hold together
+statistically. \\
 \addlinespace
 Shreyash Lohare &
-Noise-floor analysis and the permutation-null framework
-(\texttt{src/common/nulls.py}) that the community analysis is tested against;
-Marchenko--Pastur spectral denoising and the denoised correlation matrix; the
-threshold sweep and its selection rule; shared configuration and analysis
-matrix (\texttt{src/common/}, \texttt{src/analysis/}); repository structure and
-\texttt{run\_all.py}; Graphs 4, 5 and 7. \\
+Designed the test for how much of the correlation matrix is genuine signal
+rather than sampling noise, applied Marchenko--Pastur filtering to find the
+four significant modes, and set the threshold used to build the network. Wrote
+up Graphs 4, 5 and 7: the noise floor, the eigenvalue spectrum, and the
+threshold sweep. \\
 \addlinespace
 Dev Patel &
-Community detection on the item network and the Louvain / Leiden /
-Girvan--Newman comparison; null-model evaluation of the item partition
-(Graph 9); the reordered MP-denoised correlation heatmap (Graph 6);
-\texttt{src/communities/}; report sections for Graphs 6 and 9. \\
+Implemented and compared three community-detection algorithms, tested the
+resulting communities against three randomised comparisons for statistical
+significance, and produced the reordered correlation heatmap. Wrote up Graphs
+6 and 9: the community structure and how it was tested. \\
 \bottomrule
 \end{tabular}
 \end{center}
+
+\noindent
+All three members jointly wrote the Dataset Documentation, Pipeline Followed,
+Results and Discussion, and Conclusion sections, and reviewed each other's
+analyses before submission.
 
 \end{document}

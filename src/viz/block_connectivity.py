@@ -1,4 +1,4 @@
-"""Graph 9: topic-block connectivity (4x4).
+"""Graph 8: topic-block connectivity (4x4).
 
 The survey ships with its own thematic partition -- 15 items each for
 Technology (T), Education (E), Society/Ethics (S) and Environment (V). That
@@ -167,12 +167,19 @@ def _draw_block_heatmap(ax, means: pd.DataFrame, title: str, vlim: float, show_y
 
 
 def plot_block_connectivity(
-    output_path: Path = FIGURES_DIR / "fig09_block_connectivity.png",
+    output_path: Path = FIGURES_DIR / "fig09a_block_matrices.png",
+    null_output_path: Path = FIGURES_DIR / "fig09b_block_permutation.png",
     imputed_csv: Path = IMPUTED_CSV,
     config: PipelineConfig | None = None,
     n_permutations: int = 5000,
 ) -> Dict[str, object]:
-    """Build Graph 9 and return the numbers the report quotes."""
+    """Build Graph 8 and return the numbers the report quotes.
+
+    Two figures are saved rather than one three-panel figure: the raw and
+    row-centred heatmaps are directly comparable and belong side by side,
+    while the permutation-null histogram is a different kind of plot and
+    reads better on its own, at full size.
+    """
     config = config or PipelineConfig()
 
     imputed_df = pd.read_csv(imputed_csv)
@@ -195,39 +202,45 @@ def plot_block_connectivity(
     ))))
     vlim = max(vlim, 0.05)
 
-    fig, axes = plt.subplots(1, 3, figsize=(17, 5.0), gridspec_kw={"width_ratios": [1, 0.82, 1.25]})
+    # --- figure A: raw vs. row-centred block heatmaps, side by side --------
+    fig_a, axes = plt.subplots(1, 2, figsize=(10.5, 5.0), gridspec_kw={"width_ratios": [1, 1.15]})
 
     _draw_block_heatmap(axes[0], raw_means, "Raw (uncentred)", vlim, show_ylabels=True)
     image = _draw_block_heatmap(axes[1], centred_means, "Row-centred (network basis)", vlim,
                                 show_ylabels=False)
-    fig.colorbar(image, ax=axes[1], fraction=0.046, pad=0.04,
-                 label="Mean item-item Spearman r (shared scale)")
-
-    ax = axes[2]
-    null_gaps = permutation["null_gaps"]
-    ax.hist(null_gaps, bins=45, color=NULL_COLOR, edgecolor="white",
-            label=f"Shuffled block labels ({n_permutations:,} draws)")
-    ax.axvline(permutation["observed_gap"], color=OBSERVED_COLOR, linewidth=2.4,
-               label=f"Observed gap = {permutation['observed_gap']:+.4f}")
-    ax.axvline(permutation["null_mean"], color="#555555", linewidth=1.4, linestyle=":",
-               label=f"Null mean = {permutation['null_mean']:+.4f}")
-    ax.set_xlabel("Within-block mean r  minus  between-block mean r (row-centred)")
-    ax.set_ylabel("Permutations")
-    ax.set_title(f"Topic partition vs. shuffled labels\n"
-                 f"z = {permutation['z']:.2f},  p = {permutation['p_value']:.4f}", fontsize=11)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), frameon=False, fontsize=9)
-
-    fig.suptitle(
-        "Graph 9: topic-block connectivity, "
-        f"{item_df.shape[0]} respondents x {item_df.shape[1]} items",
-        fontsize=13, y=1.00,
+    fig_a.colorbar(image, ax=axes[1], fraction=0.046, pad=0.04,
+                   label="Mean item-item Spearman r (shared scale)")
+    fig_a.suptitle(
+        "Graph 8: topic-block connectivity, raw vs. row-centred",
+        fontsize=13, y=1.02,
     )
     plt.tight_layout()
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, dpi=200, bbox_inches="tight")
     plt.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight")
-    plt.close(fig)
+    plt.close(fig_a)
+
+    # --- figure B: permutation-null histogram, on its own ------------------
+    fig_b, ax = plt.subplots(figsize=(6.5, 5.0))
+    null_gaps = permutation["null_gaps"]
+    ax.hist(null_gaps, bins=45, color=NULL_COLOR, edgecolor="white",
+            label=f"Shuffled block labels ({n_permutations:,} draws)")
+    ax.axvline(permutation["observed_gap"], color=OBSERVED_COLOR, linewidth=2.4,
+               label=f"Observed gap = {permutation['observed_gap']:+.4f}")
+    ax.axvline(permutation["null_mean"], color="#555555", linewidth=1.4, linestyle=":",
+               label=f"Shuffled-label mean = {permutation['null_mean']:+.4f}")
+    ax.set_xlabel("Within-block mean r  minus  between-block mean r (row-centred)")
+    ax.set_ylabel("Permutations")
+    ax.set_title(f"Topic partition vs. shuffled labels\n"
+                 f"z = {permutation['z']:.2f},  p = {permutation['p_value']:.4f}", fontsize=11)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), frameon=False, fontsize=9)
+    plt.tight_layout()
+
+    null_output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(null_output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(null_output_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(fig_b)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     raw_means.to_csv(OUTPUT_DIR / "block_means_raw.csv")
@@ -259,6 +272,7 @@ def plot_block_connectivity(
         "weakest_cross_block": weakest,
         "within_block_ranking": _diagonal_ranking(centred_means),
         "output_path": str(output_path),
+        "null_output_path": str(null_output_path),
     }
 
 
