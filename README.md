@@ -63,18 +63,16 @@ src/
     null_models.py       permutation vs rewiring vs ER
     sensitivity.py       methods tried and rejected
   communities/           what structure is there?
-    detection.py         Louvain / Leiden / Girvan-Newman + nulls (Figure 10)
-    balance.py           structural balance sweep               (Figure 11)
-    heatmap.py           reordered correlation heatmap          (Figure 6)
+    detection.py         Louvain / Leiden / Girvan-Newman + nulls (Graph 9)
+    heatmap.py           reordered correlation heatmap          (Graph 6)
   viz/                   figures owned by the preprocessing side
-    diagnostics.py       missingness, item variance, centring   (Figures 1-3)
-    block_connectivity.py  topic-block connectivity             (Figure 9)
-    dynamics.py          Deffuant-Weisbuch opinion dynamics     (Figure 12)
+    diagnostics.py       missingness, item variance, centring   (Graphs 1-3)
+    block_connectivity.py  topic-block connectivity             (Graph 8)
     networks.py          network drawing helpers
 artifacts/               handoff files between team members
 figures/                 generated PNG + PDF, named figNN_*
 outputs/                 sanitisation and per-analysis outputs
-report/                  report.tex, references.bib, report.pdf
+report/                  report.tex, report.pdf, icml2025.sty
 run_all.py               reproduces every figure and number, in dependency order
 ```
 

@@ -29,7 +29,7 @@ carries its author.
 **Deliverables.** Parsing, encoding and missingness analysis; per-item
 regularised proportional-odds ordinal regression for the 242 missing cells, with
 artificial-masking validation under both scattered and structural mechanisms;
-row-centring; the respondent kNN network; Figures 1, 2, 3, 9 and 12.
+row-centring; Graphs 1, 2, 3 and 8.
 
 ## Shreyash Lohare — noise floor, spectral denoising, null framework
 
@@ -52,8 +52,9 @@ both other analyses are tested against; the noise floor (observed correlation SD
 0.139 against 0.106 under the null); Marchenko–Pastur filtering, which leaves
 exactly four significant modes carrying 25.6% of variance, and the denoised
 matrix all downstream networks are built from; the threshold sweep and its
-stated selection rule at |r| > 0.22; the three-null comparison showing the
-respondent network's communities fail the permutation null; Figures 4, 5 and 7.
+stated selection rule at |r| > 0.22; the null-model comparison showing the item
+network's community structure clears the rewiring and Erdős–Rényi nulls but
+fails the column-permutation null; Graphs 4, 5 and 7.
 
 ## Dev Patel — community detection, structural balance
 
@@ -72,10 +73,9 @@ respondent network's communities fail the permutation null; Figures 4, 5 and 7.
 **Deliverables.** Community detection on the item network and the
 Louvain / Leiden / Girvan–Newman comparison (all three converge on k = 15,
 Leiden best at Q = 0.491); null-model evaluation of the item partition, which
-independently reproduces the permutation-null failure; the structural balance
-sweep reaching 100% balanced triads against a null flat at 50%; the reordered
+independently reproduces the permutation-null failure; the reordered
 MP-denoised heatmap showing communities cut across the survey's thematic blocks
-(NMI 0.205).
+(NMI 0.205); Graphs 6 and 9.
 
 ---
 
@@ -91,5 +91,5 @@ Written to `artifacts/` by `python run_all.py`, consumed across the team.
 | `chance_edges_by_threshold.csv`, `null_replicates.npz` | Shreyash | Dev |
 | `null_comparison.json`, `null_modularity_replicates.npz` | Shreyash | Dev |
 | `sensitivity.json` | Shreyash | report |
-| `graph10_communities.json`, `graph11_balance_stats.json` | Dev | report |
+| `graph10_communities.json` | Dev | report |
 | `outputs/sanitised_data/` | Arijeet | all |

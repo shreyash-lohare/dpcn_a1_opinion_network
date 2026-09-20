@@ -94,12 +94,6 @@ def _p1_graph_9():
     return plot_block_connectivity()
 
 
-def _p1_graph_12():
-    from src.viz.dynamics import plot_opinion_dynamics
-
-    return plot_opinion_dynamics()
-
-
 def _p2_graph_4():
     from src.analysis.noise_floor import main
 
@@ -137,11 +131,6 @@ def _p3_graph_10():
     return run()
 
 
-def _p3_graph_11():
-    from src.communities.balance import run
-    return run()
-
-
 def _p3_graph_6():
     from src.communities.heatmap import run
     return run()
@@ -156,12 +145,9 @@ STAGES: List[Stage] = [
     Stage("Arijeet", "Dataset figures: response ceiling, contested items", _p1_dataset_figures,
           requires=["outputs/sanitised_data/dataset_imputed.csv"],
           produces=["figures/fig_response_ceiling.png"]),
-    Stage("Arijeet", "Graph 9: topic-block connectivity (4x4)", _p1_graph_9,
+    Stage("Arijeet", "Graph 8: topic-block connectivity (4x4)", _p1_graph_9,
           requires=["outputs/sanitised_data/dataset_imputed.csv"],
           produces=["outputs/block_connectivity/block_means_centred.csv"]),
-    Stage("Arijeet", "Graph 12: Deffuant-Weisbuch opinion dynamics", _p1_graph_12,
-          requires=["outputs/sanitised_data/row_centred_data.csv",
-                    "outputs/sanitised_data/dataset_imputed.csv"]),
     Stage("Shreyash", "Graph 4: noise floor + permutation null framework", _p2_graph_4,
           produces=["artifacts/chance_edges_by_threshold.csv", "artifacts/null_replicates.npz"]),
     Stage("Shreyash", "Graph 5: Marchenko-Pastur denoising", _p2_graph_5,
@@ -176,13 +162,10 @@ STAGES: List[Stage] = [
     Stage("Shreyash", "Sensitivity annex: methods tried and rejected", _p2_sensitivity,
           requires=["artifacts/corr_raw.npy", "artifacts/threshold.json"],
           produces=["artifacts/sensitivity.json"]),
-    Stage("Dev", "Graph 10: communities vs three null models", _p3_graph_10,
+    Stage("Dev", "Graph 9: communities vs three null models", _p3_graph_10,
           requires=["artifacts/corr_denoised.npy", "artifacts/threshold.json",
                     "artifacts/null_replicates.npz"],
           produces=["artifacts/graph10_communities.json"]),
-    Stage("Dev", "Graph 11: structural balance vs threshold", _p3_graph_11,
-          requires=["artifacts/corr_denoised.npy", "artifacts/threshold.json"],
-          produces=["artifacts/graph11_balance_stats.json"]),
     Stage("Dev", "Graph 6: reordered correlation heatmap", _p3_graph_6,
           requires=["artifacts/corr_denoised.npy", "artifacts/graph10_communities.json"])
 ]

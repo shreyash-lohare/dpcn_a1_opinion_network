@@ -1,2 +1,2 @@
-# Dev: Communities, structural balance, heatmap (Graphs 10, 11, 6)
+# Dev: Communities, heatmap (Graphs 9, 6)
 
