@@ -643,57 +643,6 @@ Figure~\ref{fig:g11} tracks the fraction of balanced triads in the signed item n
 \label{fig:g11}
 \end{figure}
 
-\subsection{Graph 12: Opinion dynamics}
-\label{sec:g12}
-
-This is the only analysis involving an actual process; everything above
-describes a fixed dataset. Opinions belong to respondents, so the vertices here
-are \emph{respondents}. From the row-centred matrix we connect each respondent
-to their $k=4$ most similar peers, symmetrised by union --- mutual $k$NN
-fragments this data, and disconnected components cannot merge at any
-confidence threshold, which would inflate the cluster count for reasons
-unrelated to the dynamics. The result is $91$ nodes, $298$ edges, one connected
-component.
-
-Opinions $x_i\in[0,1]$ are seeded from E03 (compulsory attendance, the most
-contested item), rescaled by $s(x)=(x+2)/4$. At each step a random edge is
-drawn and the pair moves to its midpoint if they are close enough:
-\begin{equation}
-|x_u - x_v| < \varepsilon
-\ \Longrightarrow\
-x_u,x_v \leftarrow \tfrac{1}{2}\left(x_u + x_v\right).
-\end{equation}
-We sweep $\varepsilon$ from $0.05$ to $0.60$, 20 seeded repetitions each.
-
-\textbf{Findings.} The cluster count is exactly $5.00\pm0.00$ for every
-$\varepsilon\leq0.25$, then falls to $4.45$ at $0.30$, $3.35$ at $0.40$ and
-$2.00$ at $0.50$ (Figure~\ref{fig:g12}).
-
-\textbf{The plateau is an artefact --- provably.} Under $s(x)=(x+2)/4$ the five
-categories map to $\{0,\tfrac14,\tfrac12,\tfrac34,1\}$, so any two distinct
-opinions differ by at least $\tfrac14$. For $\varepsilon\leq0.25$ the merge
-condition is therefore \emph{never} satisfied: the initial state is a fixed
-point and the final count equals the number of occupied categories, on any
-graph whatsoever. Three checks confirm it empirically. The plateau has
-\emph{zero} variance across 20 seeded runs, which no emergent outcome would. A
-complete graph --- a maximally different topology --- returns the identical
-$5.00\pm0.00$. And jittering the seeds by $\pm0.125$, destroying the grid while
-preserving the distribution, removes the plateau entirely
-($35.95\rightarrow8.95$ clusters across $\varepsilon=0.05\ldots0.25$). The five
-clusters are the original response categories failing to merge, not opinion
-groups forming, and the break at $\varepsilon=0.30$ is arithmetic rather than a
-discovered threshold.
-
-\textbf{What is not an artefact.} Above $\varepsilon=0.25$ the comparison is
-meaningful. An identically seeded complete graph --- the same dynamics with
-topology removed --- collapses to about $2$ clusters across
-$\varepsilon=0.30$--$0.45$, while the sparse $k$NN network sustains
-$3.15$--$4.45$. \emph{Network structure sustains opinion diversity that a
-well-mixed population loses at the same tolerance}: interacting only with
-nearest neighbours lets locally cohesive groups stabilise before global
-consensus propagates. This is the one result here that is neither a scale
-artefact nor a restatement of the input distribution.
-
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.78\textwidth]{../figures/fig12_opinion_dynamics.png}
@@ -802,58 +751,6 @@ count is robust to \emph{how} missing cells are filled and fragile to
 \emph{which} respondents are retained. Keeping all 91 is the better-supported
 choice --- discarding usable respondents to avoid modelling $4.4\%$ of cells
 trades away more than it protects --- but the result is conditional on it.
-
-\subsection{Methods tried and rejected}
-\label{sec:rejected}
-
-Alternatives were measured rather than argued about.
-
-\begin{center}\footnotesize
-\begin{tabular}{p{0.30\columnwidth}p{0.62\columnwidth}}
-\toprule
-Approach & Why it was rejected \\
-\midrule
-Recode NC as Neutral
-& Imposes a $0.92$-point downward shift at those cells; asserts a response that
-was explicitly withheld. \\
-\addlinespace
-Drop the 17 NC users
-& Discards a fifth of the sample to remove 37 cells, and is the only NC
-treatment that disturbs the recovered partition (AMI $0.337$). \\
-\addlinespace
-Mutual $k$NN (respondents)
-& Shatters the graph: 66 edges, 37 components, giant component $49.5\%$. Union
-$k$NN keeps one component. \\
-\addlinespace
-Raw uncentred similarity
-& $624$ of $1{,}770$ pairs survive $|r|>0.22$, $83\%$ of them positive --- a
-$35\%$-dense graph measuring agreeableness. \\
-\addlinespace
-Percentile threshold (p90)
-& Fixes the edge count by construction, so it cannot say whether any edge beats
-chance. On respondents it leaves 22 components and 20 isolates. \\
-\addlinespace
-Louvain for communities
-& Superseded by Leiden: its greedy phase can leave communities internally
-disconnected; Leiden improves $Q$ from $0.472$ to
-$0.491$ at the same $k=15$. \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\subsection{Limitations}
-
-Items with means above roughly $4.5$ measure social desirability more than
-preference strength, and with few reverse-worded items acquiescence and a
-genuine ceiling cannot be fully separated. The sample is $n=96$ from a single
-institution, so only large gaps between statements sit safely above sampling
-variation, and monotone dropout leaves later blocks on a slightly smaller base.
-No demographic fields exist, so nothing can be attributed to a subgroup.
-Finally, and most importantly for the network claims: correlation stability
-does not imply partition stability. Across NC treatments the correlation
-matrices agree at $r>0.94$ while their community assignments agree at AMI as
-low as $0.337$. Community-level conclusions need their own bootstrap stability
-analysis before being treated as findings.
 
 % ============================================================
 \section{Conclusion}
